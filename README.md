@@ -33,8 +33,11 @@ La foto dell'utente **non lascia il browser**. Non c'è upload, non c'è un serv
 
 ## Da fare
 
-- Immagine per l'anteprima social (`og:image`): il meta è tolto finché non esiste il file
 - Scelta dell'etichetta fra i quattro concept in `design/`
+- Condivisione nativa del telefono al posto del download
+
+`og.png` è l'anteprima social, 1200×630. È disegnata su canvas con lo stesso font e
+gli stessi colori della pagina: se cambia il claim va rifatta, non ritoccata a mano.
 
 ## Come va online
 
