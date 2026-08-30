@@ -366,22 +366,38 @@
   .themes[hidden] { display: none; }
   .themes button:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
 
-  .cta { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; justify-content: center; }
+  /* Una sola azione principale, larga. Le due della foto sono ingressi, non
+     azioni: stanno sopra, in secondo piano. Il testo e un ripiego, quindi e un
+     link. Tre pesi diversi per tre cose diverse. */
+  .cta-photo { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
   .btn {
     font: inherit; font-weight: 800; font-size: 14px; border-radius: 999px;
     padding: 13px 22px; cursor: pointer; border: 1px solid var(--line);
     background: var(--card); color: var(--ink);
   }
   .btn.primary { background: var(--green); border-color: var(--green); color: var(--on-brand); }
+  .btn.ghost {
+    background: transparent; border-color: var(--line); color: var(--ink);
+    font-size: 13px; padding: 12px 10px;
+  }
+  .btn.ghost:hover { background: var(--card); }
   .btn:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
   .btn[hidden] { display: none; }
-  .btn.wide { min-width: 240px; }
+  .btn.wide { display: block; width: 100%; margin-top: 10px; }
   /* Grigio quando non si puo premere: l'etichetta ha bisogno di una foto sotto. */
   .btn[disabled] {
     background: var(--chip); border-color: var(--line); color: var(--soft);
     cursor: not-allowed;
   }
-  .hint { font-size: 12px; color: var(--soft); margin-top: 10px; text-align: center; }
+  .hint { font-size: 13px; color: var(--soft); margin: 14px 0 0; text-align: center; }
+  .linkbtn {
+    display: block; margin: 14px auto 0; padding: 4px 2px;
+    font: inherit; font-size: 12px; font-weight: 700; color: var(--soft);
+    background: none; border: none; cursor: pointer;
+    text-decoration: underline; text-underline-offset: 3px;
+  }
+  .linkbtn:hover { color: var(--ink); }
+  .linkbtn:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
   .hint b { color: var(--ink); }
 
   .saved { display: none; margin-top: 18px; text-align: center; }
@@ -547,19 +563,18 @@
       <button data-bg="2" aria-pressed="false">Notte</button>
     </div>
 
-    <div class="cta">
+    <p class="hint" id="shareHint">La card è pronta. Se vuoi, mettila sopra una tua foto.</p>
+
+    <div class="cta-photo">
       <input type="file" id="file" accept="image/*" class="sr" tabindex="-1" aria-hidden="true">
       <input type="file" id="shot" accept="image/*" capture="environment" class="sr" tabindex="-1" aria-hidden="true">
-      <button class="btn" type="button" id="take">Scatta una foto</button>
-      <button class="btn" type="button" id="upload">Prendila dal rullino</button>
+      <button class="btn ghost" type="button" id="take">Scatta una foto</button>
+      <button class="btn ghost" type="button" id="upload">Prendila dal rullino</button>
     </div>
-    <div class="cta">
-      <button class="btn primary wide" type="button" id="save">Genera il PNG</button>
-    </div>
-    <button class="swap" type="button" id="shareClaim">
+    <button class="btn primary wide" type="button" id="save">Genera il PNG</button>
+    <button class="linkbtn" type="button" id="shareClaim">
       <span id="shareClaimLabel">Condividi solo la frase, come testo</span>
     </button>
-    <p class="hint" id="shareHint"><b>Trascina l'etichetta</b> per spostarla dove vuoi.</p>
 
     <div class="saved" id="saved">
       <img id="savedImg" alt="La tua storia pronta da salvare">
@@ -1027,6 +1042,9 @@
   /* Senza foto la storia e gia pronta: una card bianca piccola su fondo scuro,
      come quando si condivide il testo di una canzone. Il nome del sito sta
      fuori dalla card, piccolo e chiaro. */
+  /* A capo bilanciati: l'avvolgimento avido lascia spesso una parola orfana
+     sull'ultima riga, che in un titolo grande si vede subito. Se l'ultima riga
+     e molto corta, si tira giu una parola da quella sopra. */
   function wrapOn(text, font, maxW) {
     ctx.font = font;
     const words = text.split(' ');
@@ -1037,6 +1055,14 @@
       else line.push(w);
     }
     if (line.length) lines.push(line);
+
+    for (let giro = 0; giro < 2 && lines.length > 1; giro++) {
+      const ultima = lines[lines.length - 1];
+      const prima = lines[lines.length - 2];
+      if (ctx.measureText(ultima.join(' ')).width > maxW * 0.42 || prima.length < 2) break;
+      ultima.unshift(prima.pop());
+      if (ctx.measureText(ultima.join(' ')).width > maxW) { prima.push(ultima.shift()); break; }
+    }
     return lines;
   }
 
@@ -1128,26 +1154,27 @@
      passi e una freccia indica l'etichetta. Con la foto sparisce tutto. */
   function drawHintDati() {
     const r = badgeRect();
-    ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
-    const L = 100;
-    let y = r.y - 300;
-    ctx.fillStyle = 'rgba(255,255,255,0.92)'; ctx.font = F(800, 46);
-    ctx.fillText('1. Carica una foto', L, y);
-    ctx.fillText('2. Trascina l\'etichetta', L, y + 70);
-    ctx.strokeStyle = 'rgba(255,255,255,0.6)'; ctx.lineWidth = 5;
-    ctx.beginPath();
-    ctx.moveTo(L + 14, y + 118);
-    ctx.lineTo(L + 14, r.y - 34);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(L - 8, r.y - 58); ctx.lineTo(L + 14, r.y - 30); ctx.lineTo(L + 36, r.y - 58);
-    ctx.stroke();
+    ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+    let y = Math.max(SAFE + 120, r.y - 420);
+    ctx.fillStyle = '#FFFFFF'; ctx.font = F(900, 62);
+    ctx.fillText('1. Carica una foto', W / 2, y);
+    ctx.fillText('2. Sposta l\'etichetta', W / 2, y + 86);
+    /* la freccia scende fino al bordo dell'etichetta */
+    const ax = W / 2, top = y + 140, bottom = r.y - 40;
+    if (bottom > top + 40) {
+      ctx.strokeStyle = 'rgba(255,255,255,0.65)'; ctx.lineWidth = 5; ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.moveTo(ax, top); ctx.lineTo(ax, bottom); ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(ax - 22, bottom - 26); ctx.lineTo(ax, bottom); ctx.lineTo(ax + 22, bottom - 26);
+      ctx.stroke();
+    }
+    ctx.textAlign = 'left';
   }
 
   /* Una sola fonte di verita per dove sta l'etichetta: la usano il disegno e
      il trascinamento. Prima il limite del disegno e quello del dito erano due
      numeri diversi, quindi ai bordi il dito si muoveva e l'etichetta no. */
-  const BADGE_H = 298, BADGE_M = 60;
+  const BADGE_H = 280, BADGE_M = 60;
   const badgeMin = () => (SAFE + BADGE_H / 2) / H;
   const badgeMax = () => (H - SAFE - BADGE_H / 2) / H;
   const clampY = v => Math.min(Math.max(v, badgeMin()), badgeMax());
@@ -1174,53 +1201,51 @@
     roundRect(0, 0, w, h, 40); ctx.fill();
     ctx.restore();
 
-    const COV = 210;
+    const COV = 200;
     drawCover(PAD, PAD, COV, c);
 
-    /* blocco del numero, ancorato a destra */
+    /* Niente etichetta "IN LOOP" sopra il numero: il marchio si chiama inLOOP,
+       quindi era la stessa parola detta due volte. Resta il numero, grande, e
+       il marchio piccolo in fondo a destra sulla riga dei dati. */
+    const nStr = String(timesFor(c));
+    ctx.font = F(900, 96); const wNum = ctx.measureText(nStr).width;
+    ctx.font = F(800, 36); const wVolte = ctx.measureText(' volte').width;
+    const bigW = wNum + wVolte + 46;
+
     ctx.textBaseline = 'alphabetic';
     ctx.textAlign = 'right';
-    ctx.fillStyle = softC; ctx.font = F(800, 26);
-    ctx.letterSpacing = '3px';
-    ctx.fillText('IN LOOP', w - PAD, PAD + 40);
-    ctx.letterSpacing = '0px';
-    ctx.font = F(800, 46); ctx.fillStyle = inkC;
+    ctx.font = F(800, 36); ctx.fillStyle = inkC;
     const vw = ctx.measureText(' volte').width;
-    ctx.fillText(' volte', w - PAD, PAD + 140);
-    ctx.fillStyle = '#0E7A38'; ctx.font = F(900, 100);
-    ctx.fillText(String(timesFor(c)), w - PAD - vw, PAD + 140);
-    ctx.fillStyle = softC; ctx.font = F(600, 26);
-    ctx.fillText('inloop.zetakiwi.com', w - PAD, PAD + 218);
+    ctx.fillText(' volte', w - PAD, PAD + 104);
+    ctx.fillStyle = '#0E7A38'; ctx.font = F(900, 96);
+    ctx.fillText(nStr, w - PAD - vw, PAD + 104);
+    ctx.fillStyle = softC; ctx.font = F(700, 28);
+    ctx.fillText('inLOOP', w - PAD, PAD + 180);
     ctx.textAlign = 'left';
 
-    /* Lo spazio del blocco numero si MISURA, non si indovina: riservarne 330
-       fissi troncava "Blinding Lights" senza motivo. */
-    const nStr = String(timesFor(c));
-    ctx.font = F(800, 26); ctx.letterSpacing = '3px';
-    const wLabel = ctx.measureText('IN LOOP').width;
-    ctx.letterSpacing = '0px';
-    ctx.font = F(900, 100); const wNum = ctx.measureText(nStr).width;
-    ctx.font = F(800, 46); const wVolte = ctx.measureText(' volte').width;
-    ctx.font = F(600, 26); const wSite = ctx.measureText('inloop.zetakiwi.com').width;
-    const bigW = Math.max(wLabel, wNum + wVolte, wSite) + 40;
-
-    /* colonna centrale: brano, artista, corsa */
-    const tx = PAD + COV + 30, tw = w - tx - PAD - bigW;
-    ctx.fillStyle = inkC; ctx.font = F(800, 46);
-    ctx.fillText(fitText(c.t, F(800, 46), tw), tx, PAD + 76);
-    ctx.fillStyle = softC; ctx.font = F(600, 36);
-    ctx.fillText(fitText(c.w, F(600, 36), tw), tx, PAD + 128);
+    /* Il titolo scende di corpo prima di rassegnarsi a farsi troncare. */
+    const tx = PAD + COV + 28, tw = w - tx - PAD - bigW;
+    let tSize = 46;
+    ctx.font = F(800, tSize);
+    while (tSize > 32 && ctx.measureText(c.t).width > tw) {
+      tSize -= 2;
+      ctx.font = F(800, tSize);
+    }
+    ctx.fillStyle = inkC;
+    ctx.fillText(fitText(c.t, F(800, tSize), tw), tx, PAD + 64);
+    ctx.fillStyle = softC; ctx.font = F(600, 32);
+    ctx.fillText(fitText(c.w, F(600, 32), tw), tx, PAD + 112);
 
     /* Distanza, tempo e ritmo. Quel /km dice "corsa" senza scrivere la parola. */
     const parts = [kmText(), timeText(), paceText()];
     let px = tx;
     parts.forEach((p, i) => {
-      ctx.font = F(800, 36); ctx.fillStyle = '#FC4C02';
-      ctx.fillText(p, px, PAD + 196);
+      ctx.font = F(800, 32); ctx.fillStyle = '#FC4C02';
+      ctx.fillText(p, px, PAD + 180);
       px += ctx.measureText(p).width;
       if (i < parts.length - 1) {
         ctx.fillStyle = '#C9D2C6';
-        ctx.fillText(' \u00B7 ', px, PAD + 196);
+        ctx.fillText(' \u00B7 ', px, PAD + 180);
         px += ctx.measureText(' \u00B7 ').width;
       }
     });
