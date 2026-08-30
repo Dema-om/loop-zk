@@ -329,6 +329,23 @@
   }
   .share > p { color: var(--soft); font-size: 14px; margin: 0 0 10px; }
 
+  /* Due versioni della stessa storia: la frase e l'etichetta coi dati.
+     Non e una modalita del sito, e la scelta di cosa mandare in storia. */
+  .view-toggle {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
+    background: var(--chip); border: 1px solid var(--line);
+    border-radius: 16px; padding: 5px; margin: 18px 0 0;
+  }
+  .view-toggle button {
+    font: inherit; font-weight: 800; font-size: 13px; color: var(--ink);
+    background: none; border: none; border-radius: 12px; padding: 10px 4px;
+    cursor: pointer; line-height: 1.15;
+  }
+  .view-toggle button small { display: block; font-size: 11px; font-weight: 600; color: var(--soft); }
+  .view-toggle button[aria-pressed="true"] { background: var(--green); color: var(--on-brand); }
+  .view-toggle button[aria-pressed="true"] small { color: var(--on-brand); opacity: 0.72; }
+  .view-toggle button:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
+
   .stage { margin: 22px auto 0; width: min(300px, 82vw); }
   .stage canvas {
     display: block; width: 100%; height: auto; border-radius: 26px;
@@ -375,6 +392,10 @@
   }
   .about h3 { font-size: 15px; font-weight: 900; margin: 0 0 8px; letter-spacing: -0.01em; }
   .about p { font-size: 14px; color: var(--soft); margin: 0 0 10px; }
+  .details { margin: 0; padding-left: 20px; font-size: 14px; color: var(--soft); }
+  .details li { margin-bottom: 10px; }
+  .details b { color: var(--ink); font-weight: 800; }
+  .about + .about { margin-top: 16px; }
   .about a.me {
     display: inline-flex; align-items: center; gap: 8px;
     font-size: 14px; font-weight: 800; color: var(--ink); text-decoration: none;
@@ -505,6 +526,11 @@
     <h2>Condividi sulle storie</h2>
     <p>Questa è la card che finirà in storia. Va bene così com'è, oppure mettila sopra una tua foto: scattala adesso o prendila dal rullino. Esce un PNG a 1080×1920 e l'immagine non lascia mai il telefono.</p>
 
+    <div class="view-toggle" role="group" aria-label="Versione da condividere">
+      <button id="vFrase" aria-pressed="true">La frase<small>senza dati</small></button>
+      <button id="vDati" aria-pressed="false">I dati<small>l'etichetta sulla corsa</small></button>
+    </div>
+
     <div class="stage">
       <canvas id="cv" width="1080" height="1920" tabindex="0" role="img"
               aria-label="Anteprima della storia. Trascina per spostare l'etichetta."></canvas>
@@ -537,9 +563,56 @@
     <h3>Cos'è questo</h3>
     <p>Volte è un concept: immagina che Spotify e Strava facciano una cosa insieme, e la prova su un gesto solo,
     contare la corsa in canzoni. Non è affiliato a nessuna delle due: i loro colori stanno qui perché sono il materiale dell'esercizio.</p>
+    <p>Il punto di partenza è vero. Nel 2023 le due app <b>si erano davvero parlate</b>: Strava aveva messo il
+    lettore di Spotify dentro la schermata di registrazione, e poi ha chiuso l'integrazione. Questo sito
+    prende quel filo e prova un'altra direzione: non i comandi del lettore dentro l'app di corsa,
+    ma la musica come <b>unità di misura</b> della fatica.</p>
     <p>Niente account e niente permessi, di proposito. Il loop è un tap dentro la tua app di musica,
     quindi questo sito non ha bisogno di collegarsi a niente per servire a qualcosa.</p>
-    <p>L'ho fatto io, Matteo De Marco.</p>
+  </section>
+
+  <section class="about">
+    <h3>Le cose piccole</h3>
+    <p>Un concept si giudica dai dettagli che nessuno nota finché non mancano. Questi li ho messi apposta,
+    e quasi tutti nascono da una cosa vista rotta da qualche altra parte.</p>
+    <ul class="details">
+      <li><b>Il testo si legge davvero.</b> Bianco su verde Spotify fa 2,59 a 1 e su arancio Strava 3,31,
+      sotto il minimo di leggibilità. Quindi i colori di marca fanno da superficie con testo scuro sopra,
+      come fa Spotify sui suoi bottoni, e diventano testo solo dove il fondo è scuro.</li>
+      <li><b>L'etichetta non finisce sotto Instagram.</b> In alto la storia ha la barra di avanzamento e in basso
+      il campo «rispondi»: c'è un limite invalicabile a 260 pixel dai bordi, anche trascinando.</li>
+      <li><b>La tua foto resta intera.</b> Uno scatto verticale è più stretto del formato storia: riempire il frame
+      taglierebbe via mezza inquadratura, quindi sta dentro e le bande si riempiono con la stessa foto sfocata.</li>
+      <li><b>Si afferra l'etichetta, non la foto.</b> Prima un tocco qualsiasi la teletrasportava sotto il dito,
+      e ai bordi c'erano zone morte perché il limite del dito non coincideva con quello del disegno.</li>
+      <li><b>La tastiera non si apre da sola.</b> Su telefono il focus automatico copre proprio i campi appena
+      comparsi. E toccando un campo il valore si seleziona, così ci scrivi sopra invece di cancellare cifra per cifra.</li>
+      <li><b>Distanza, tempo e ritmo sono la stessa cosa detta in tre modi.</b> Ne compili due e il terzo si
+      calcola da solo, evidenziato, in qualunque ordine tu ricopi dalla tua app.</li>
+      <li><b>La rotella solo dove serve.</b> Sul tempo, che ha due parti e un intervallo noto. Per la distanza
+      si scrive e basta, è più veloce.</li>
+      <li><b>Niente cursore che balla.</b> Cifre a larghezza fissa ovunque ci siano numeri che cambiano.</li>
+      <li><b>I decimali solo quando sono veri.</b> Cinque chilometri scelti da un chip sono tondi; 5,04 km
+      ricopiati dall'app sono misurati. Scrivere i decimali su una stima fingerebbe una precisione che non c'è.</li>
+      <li><b>Il claim si ferma appena lo tocchi.</b> Le cose che si muovono da sole vanno sempre potute fermare,
+      e nel frattempo non devono cambiare i numeri sotto gli occhi di chi legge.</li>
+      <li><b>Niente slider.</b> Per valori discreti col pollice sono imprecisi e non mostrano dove sei.</li>
+      <li><b>La foto non lascia il telefono.</b> Tutto avviene nel browser: nessun caricamento, nessun server,
+      niente da promettere sulla privacy perché non c'è niente da custodire.</li>
+    </ul>
+  </section>
+
+  <section class="about">
+    <h3>Chi l'ha fatto</h3>
+    <p>Matteo De Marco. Vengo dal design e dall'interfaccia, e da lì mi porto dietro l'abitudine a
+    guardare le cose dal lato di chi le usa: quasi tutte le scelte qui sopra nascono da un'app che mi ha
+    fatto arrabbiare, non da una linea guida.</p>
+    <p>Mi occupo di AI e di come si costruiscono prodotti con l'AI, quello che oggi si chiama vibe coding
+    o AI building. Mi interessano il marketing e i dati, e mi interessano la musica e lo sport: questo
+    progetto è il punto in cui si incontrano.</p>
+    <p>Sto costruendo una serie di progetti come questo, che servono a due cose insieme: risolvere qualcosa
+    di piccolo per bene, e raccontare come ragiono. Ne pubblicherò altri.
+    <b>Lavoro nell'AI e sono aperto a proposte.</b></p>
     <a class="me" href="https://www.linkedin.com/in/matteodemarcoo" target="_blank" rel="noopener">
       Matteo De Marco su LinkedIn
     </a>
@@ -582,6 +655,7 @@
   let theme = 'light';
   let badgeY = 0.78;
   let photo = null;
+  let versione = 'frase';   /* 'frase' oppure 'dati' */
 
   /* Due modalita. In STIMA la distanza e tonda perche l'utente l'ha scelta da
      un chip, e il tempo si ricava dal ritmo: sono numeri di un programma.
@@ -900,11 +974,14 @@
     return lines;
   }
 
-  function drawStoryCard() {
-    const c = song(), n = timesFor(c);
+  function drawDark() {
     ctx.fillStyle = '#14171B'; ctx.fillRect(0, 0, W, H);
     ctx.strokeStyle = 'rgba(255,255,255,0.05)'; ctx.lineWidth = 4;
     [700, 520].forEach(r => { ctx.beginPath(); ctx.arc(W / 2, H / 2, r, 0, Math.PI * 2); ctx.stroke(); });
+  }
+
+  function drawPhraseCard() {
+    const c = song(), n = timesFor(c);
 
     const CW = 880, PAD = 64, inner = CW - PAD * 2, COV = 92;
     const bigFont = F(900, 68);
@@ -947,9 +1024,11 @@
     });
 
     /* il sito, fuori dalla card */
-    ctx.fillStyle = 'rgba(244,244,240,0.5)'; ctx.font = F(600, 34);
+    ctx.fillStyle = 'rgba(255,255,255,0.62)'; ctx.font = F(600, 34);
     ctx.textAlign = 'center';
+    ctx.shadowColor = 'rgba(0,0,0,0.45)'; ctx.shadowBlur = 14;
     ctx.fillText('volte.run', W / 2, cy + cardH + 80);
+    ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0;
     ctx.textAlign = 'left';
   }
 
@@ -1044,11 +1123,26 @@
     ctx.restore();
   }
 
+  /* Il fondo e la foto se c'e, altrimenti il buio con i cerchi. Sopra ci va
+     la versione scelta: la frase in una card bianca, o l'etichetta coi dati. */
   function render() {
     ctx.clearRect(0, 0, W, H);
-    if (photo) { drawPhoto(); drawBadge(); }
-    else drawStoryCard();
+    if (photo) drawPhoto(); else drawDark();
+    if (versione === 'frase') drawPhraseCard(); else drawBadge();
   }
+
+  function setVersione(v) {
+    versione = v;
+    $('vFrase').setAttribute('aria-pressed', v === 'frase' ? 'true' : 'false');
+    $('vDati').setAttribute('aria-pressed', v === 'dati' ? 'true' : 'false');
+    $('themes').hidden = !(v === 'dati');
+    $('shareHint').innerHTML = v === 'dati'
+      ? '<b>Trascina l\'etichetta</b> per spostarla dove vuoi.'
+      : 'La frase sta al centro. Aggiungi una foto e le finisce sopra.';
+    render();
+  }
+  $('vFrase').addEventListener('click', () => setVersione('frase'));
+  $('vDati').addEventListener('click', () => setVersione('dati'));
 
   /* Condividere il claim: e una frase e un link, non un'immagine. L'immagine
      e lo sticker sulla foto, piu sotto. Dove il foglio nativo non c'e, il
@@ -1081,7 +1175,7 @@
   const yInCanvas = e => (e.clientY - cv.getBoundingClientRect().top) * (H / cv.getBoundingClientRect().height);
 
   cv.addEventListener('pointerdown', e => {
-    if (!photo) return;                       /* senza foto non si sposta niente */
+    if (versione !== 'dati') return;           /* si trascina solo l'etichetta */
     const y = yInCanvas(e), r = badgeRect();
     if (y < r.y - 24 || y > r.y + r.h + 24) return;   /* si afferra l'etichetta, non la foto */
     dragging = true;
@@ -1098,7 +1192,7 @@
   cv.addEventListener('pointerup', endDrag);
   cv.addEventListener('pointercancel', endDrag);
   cv.addEventListener('keydown', e => {
-    if (!photo) return;
+    if (versione !== 'dati') return;
     if (e.key === 'ArrowUp') { badgeY = clampY(badgeY - 0.03); render(); e.preventDefault(); }
     if (e.key === 'ArrowDown') { badgeY = clampY(badgeY + 0.03); render(); e.preventDefault(); }
   });
@@ -1120,8 +1214,6 @@
     img.onload = () => {
       photo = img;
       document.querySelector('.stage').classList.add('movable');
-      $('themes').hidden = false;
-      $('shareHint').innerHTML = '<b>Trascina l\'etichetta</b> per spostarla dove vuoi.';
       render();
     };
     img.src = URL.createObjectURL(f);
