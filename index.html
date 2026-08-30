@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>inLOOP · quanto dura la tua corsa in canzoni</title>
 <meta name="description" content="Cinque chilometri sembrano tanti, ma sono sedici volte la tua canzone preferita. inLOOP traduce la distanza in riascolti e ti prepara la storia da condividere.">
 <meta name="theme-color" content="#FFFFFF">
@@ -471,6 +471,33 @@
   .details li { margin-bottom: 10px; }
   .details b { color: var(--ink); font-weight: 800; }
   .about + .about { margin-top: 16px; }
+
+  /* Le due sezioni lunghe stavano aperte e da sole valevano piu di meta sito:
+     ora sono schede che si aprono, chiuse di default. Il titolo resta visibile,
+     quindi si sa cosa c'e dentro senza doverlo scorrere. */
+  details.fold { padding: 0; }
+  details.fold summary {
+    display: flex; align-items: center; gap: 10px;
+    padding: 18px 20px; cursor: pointer; list-style: none;
+    font-size: 15px; font-weight: 900; letter-spacing: -0.01em;
+  }
+  details.fold summary::-webkit-details-marker { display: none; }
+  details.fold summary small {
+    font-size: 13px; font-weight: 600; color: var(--soft); letter-spacing: 0;
+  }
+  /* La freccia dice da sola se e aperta o chiusa, e gira quando cambia. */
+  details.fold summary::after {
+    content: ""; margin-left: auto; flex: none;
+    width: 9px; height: 9px; border-right: 2.4px solid var(--soft);
+    border-bottom: 2.4px solid var(--soft); border-radius: 1px;
+    transform: rotate(45deg) translate(-2px, -2px);
+    transition: transform 0.18s;
+  }
+  details.fold[open] summary::after { transform: rotate(-135deg) translate(-2px, -2px); }
+  details.fold summary:focus-visible { outline: 2px solid var(--green); outline-offset: -2px; border-radius: 20px; }
+  .fold-body { padding: 0 20px 20px; }
+  @media (max-width: 380px) { details.fold summary small { display: none; } }
+  @media (prefers-reduced-motion: reduce) { details.fold summary::after { transition: none; } }
   .about a.me {
     display: inline-flex; align-items: center; gap: 8px;
     font-size: 14px; font-weight: 800; color: var(--ink); text-decoration: none;
@@ -482,7 +509,7 @@
 
   footer {
     border-top: 1px solid var(--line);
-    padding: 24px 0 calc(44px + env(safe-area-inset-bottom));
+    padding: 24px 0 44px;
     color: var(--soft); font-size: 12px;
   }
   .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
@@ -653,11 +680,12 @@
     i loro colori stanno qui perché sono il materiale dell'esercizio.</p>
   </section>
 
-  <section class="about">
-    <h3>Chi l'ha fatto</h3>
-    <p>Matteo De Marco. Vengo dal design e dall'interfaccia, e da lì mi porto dietro l'abitudine a
-    guardare le cose dal lato di chi le usa: quasi tutte le scelte qui sopra nascono da un'app che mi ha
-    fatto arrabbiare, non da una linea guida.</p>
+  <details class="about fold">
+    <summary><span>Chi l'ha fatto</span><small>Matteo De Marco</small></summary>
+    <div class="fold-body">
+    <p>Vengo dal design e dall'interfaccia, e da lì mi porto dietro l'abitudine a guardare le cose dal
+    lato di chi le usa: quasi tutte le scelte qui sopra nascono da un'app che mi ha fatto arrabbiare,
+    non da una linea guida.</p>
     <p>Mi occupo di AI e di come si costruiscono prodotti con l'AI, quello che oggi si chiama vibe coding
     o AI building. Mi interessano il marketing e i dati, e mi interessano la musica e lo sport: questo
     progetto è il punto in cui si incontrano.</p>
@@ -674,14 +702,12 @@
         <path d="M4 10 10 4M10 4H5.2M10 4v4.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </a>
-  </section>
+    </div>
+  </details>
 
-  <section class="about">
-    <h3>Accortezze di design e sviluppo</h3>
-    <p>Un concept si giudica dai dettagli che nessuno nota finché non mancano. Quasi tutti questi
-    nascono da una cosa vista rotta da qualche altra parte, o da un errore che ho fatto e poi corretto.</p>
-
-    <p class="det-head">Le scelte grosse</p>
+  <details class="about fold">
+    <summary><span>Come è fatto</span><small>undici cose che si notano solo se mancano</small></summary>
+    <div class="fold-body">
     <ul class="details">
       <li><b>Prima della corsa, non dopo.</b> Chiedere lo screenshot di Strava significava chiedere dati
       già scritti dentro l'immagine, e produceva etichette che si contraddicevano da sole: il ritmo scelto
@@ -690,65 +716,29 @@
       Una canzone in loop invece è un tap dentro qualsiasi app: il sito dà il numero e lo esegui da solo.</li>
       <li><b>Nessuna integrazione con Spotify, e non per pigrizia.</b> Da marzo 2025 per uscire dalla
       modalità sviluppo dell'API servono 250.000 utenti attivi al mese, e la modalità sviluppo è scesa a
-      cinque utenti. La ricerca userà l'archivio di Apple, gratuito e senza chiavi.</li>
-      <li><b>Niente account, niente server.</b> Tutto avviene nel browser: la foto non viene caricata da
-      nessuna parte, quindi non c'è niente da promettere sulla privacy perché non c'è niente da custodire.</li>
-    </ul>
-
-    <p class="det-head">Quello che si legge</p>
-    <ul class="details">
+      cinque utenti. La ricerca usa l'archivio di Apple, gratuito e senza chiavi.</li>
       <li><b>Il testo si legge davvero.</b> Bianco su verde Spotify fa 2,59 a 1 e su arancio Strava 3,31,
       sotto il minimo. Quindi i colori di marca fanno da superficie con testo scuro sopra, come fa Spotify
       sui suoi bottoni, e diventano testo solo dove il fondo è scuro.</li>
       <li><b>L'arancione è quello giusto.</b> Usavo #FC5200 preso da una ricerca, ma quello di Strava è
-      #FC4C02. Un dettaglio che in un concept sui marchi altrui non puoi sbagliare.</li>
-      <li><b>Il passo non si scrive più «7:30 /km».</b> Non si capisce. Ora la domanda è «quanto ci metti a
-      fare un chilometro» e le risposte sono Piano, Normale e Forte con i minuti sotto.</li>
-      <li><b>La parola «corsa» non serve.</b> L'unità <b>/km</b> la dichiara da sola: scriverla sarebbe
-      dirlo due volte.</li>
-      <li><b>Cifre a larghezza fissa</b> ovunque ci siano numeri che cambiano, così non ballano.</li>
-      <li><b>I decimali solo quando sono veri.</b> Cinque chilometri scelti da un chip sono tondi; 5,04
-      ricopiati dall'app sono misurati. Metterli su una stima fingerebbe una precisione che non c'è.</li>
-    </ul>
-
-    <p class="det-head">Quello che si tocca</p>
-    <ul class="details">
-      <li><b>La tastiera non si apre da sola.</b> Su telefono il focus automatico copre proprio i campi
-      appena comparsi. E toccando un campo il valore si seleziona, così ci scrivi sopra.</li>
-      <li><b>Niente slider.</b> Per valori discreti col pollice sono imprecisi e non mostrano dove sei.
-      La rotella invece c'è, ma solo sul tempo, che ha due parti e un intervallo noto.</li>
-      <li><b>Distanza, tempo e ritmo sono la stessa cosa detta in tre modi.</b> Ne compili due e il terzo
-      si calcola da solo, in qualunque ordine tu ricopi dalla tua app.</li>
-      <li><b>Due schede, non un comando nascosto.</b> Prima un link in fondo ribaltava tutta la card senza
-      dire cosa era cambiato né come tornare indietro.</li>
-      <li><b>Si afferra l'etichetta, non la foto.</b> Prima un tocco qualsiasi la teletrasportava sotto il
-      dito, e ai bordi c'erano zone morte perché il limite del dito non coincideva con quello del disegno.</li>
+      #FC4C02. In un concept sui marchi altrui non puoi sbagliarlo.</li>
+      <li><b>Il sito non sapeva di essere su un telefono.</b> Mancava la riga che lo dichiara, e Safari
+      disegnava la pagina larga 980 pixel per poi rimpicciolirla: usciva una colonnina stretta in mezzo a
+      due margini enormi. Si vede solo da un telefono vero, mai nell'anteprima del computer.</li>
+      <li><b>Toccare la ricerca non ingrandisce la pagina.</b> iPhone lo fa da solo con ogni campo sotto i
+      16 pixel di testo, e la vista salta. Era l'unico campo del sito sotto quella soglia.</li>
       <li><b>La pagina non salta.</b> Ricostruivo la lista delle canzoni a ogni cambio, e sostituire nodi
       sopra la vista fa perdere al browser l'ancoraggio dello scroll.</li>
-      <li><b>Il claim si ferma appena lo tocchi.</b> Le cose che si muovono da sole vanno sempre potute
-      fermare, e intanto non devono cambiare i numeri sotto gli occhi di chi legge.</li>
-    </ul>
-
-    <p class="det-head">Quello che esce</p>
-    <ul class="details">
+      <li><b>Si afferra l'etichetta, non la foto.</b> Prima un tocco qualsiasi la teletrasportava sotto il
+      dito, e ai bordi c'erano zone morte perché il limite del dito non coincideva con quello del disegno.</li>
       <li><b>L'etichetta non finisce sotto Instagram.</b> In alto la storia ha la barra di avanzamento e in
       basso il campo «rispondi»: c'è un limite invalicabile a 260 pixel dai bordi, anche trascinando.</li>
-      <li><b>La tua foto resta intera.</b> Uno scatto verticale è più stretto del formato storia: riempire
-      il frame taglierebbe via mezza inquadratura, quindi sta dentro e le bande si riempiono con la stessa
-      foto sfocata.</li>
-      <li><b>Il titolo non si tronca senza motivo.</b> Riservavo uno spazio fisso al numero e mangiava i
-      titoli lunghi: ora quella larghezza si misura sul contenuto vero.</li>
-      <li><b>La card si adatta al titolo.</b> Il corpo del testo scende finché la frase non sta in tre
-      righe, così un brano dal nome lunghissimo non rompe la composizione.</li>
-      <li><b>Un solo motore di disegno.</b> L'anteprima e il file finale escono dallo stesso codice, quindi
-      quello che vedi è esattamente il PNG che salvi.</li>
       <li><b>Le copertine si caricano in un modo preciso.</b> Un'immagine presa da un altro sito
-      «contamina» il canvas e blocca il salvataggio del PNG: vanno chieste dichiarando l'origine.
-      Provato: senza quella riga il file non esce, e l'errore arriva solo al momento di salvare.</li>
-      <li><b>La ricerca aspetta un attimo.</b> Chi scrive «bohemian» non deve produrre otto richieste,
-      una per lettera, e se una risposta lenta arriva dopo una più recente viene scartata.</li>
+      «contamina» il disegno e blocca il salvataggio del PNG: va chiesta dichiarando l'origine. Provato:
+      senza quella riga il file non esce, e l'errore arriva solo al momento di salvare.</li>
     </ul>
-  </section>
+    </div>
+  </details>
 
   <footer>
     Fatto per chi corre con la stessa canzone nelle orecchie. Niente account, niente tracciamento.
