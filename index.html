@@ -14,14 +14,14 @@
     --chip: #EEF2EC;
     --green: #1DB954;
     --green-soft: #DDF5E6;
-    --orange: #FC5200;
+    --orange: #FC4C02;
     /* I due colori di marca sono bellissimi come SUPERFICI e illeggibili come
        TESTO: bianco su verde fa 2,59:1 e su arancio 3,31:1, sotto il minimo.
        Quindi: fondo di marca con testo scuro (7,24:1 sul verde, come fa Spotify
        sui suoi bottoni), e per il testo colorato su chiaro due varianti scure. */
     --on-brand: #121212;
     --green-text: #0E7A38;
-    --orange-text: #C43F00;
+    --orange-text: #C23A00;
   }
 
   * { box-sizing: border-box; }
@@ -140,6 +140,51 @@
   .seg button[aria-pressed="true"] small { color: var(--on-brand); opacity: 0.72; }
   .seg button:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
   .explain { font-size: 12px; color: var(--soft); margin: 10px 0 0; }
+
+  /* I dati esatti stanno in secondo piano di proposito: chi pianifica non li
+     vede, chi ha già corso li trova. Un bottone di testo, non un campo aperto. */
+  .exact-toggle {
+    font: inherit; font-size: 13px; font-weight: 700;
+    color: var(--orange-text); background: none; border: none;
+    padding: 14px 0 0; margin: 0; cursor: pointer;
+    text-decoration: underline; text-underline-offset: 3px;
+  }
+  .exact-toggle:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
+  .exact-toggle[aria-expanded="true"] { display: none; }
+  .exact {
+    margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line);
+  }
+  .exact[hidden] { display: none; }
+  .exact-why { font-size: 12px; color: var(--soft); margin: 0 0 12px; }
+  .exact-fields { display: flex; gap: 12px; flex-wrap: wrap; }
+  .exact-fields label {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13px; font-weight: 700; color: var(--soft);
+  }
+  .exact-fields input {
+    width: 104px; font: inherit; font-weight: 800; font-size: 18px; text-align: center;
+    color: var(--ink); background: var(--chip); border: 1px solid var(--line);
+    border-radius: 12px; padding: 9px 8px; font-variant-numeric: tabular-nums;
+  }
+  .exact-fields input:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
+  .exact-fields small { font-weight: 600; font-size: 12px; }
+  .exact-out {
+    margin: 12px 0 0; font-size: 14px; font-weight: 800;
+    color: var(--orange-text); font-variant-numeric: tabular-nums;
+  }
+  .exact-off {
+    font: inherit; font-size: 12px; font-weight: 700; color: var(--soft);
+    background: none; border: none; padding: 10px 0 0; cursor: pointer;
+    text-decoration: underline; text-underline-offset: 3px;
+  }
+  .exact-off:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
+  /* Con i dati esatti accesi la stima e scavalcata: si spegne, ma resta
+     toccabile, e toccarla riporta alla stima. */
+  .card-ui.overridden .chips,
+  .card-ui.overridden .seg,
+  .card-ui.overridden .sub-label,
+  .card-ui.overridden .explain,
+  .card-ui.overridden .free { opacity: 0.4; }
 
   /* ---------- canzoni, con il numero già addosso ---------- */
   .search {
@@ -326,6 +371,27 @@
         <button data-pace="285" aria-pressed="false">Forte<small>4 min 45</small></button>
       </div>
       <p class="explain">Se non lo sai, lascia Normale: è il ritmo di chi corre chiacchierando.</p>
+
+      <button class="exact-toggle" type="button" id="exactOn" aria-expanded="false" aria-controls="exactBox">
+        Hai già corso? Metti i dati esatti
+      </button>
+      <div class="exact" id="exactBox" hidden>
+        <p class="exact-why">Copia distanza e tempo dalla tua app: il ritmo lo calcoliamo noi, e sullo sticker finiscono i numeri veri invece di quelli tondi.</p>
+        <div class="exact-fields">
+          <label>
+            <span>Distanza</span>
+            <input id="exKm" type="text" inputmode="decimal" value="5,04" aria-label="Distanza in chilometri">
+            <small>km</small>
+          </label>
+          <label>
+            <span>Tempo</span>
+            <input id="exTime" type="text" inputmode="numeric" value="30:12" aria-label="Tempo, minuti e secondi">
+            <small>min:sec</small>
+          </label>
+        </div>
+        <p class="exact-out" id="exactOut">Ritmo: 5:59 al km</p>
+        <button class="exact-off" type="button" id="exactOff">Torna alla stima</button>
+      </div>
     </div>
   </section>
 
@@ -412,6 +478,8 @@
   const kmLabel = n => (Number.isInteger(n) ? n : fmt1(n)) + ' km';
   const durLabel = s => Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
   const minLabel = s => Math.round(s / 60) + ' min';
+  const fmt2 = n => n.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const clock = s => Math.floor(s / 60) + ':' + String(Math.round(s % 60)).padStart(2, '0');
 
   /* Catalogo del mockup. Sportswear (1:59) e As It Was (2:47) sono verificate;
      le altre sono durate di uso comune, da sostituire con la ricerca iTunes nel sito vero. */
@@ -437,9 +505,22 @@
   let badgeY = 0.78;
   let photo = null;
 
-  const target = () => km * paceSec;                    /* secondi di corsa */
+  /* Due modalita. In STIMA la distanza e tonda perche l'utente l'ha scelta da
+     un chip, e il tempo si ricava dal ritmo: sono numeri di un programma.
+     In ESATTA l'utente ricopia distanza e tempo dalla sua app, quindi i numeri
+     sono misurati e possono avere i decimali senza fingere precisione. */
+  let exact = null;   /* { km: 5.04, sec: 1812 } oppure null */
+
+  const runKm = () => exact ? exact.km : km;
+  const target = () => exact ? exact.sec : km * paceSec;   /* secondi di corsa */
+  const runPace = () => target() / runKm();                /* secondi al km */
   const song = () => picked || heroPicks[heroIdx];
   const timesFor = c => Math.ceil(target() / c.s);
+
+  /* Etichette: tonde quando e una stima, precise quando e una misura. */
+  const kmText = () => exact ? fmt2(exact.km) + ' km' : kmLabel(km);
+  const timeText = () => exact ? clock(exact.sec) : minLabel(target());
+  const paceText = () => durLabel(Math.round(runPace())) + '/km';
 
   /* ----- claim: gira finché non tocchi niente ----- */
   let timer = null;
@@ -463,7 +544,7 @@
 
   function renderHero() {
     const c = song();
-    $('cLine1').innerHTML = '<span class="d">' + kmLabel(km) + '</span> sembrano tanti.';
+    $('cLine1').innerHTML = '<span class="d">' + kmText() + '</span> sembrano tanti.';
     $('cLine2').innerHTML = 'Sono <span class="n">' + timesFor(c) + '</span> volte <span class="t">' + c.t + '</span>.';
     $('cWho').textContent = c.w + ' · ' + durLabel(c.s);
     $('cHint').textContent = picked
@@ -486,6 +567,7 @@
       $('freeBox').classList.toggle('open', free);
       km = free ? readFreeKm() : parseFloat(b.dataset.km);
       if (free) $('freeKm').focus();
+      leaveExact();          /* toccare la stima riporta alla stima */
       stopRotation(); update();
     });
   });
@@ -496,6 +578,7 @@
       document.querySelectorAll('#levels button').forEach(x => x.setAttribute('aria-pressed', 'false'));
       b.setAttribute('aria-pressed', 'true');
       paceSec = parseInt(b.dataset.pace, 10);
+      leaveExact();          /* toccare la stima riporta alla stima */
       stopRotation(); update();
     });
   });
@@ -523,7 +606,7 @@
         '<span class="cover" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor"><path d="M4 2.5v9l7-4.5z"/></svg></span>' +
         '<span class="name"><span>' + c.t + '</span><span class="artist">' + c.w + '</span></span>' +
         '<span class="times">×' + timesFor(c) + '<small>' + durLabel(c.s) + '</small></span>';
-      b.setAttribute('aria-label', c.t + ', ' + c.w + ', ' + timesFor(c) + ' volte per ' + kmLabel(km));
+      b.setAttribute('aria-label', c.t + ', ' + c.w + ', ' + timesFor(c) + ' volte per ' + kmText());
       b.addEventListener('click', () => {
         picked = c;
         stopRotation();
@@ -533,6 +616,57 @@
     });
   }
   $('q').addEventListener('input', renderResults);
+
+  /* ----- dati esatti: opzionale, e vince sulla stima quando e acceso ----- */
+  function parseTime(v) {
+    /* accetta "30:12", "30.12", "1:02:33" e anche i minuti secchi "30" */
+    const parts = String(v).trim().replace(/[.,]/g, ':').split(':').map(x => parseInt(x, 10));
+    if (parts.some(isNaN) || !parts.length) return null;
+    if (parts.length === 1) return parts[0] * 60;
+    if (parts.length === 2) return parts[0] * 60 + parts[1];
+    return parts[0] * 3600 + parts[1] * 60 + parts[2];
+  }
+  function readExact() {
+    const k = parseFloat(($('exKm').value || '').replace(',', '.'));
+    const t = parseTime($('exTime').value);
+    if (!isFinite(k) || k <= 0 || !t || t <= 0) return null;
+    return { km: Math.min(k, 300), sec: Math.min(t, 86400) };
+  }
+  function markOverride(on) {
+    const card = $('exactBox').closest('.card-ui');
+    if (card) card.classList.toggle('overridden', on);
+  }
+  function leaveExact() {
+    exact = null;
+    markOverride(false);
+    $('exactOn').setAttribute('aria-expanded', 'false');
+    $('exactBox').hidden = true;
+  }
+  function refreshExact() {
+    const e = readExact();
+    if (e) {
+      exact = e;
+      $('exactOut').textContent = 'Ritmo: ' + clock(Math.round(e.sec / e.km)) + ' al km';
+      markOverride(true);
+    } else {
+      $('exactOut').textContent = 'Servono una distanza e un tempo validi.';
+    }
+    update();
+  }
+  $('exactOn').addEventListener('click', () => {
+    $('exactOn').setAttribute('aria-expanded', 'true');
+    $('exactBox').hidden = false;
+    $('exKm').focus();
+    stopRotation();
+    refreshExact();
+  });
+  $('exactOff').addEventListener('click', () => {
+    leaveExact();
+    $('exactOn').focus();
+    update();
+  });
+  $('exKm').addEventListener('input', refreshExact);
+  $('exTime').addEventListener('input', refreshExact);
 
   /* ================= la storia: un solo renderer su canvas ================= */
   const cv = $('cv');
@@ -620,78 +754,73 @@
     roundRect(x, y, size, size, 22); ctx.stroke();
   }
 
-  /* L'etichetta: copertina e nome in alto, sotto la frase che conta.
-     "Riprodotta 16 volte" si capisce da sola, "IN LOOP PER" no. */
+  /* L'etichetta, gerarchia C: copertina ancora a sinistra, brano al centro,
+     un solo numero grande a destra. La frase "In loop per N volte" e diventata
+     etichetta piu numero, perche a 105 punti veri una frase non ci sta. */
   function drawBadge() {
     const c = song();
     const dark = theme === 'dark';
-    const M = 60, PAD = 52, w = W - M * 2, h = 524;
+    const M = 60, PAD = 44, w = W - M * 2, h = 298;
     const cx = W / 2, cy = Math.min(Math.max(badgeY * H, SAFE + h / 2), H - SAFE - h / 2);
     const inkC = dark ? '#F4F4F0' : '#121212';
     const softC = dark ? '#9AA49C' : '#5F6963';
 
     ctx.save();
     ctx.translate(cx, cy);
-    ctx.rotate(-1.5 * Math.PI / 180);
+    ctx.rotate(-1.2 * Math.PI / 180);
     ctx.translate(-w / 2, -h / 2);
 
     ctx.save();
-    ctx.shadowColor = 'rgba(0,0,0,0.28)'; ctx.shadowBlur = 60; ctx.shadowOffsetY = 18;
+    ctx.shadowColor = 'rgba(0,0,0,0.3)'; ctx.shadowBlur = 60; ctx.shadowOffsetY = 18;
     ctx.fillStyle = dark ? '#16181C' : '#FFFFFF';
-    roundRect(0, 0, w, h, 52); ctx.fill();
+    roundRect(0, 0, w, h, 40); ctx.fill();
     ctx.restore();
     /* su una foto scura l'etichetta scura sparirebbe: le serve un bordo */
     if (dark) {
       ctx.strokeStyle = 'rgba(255,255,255,0.22)'; ctx.lineWidth = 3;
-      roundRect(0, 0, w, h, 52); ctx.stroke();
+      roundRect(0, 0, w, h, 40); ctx.stroke();
     }
 
-    /* riga alta: copertina, titolo, artista */
-    const COV = 168;
+    const COV = 210;
     drawCover(PAD, PAD, COV, c);
-    const tx = PAD + COV + 34, tw = w - tx - PAD;
-    ctx.textBaseline = 'top';
-    const titleFont = F(900, 60);
-    ctx.fillStyle = inkC; ctx.font = titleFont;
-    ctx.fillText(fitText(c.t, titleFont, tw), tx, PAD + 26);
-    ctx.fillStyle = softC; ctx.font = F(600, 40);
-    ctx.fillText(fitText(c.w, F(600, 40), tw), tx, PAD + 100);
 
-    const lineY = PAD + COV + 40;
-    ctx.strokeStyle = dark ? '#2A2E33' : '#E2E7E0';
-    ctx.lineWidth = 3;
-    ctx.beginPath(); ctx.moveTo(PAD, lineY); ctx.lineTo(w - PAD, lineY); ctx.stroke();
-
-    /* la frase: parole piccole, numero grande, tutte sulla stessa base */
-    const baseY = lineY + 112;
+    /* blocco del numero, ancorato a destra */
     ctx.textBaseline = 'alphabetic';
-    let x = PAD;
-    ctx.fillStyle = softC; ctx.font = F(600, 42);
-    ctx.fillText('Riprodotta', x, baseY);
-    x += ctx.measureText('Riprodotta').width + 20;
-    ctx.fillStyle = '#0E7A38'; ctx.font = F(900, 96);
-    const nT = String(timesFor(c));
-    ctx.fillText(nT, x, baseY);
-    x += ctx.measureText(nT).width + 18;
-    ctx.fillStyle = inkC; ctx.font = F(800, 46);
-    ctx.fillText('volte', x, baseY);
-
-    /* piede: distanza e durata, non il passo */
-    const footY = h - PAD - 42;
-    ctx.textBaseline = 'top';
-    ctx.font = F(800, 40);
-    ctx.fillStyle = '#FC5200';
-    const kmT = kmLabel(km), timeT = minLabel(target());
-    ctx.fillText(kmT, PAD, footY);
-    const sepX = PAD + ctx.measureText(kmT).width + 22;
-    ctx.fillStyle = dark ? '#3A4048' : '#C9D2C6';
-    ctx.fillText('\u00B7', sepX, footY);
-    ctx.fillStyle = '#FC5200';
-    ctx.fillText(timeT, sepX + ctx.measureText('\u00B7').width + 22, footY);
-    ctx.fillStyle = softC; ctx.font = F(600, 38);
     ctx.textAlign = 'right';
-    ctx.fillText('volte.run', w - PAD, footY + 2);
+    ctx.fillStyle = softC; ctx.font = F(800, 26);
+    ctx.letterSpacing = '3px';
+    ctx.fillText('IN LOOP', w - PAD, PAD + 40);
+    ctx.letterSpacing = '0px';
+    ctx.font = F(800, 46); ctx.fillStyle = inkC;
+    const vw = ctx.measureText(' volte').width;
+    ctx.fillText(' volte', w - PAD, PAD + 140);
+    ctx.fillStyle = '#0E7A38'; ctx.font = F(900, 100);
+    ctx.fillText(String(timesFor(c)), w - PAD - vw, PAD + 140);
+    ctx.fillStyle = softC; ctx.font = F(600, 26);
+    ctx.fillText('volte.run', w - PAD, PAD + 218);
     ctx.textAlign = 'left';
+
+    /* colonna centrale: brano, artista, corsa */
+    const bigW = 330;
+    const tx = PAD + COV + 30, tw = w - tx - PAD - bigW;
+    ctx.fillStyle = inkC; ctx.font = F(800, 46);
+    ctx.fillText(fitText(c.t, F(800, 46), tw), tx, PAD + 76);
+    ctx.fillStyle = softC; ctx.font = F(600, 36);
+    ctx.fillText(fitText(c.w, F(600, 36), tw), tx, PAD + 128);
+
+    /* Distanza, tempo e ritmo. Quel /km dice "corsa" senza scrivere la parola. */
+    const parts = [kmText(), timeText(), paceText()];
+    let px = tx;
+    parts.forEach((p, i) => {
+      ctx.font = F(800, 36); ctx.fillStyle = '#FC4C02';
+      ctx.fillText(p, px, PAD + 196);
+      px += ctx.measureText(p).width;
+      if (i < parts.length - 1) {
+        ctx.fillStyle = dark ? '#3A4048' : '#C9D2C6';
+        ctx.fillText(' \u00B7 ', px, PAD + 196);
+        px += ctx.measureText(' \u00B7 ').width;
+      }
+    });
 
     ctx.restore();
   }
@@ -771,12 +900,14 @@
       if (i === shown - 1 && n <= 60 && exact % 1 > 0.02) seg.className = 'part';
       tank.appendChild(seg);
     }
-    tank.setAttribute('aria-label', n + ' riascolti riempiono ' + kmLabel(km) +
+    tank.setAttribute('aria-label', n + ' riascolti riempiono ' + kmText() +
       (n > 60 ? ' (ne vedi i primi 60)' : ''));
 
-    $('coach').innerHTML = 'Oggi <b>' + kmLabel(km) + '</b> sono ' + n + ' volte ' + c.t + '.';
-    $('fine').textContent = 'La corsa dura ' + minLabel(target()) + ' · ' + c.t + ' dura ' + durLabel(c.s);
-    $('whyText').innerHTML = 'La distanza non si accorcia: <b>' + kmLabel(km) + '</b> restano ' + kmLabel(km) +
+    $('coach').innerHTML = (exact ? 'La tua corsa: <b>' : 'Oggi <b>') + kmText() + '</b> ' +
+      (exact ? 'sono' : 'sono') + ' ' + n + ' volte ' + c.t + '.';
+    $('fine').textContent = 'La corsa dura ' + timeText() + ' · ritmo ' + paceText() +
+      ' · ' + c.t + ' dura ' + durLabel(c.s);
+    $('whyText').innerHTML = 'La distanza non si accorcia: <b>' + kmText() + '</b> restano ' + kmText() +
       '. Ma contarli in canzoni li sposta su una misura che non ti pesa, perché ascoltare <b>' + n +
       ' volte</b> un pezzo che ti piace è una cosa che faresti comunque.';
 
