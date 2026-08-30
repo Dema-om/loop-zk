@@ -1239,7 +1239,9 @@
   let picked = null;
   let sfondo = 'cover';   /* 'cover' oppure l'indice di una tinta */
   let badgeY = 0.78;
-  let badgeS = 1;   /* quanto e grande l'etichetta: 1 e la misura di partenza */
+  /* Parte un filo piu piccola: a 1 riempiva l'81,5% della storia e sembrava
+     un cartello. A 0,92 sono tre quarti, e resta comunque leggibile da lontano. */
+  let badgeS = 0.92;
   let photo = null;
   let versione = 'frase';   /* 'frase' oppure 'dati' */
 
