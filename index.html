@@ -369,6 +369,7 @@
   /* Una sola azione principale, larga. Le due della foto sono ingressi, non
      azioni: stanno sopra, in secondo piano. Il testo e un ripiego, quindi e un
      link. Tre pesi diversi per tre cose diverse. */
+  .cta-photo[hidden] { display: none; }
   .cta-photo { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
   .btn {
     font: inherit; font-weight: 800; font-size: 14px; border-radius: 999px;
@@ -396,6 +397,7 @@
     background: none; border: none; cursor: pointer;
     text-decoration: underline; text-underline-offset: 3px;
   }
+  .linkbtn[hidden] { display: none; }
   .linkbtn:hover { color: var(--ink); }
   .linkbtn:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
   .hint b { color: var(--ink); }
@@ -544,7 +546,9 @@
 
   <section class="share">
     <h2>Condividi sulle storie</h2>
-    <p>Questa è la card che finirà in storia. Va bene così com'è, oppure mettila sopra una tua foto: scattala adesso o prendila dal rullino. Esce un PNG a 1080×1920 e l'immagine non lascia mai il telefono.</p>
+    <p>Due versioni della stessa storia. <b>La frase</b> sta su un colore ed è già pronta.
+    <b>I dati</b> sono un'etichetta che va sopra una tua foto. Esce un PNG a 1080×1920,
+    e l'immagine non lascia mai il telefono.</p>
 
     <div class="view-toggle" role="group" aria-label="Versione da condividere">
       <button id="vFrase" aria-pressed="true">La frase<small>senza dati</small></button>
@@ -571,7 +575,7 @@
       <button class="btn ghost" type="button" id="take">Scatta una foto</button>
       <button class="btn ghost" type="button" id="upload">Prendila dal rullino</button>
     </div>
-    <button class="btn primary wide" type="button" id="save">Genera il PNG</button>
+    <button class="btn primary wide" type="button" id="save">Condividi</button>
     <button class="linkbtn" type="button" id="shareClaim">
       <span id="shareClaimLabel">Condividi solo la frase, come testo</span>
     </button>
@@ -579,7 +583,7 @@
     <div class="saved" id="saved">
       <img id="savedImg" alt="La tua storia pronta da salvare">
       <p class="hint">Tieni premuto sull'immagine (o tasto destro) e salvala nel rullino.
-      Sul sito vero questo è un download diretto: qui dentro l'anteprima blocca i download.</p>
+      Sul sito vero il telefono apre il foglio di condivisione: qui dentro l'anteprima lo blocca.</p>
     </div>
   </section>
 
@@ -1219,8 +1223,6 @@
     ctx.fillText(' volte', w - PAD, PAD + 104);
     ctx.fillStyle = '#0E7A38'; ctx.font = F(900, 96);
     ctx.fillText(nStr, w - PAD - vw, PAD + 104);
-    ctx.fillStyle = softC; ctx.font = F(700, 28);
-    ctx.fillText('inLOOP', w - PAD, PAD + 180);
     ctx.textAlign = 'left';
 
     /* Il titolo scende di corpo prima di rassegnarsi a farsi troncare. */
@@ -1257,10 +1259,21 @@
      la versione scelta: la frase in una card bianca, o l'etichetta coi dati. */
   function render() {
     ctx.clearRect(0, 0, W, H);
+    if (versione === 'frase') { drawGradient(); drawPhraseCard(); return; }
     if (photo) drawPhoto(); else drawGradient();
-    if (versione === 'frase') { drawPhraseCard(); return; }
     if (!photo) drawHintDati();
     drawBadge();
+    /* Il dominio per esteso serve a farsi trovare, ma dentro l'etichetta
+       affollava la riga: sta sotto, sulla foto, con un'ombra che lo tiene
+       leggibile su qualunque cosa ci finisca dietro. */
+    const rb = badgeRect();
+    const dy = Math.min(rb.y + rb.h + 58, H - SAFE + 40);
+    ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+    ctx.fillStyle = 'rgba(255,255,255,0.92)'; ctx.font = F(600, 32);
+    ctx.shadowColor = 'rgba(0,0,0,0.55)'; ctx.shadowBlur = 16; ctx.shadowOffsetY = 2;
+    ctx.fillText('inloop.zetakiwi.com', W / 2, dy);
+    ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
+    ctx.textAlign = 'left';
   }
 
   /* "La frase" e finita da sola. "I dati" e un'etichetta, e un'etichetta ha
@@ -1272,14 +1285,18 @@
     aggiornaComandi();
     render();
   }
+  /* Due versioni, due strumenti. La frase vive su un colore e si sceglie il
+     colore. I dati vivono su una foto tua e senza foto non esistono. */
   function aggiornaComandi() {
-    const serveFoto = versione === 'dati' && !photo;
-    $('sfondi').hidden = !!photo || versione === 'dati';
-    $('save').disabled = serveFoto;
-    $('shareHint').innerHTML = versione === 'dati'
+    const dati = versione === 'dati';
+    $('sfondi').hidden = dati;
+    document.querySelector('.cta-photo').hidden = !dati;
+    $('shareClaim').hidden = dati;
+    $('save').disabled = dati && !photo;
+    $('shareHint').innerHTML = dati
       ? (photo ? '<b>Trascina l\'etichetta</b> per spostarla dove vuoi.'
-               : 'Serve una foto sotto: scattala o prendila dal rullino.')
-      : 'La card è pronta. Se vuoi, mettila sopra una tua foto.';
+               : 'Scatta una foto o prendila dal rullino: l\'etichetta ci finisce sopra.')
+      : 'Scegli il colore e condividi.';
   }
   $('vFrase').addEventListener('click', () => setVersione('frase'));
   $('vDati').addEventListener('click', () => setVersione('dati'));
@@ -1365,14 +1382,23 @@
   $('file').addEventListener('change', () => loadFrom($('file')));
   $('shot').addEventListener('change', () => loadFrom($('shot')));
 
-  $('save').addEventListener('click', () => {
+  /* Condividere: il telefono apre il suo foglio con l'immagine dentro, dove
+     Instagram e gia in lista. Dove il foglio non c'e, l'immagine resta a
+     schermo da tenere premuta. */
+  $('save').addEventListener('click', async () => {
     render();
-    cv.toBlob(b => {
-      if (!b) return;
-      $('savedImg').src = URL.createObjectURL(b);
-      $('saved').classList.add('open');
-      $('saved').scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'center' });
-    }, 'image/png');
+    const blob = await new Promise(r => cv.toBlob(r, 'image/png'));
+    if (!blob) return;
+    const file = new File([blob], 'inloop.png', { type: 'image/png' });
+    try {
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file] });
+        return;
+      }
+    } catch (e) { return; }
+    $('savedImg').src = URL.createObjectURL(blob);
+    $('saved').classList.add('open');
+    $('saved').scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'center' });
   });
 
   /* ----- esito ----- */
