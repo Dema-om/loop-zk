@@ -67,6 +67,7 @@
   .claim-line2.fade { opacity: 0; transition: opacity 0.18s; }
   .claim-line2.show { opacity: 1; transition: opacity 0.25s; }
   .claim-who { font-size: 14px; font-weight: 600; color: var(--soft); margin: 6px 0 0; }
+  .thesis { font-size: 15px; color: var(--soft); margin: 12px 0 0; }
   /* Il percorso in quattro parole: dice cosa succede prima ancora di scorrere. */
   .path {
     display: flex; flex-wrap: wrap; align-items: center;
@@ -228,16 +229,41 @@
     border-radius: 20px; padding: 18px;
     box-shadow: 0 8px 30px rgba(18, 18, 18, 0.05);
   }
+  /* Il risultato e la risposta del sito: deve sembrare una risposta, non una
+     nota a pie di pagina. Il verde entra come superficie sotto il numero. */
+  .result { display: flex; align-items: center; gap: 16px; }
+  .big-n {
+    background: var(--green); color: var(--on-brand);
+    border-radius: 18px; padding: 14px 16px; text-align: center; flex: none; min-width: 108px;
+  }
+  .big-n span {
+    display: block; font-weight: 900; font-size: 48px; line-height: 1;
+    letter-spacing: -0.03em; font-variant-numeric: tabular-nums;
+  }
+  .big-n small {
+    display: block; margin-top: 6px; font-size: 10px; font-weight: 800;
+    letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.7;
+  }
+  .result-song { min-width: 0; }
+  .rs-title {
+    margin: 0; font-weight: 900; font-size: 21px; letter-spacing: -0.02em;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .rs-artist { margin: 2px 0 0; font-size: 14px; font-weight: 600; color: var(--soft); }
+  .rs-run {
+    margin: 10px 0 0; font-size: 15px; font-weight: 800;
+    color: var(--orange-text); font-variant-numeric: tabular-nums;
+  }
+
   /* Un blocco per riascolto: il numero si vede, non si legge soltanto. */
   .tank {
+    margin-top: 18px;
     display: flex; gap: 3px; align-items: stretch; height: 30px;
     border-radius: 8px; overflow: hidden;
     background: var(--chip); border: 1px solid var(--line); padding: 3px;
   }
   .tank span { flex: 1; border-radius: 4px; background: var(--orange); min-width: 2px; }
   .tank span.part { opacity: 0.35; }
-  .coach { margin: 12px 0 0; font-size: 16px; font-weight: 700; }
-  .coach b { color: var(--orange-text); font-variant-numeric: tabular-nums; }
   .fine { font-size: 12px; color: var(--soft); margin: 6px 0 0; font-variant-numeric: tabular-nums; }
   .repeat {
     margin: 14px 0 0; padding-top: 12px; border-top: 1px solid var(--line);
@@ -335,6 +361,7 @@
       <p class="claim-line2 show" id="cLine2">Sono <span class="n">15</span> volte <span class="t">Sportswear</span>.</p>
       <p class="claim-who" id="cWho">Dark Polo Gang · 1:59</p>
     </div>
+    <p class="thesis">I chilometri restano quelli. Contati in canzoni pesano meno, perché ascoltare un pezzo che ti piace è una cosa che faresti comunque.</p>
     <ol class="path" aria-label="Come funziona">
       <li>I dati della corsa</li>
       <li>La tua canzone</li>
@@ -411,17 +438,17 @@
   </section>
 
   <section class="outcome" aria-label="Il risultato" aria-live="polite">
+    <div class="result">
+      <div class="big-n"><span id="bigTimes">16</span><small>volte in loop</small></div>
+      <div class="result-song">
+        <p class="rs-title" id="rsTitle">Sportswear</p>
+        <p class="rs-artist" id="rsArtist">Dark Polo Gang</p>
+        <p class="rs-run" id="rsRun">5 km · 30 min · 6:00/km</p>
+      </div>
+    </div>
     <div class="tank" id="tank" role="img" aria-label="Un blocco per ogni riascolto"></div>
-    <p class="coach" id="coach">Oggi <b>5 km</b> sono 16 volte Sportswear.</p>
-    <p class="fine" id="fine">La corsa dura 30 min · Sportswear dura 1:59</p>
+    <p class="fine" id="fine">Sportswear dura 1:59, e la corsa 30 minuti.</p>
     <p class="repeat">Adesso mettila in <b>repeat</b> e parti.</p>
-  </section>
-
-  <section class="why" aria-label="Perché funziona">
-    <h2 class="lab">Perché funziona</h2>
-    <p id="whyText">La distanza non si accorcia: <b>5 km</b> restano 5 km. Ma contarli in canzoni li sposta
-    su una misura che non ti pesa, perché ascoltare <b>16 volte</b> un pezzo che ti piace è una cosa che faresti comunque.</p>
-    <p class="last">Non cambia la strada. Cambia quanto sembra lunga.</p>
   </section>
 
   <section class="share">
@@ -458,11 +485,11 @@
 
   <section class="about" id="about">
     <h3>Cos'è questo</h3>
-    <p>Volte è un concept: un esercizio di design e sviluppo su come sarebbe un incontro tra Spotify e Strava.
-    Non è un prodotto, non è affiliato a nessuna delle due, e i loro colori sono citati apertamente come materiale del concept.</p>
-    <p>Funziona con una canzone sola e nessun account, di proposito: mettere un brano in repeat è un tap in qualsiasi app,
-    quindi il sito non ha bisogno di collegarsi a niente per essere utile.</p>
-    <p>L'ho fatto io, Matteo De Marco. Le altre cose che costruisco stanno qui:</p>
+    <p>Volte è un concept: immagina che Spotify e Strava facciano una cosa insieme, e la prova su un gesto solo,
+    contare la corsa in canzoni. Non è affiliato a nessuna delle due: i loro colori stanno qui perché sono il materiale dell'esercizio.</p>
+    <p>Niente account e niente permessi, di proposito. Il repeat è un tap dentro la tua app di musica,
+    quindi questo sito non ha bisogno di collegarsi a niente per servire a qualcosa.</p>
+    <p>L'ho fatto io, Matteo De Marco.</p>
     <a class="me" href="https://www.linkedin.com/in/matteodemarcoo" target="_blank" rel="noopener">
       Matteo De Marco su LinkedIn
     </a>
@@ -921,13 +948,11 @@
     tank.setAttribute('aria-label', n + ' riascolti riempiono ' + kmText() +
       (n > 60 ? ' (ne vedi i primi 60)' : ''));
 
-    $('coach').innerHTML = (exact ? 'La tua corsa: <b>' : 'Oggi <b>') + kmText() + '</b> ' +
-      (exact ? 'sono' : 'sono') + ' ' + n + ' volte ' + c.t + '.';
-    $('fine').textContent = 'La corsa dura ' + timeText() + ' · ritmo ' + paceText() +
-      ' · ' + c.t + ' dura ' + durLabel(c.s);
-    $('whyText').innerHTML = 'La distanza non si accorcia: <b>' + kmText() + '</b> restano ' + kmText() +
-      '. Ma contarli in canzoni li sposta su una misura che non ti pesa, perché ascoltare <b>' + n +
-      ' volte</b> un pezzo che ti piace è una cosa che faresti comunque.';
+    $('bigTimes').textContent = n;
+    $('rsTitle').textContent = c.t;
+    $('rsArtist').textContent = c.w;
+    $('rsRun').textContent = kmText() + ' · ' + timeText() + ' · ' + paceText();
+    $('fine').textContent = c.t + ' dura ' + durLabel(c.s) + ', e la corsa ' + timeText() + '.';
 
     render();
   }
