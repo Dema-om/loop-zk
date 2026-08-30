@@ -68,6 +68,18 @@
   .claim-line2.show { opacity: 1; transition: opacity 0.25s; }
   .claim-who { font-size: 14px; font-weight: 600; color: var(--soft); margin: 6px 0 0; }
   .thesis { font-size: 15px; color: var(--soft); margin: 12px 0 0; }
+  /* Il claim si condivide come frase e link: l'immagine e un'altra cosa, e sta
+     piu in basso sulla foto dell'utente. */
+  .share-claim {
+    display: inline-flex; align-items: center; gap: 8px;
+    margin: 16px 0 0; padding: 9px 16px;
+    font: inherit; font-size: 13px; font-weight: 800;
+    color: var(--on-brand); background: var(--green);
+    border: none; border-radius: 999px; cursor: pointer;
+  }
+  .share-claim:hover { filter: brightness(0.96); }
+  .share-claim:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
   /* Il percorso in quattro parole: dice cosa succede prima ancora di scorrere. */
   .path {
     display: flex; flex-wrap: wrap; align-items: center;
@@ -263,40 +275,34 @@
      condivide: superficie verde piena, testo scuro, un numero solo. I dati
      della corsa restano arancioni ma dentro una pastiglia bianca, cosi i due
      colori di marca non si toccano mai. */
+  /* Il nero su verde era pesante. Si ribalta: superficie scura come l'app di
+     Spotify, e i due colori di marca tornano a essere testo, dove finalmente
+     hanno contrasto (verde 6,9:1 e arancio 5,4:1 su questo fondo). */
   .verdict {
     position: relative;
-    background: var(--green); color: var(--on-brand);
+    background: #14171B; color: #F4F4F0;
     border-radius: 22px; padding: 22px 22px 20px;
   }
   .v-label {
     margin: 0; font-size: 11px; font-weight: 800;
-    letter-spacing: 0.14em; text-transform: uppercase; opacity: 0.66;
+    letter-spacing: 0.14em; text-transform: uppercase; color: #9AA49C;
   }
   .v-number {
     margin: 4px 0 0; font-weight: 900; font-size: clamp(40px, 12vw, 56px);
     line-height: 1; letter-spacing: -0.035em;
   }
+  .v-number { color: var(--green); }
   .v-number span { font-variant-numeric: tabular-nums; }
   .v-song {
     margin: 12px 0 0; font-weight: 900; font-size: 20px; letter-spacing: -0.02em;
     overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   }
-  .v-artist { margin: 1px 0 0; font-size: 14px; font-weight: 600; opacity: 0.72; }
+  .v-artist { margin: 1px 0 0; font-size: 14px; font-weight: 600; color: #9AA49C; }
   .v-run {
     display: inline-block; margin: 14px 0 0;
-    background: #FFFFFF; color: var(--orange-text);
-    border-radius: 999px; padding: 8px 15px;
-    font-size: 14px; font-weight: 800; font-variant-numeric: tabular-nums;
+    color: #FF7A3C; font-size: 15px; font-weight: 800;
+    font-variant-numeric: tabular-nums;
   }
-  .share-btn {
-    position: absolute; top: 16px; right: 16px;
-    width: 40px; height: 40px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    background: rgba(255, 255, 255, 0.9); color: var(--ink);
-    border: none; cursor: pointer;
-  }
-  .share-btn:hover { background: #FFFFFF; }
-  .share-btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
 
   /* Un blocco per riascolto: il numero si vede, non si legge soltanto.
      Dentro il verde i blocchi sono scuri su un binario chiaro. */
@@ -304,9 +310,9 @@
     margin-top: 16px;
     display: flex; gap: 3px; align-items: stretch; height: 26px;
     border-radius: 8px; overflow: hidden;
-    background: rgba(255, 255, 255, 0.3); padding: 3px;
+    background: rgba(255, 255, 255, 0.12); padding: 3px;
   }
-  .tank span { flex: 1; border-radius: 4px; background: var(--on-brand); min-width: 2px; }
+  .tank span { flex: 1; border-radius: 4px; background: var(--green); min-width: 2px; }
   .tank span.part { opacity: 0.34; }
 
   .fine { font-size: 12px; color: var(--soft); margin: 14px 0 0; font-variant-numeric: tabular-nums; }
@@ -410,6 +416,13 @@
       <p class="claim-who" id="cWho">Dark Polo Gang · 1:59</p>
     </div>
     <p class="thesis">I chilometri restano quelli. Contati in canzoni pesano meno, perché ascoltare un pezzo che ti piace è una cosa che faresti comunque.</p>
+    <button class="share-claim" type="button" id="shareClaim">
+      <svg width="15" height="15" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+        <path d="M9 12V2.5M9 2.5 5.6 5.9M9 2.5l3.4 3.4" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M3 10.5v3.9A1.6 1.6 0 0 0 4.6 16h8.8a1.6 1.6 0 0 0 1.6-1.6v-3.9" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>
+      </svg>
+      <span id="shareClaimLabel">Condividi la frase</span>
+    </button>
     <ol class="path" aria-label="Come funziona">
       <li>I dati della corsa</li>
       <li>La tua canzone</li>
@@ -494,12 +507,6 @@
 
   <section class="outcome" aria-label="Il risultato" aria-live="polite">
     <div class="verdict">
-      <button class="share-btn" type="button" id="shareTop" aria-label="Condividi questo risultato">
-        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
-          <path d="M9 12V2.5M9 2.5 5.6 5.9M9 2.5l3.4 3.4" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M3 10.5v3.9A1.6 1.6 0 0 0 4.6 16h8.8a1.6 1.6 0 0 0 1.6-1.6v-3.9" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>
-        </svg>
-      </button>
       <p class="v-label">In loop per</p>
       <p class="v-number"><span id="bigTimes">16</span> volte</p>
       <p class="v-song" id="rsTitle">Sportswear</p>
@@ -1008,83 +1015,27 @@
     drawBadge();
   }
 
-  /* Condivisione rapida del risultato: la stessa scheda verde, disegnata a
-     misura di storia. Il telefono la passa a Instagram col foglio nativo;
-     dove il foglio non c'è, l'immagine resta a schermo da tenere premuta. */
-  function drawVerdictCard(x) {
-    const c = song(), n = timesFor(c);
-    x.fillStyle = '#1DB954'; x.fillRect(0, 0, W, H);
-    x.strokeStyle = 'rgba(255,255,255,0.16)'; x.lineWidth = 6;
-    [W * 0.66, W * 0.48].forEach(r => { x.beginPath(); x.arc(W / 2, H / 2, r, 0, Math.PI * 2); x.stroke(); });
-
-    const L = 110;
-    let y = H / 2 - 300;
-    x.textBaseline = 'alphabetic'; x.textAlign = 'left';
-    x.fillStyle = 'rgba(18,18,18,0.66)'; x.font = F(800, 34);
-    x.letterSpacing = '5px'; x.fillText('IN LOOP PER', L, y); x.letterSpacing = '0px';
-
-    y += 150;
-    x.fillStyle = '#121212'; x.font = F(900, 190);
-    x.fillText(n + ' volte', L, y);
-
-    y += 110;
-    x.font = F(900, 62);
-    x.fillText(fitTextOn(x, c.t, F(900, 62), W - L * 2), L, y);
-    y += 62;
-    x.fillStyle = 'rgba(18,18,18,0.7)'; x.font = F(600, 42);
-    x.fillText(fitTextOn(x, c.w, F(600, 42), W - L * 2), L, y);
-
-    /* pastiglia bianca coi dati della corsa */
-    y += 110;
-    const run = kmText() + ' \u00B7 ' + timeText() + ' \u00B7 ' + paceText();
-    x.font = F(800, 42);
-    const pw = x.measureText(run).width + 64;
-    x.fillStyle = '#FFFFFF';
-    roundRectOn(x, L, y - 52, pw, 84, 42); x.fill();
-    x.fillStyle = '#C23A00';
-    x.fillText(run, L + 32, y);
-
-    x.fillStyle = 'rgba(18,18,18,0.6)'; x.font = F(600, 36);
-    x.fillText('volte.run', L, H - 300);
-  }
-  function roundRectOn(x, a, b, w2, h2, r) {
-    x.beginPath(); x.moveTo(a + r, b);
-    x.arcTo(a + w2, b, a + w2, b + h2, r);
-    x.arcTo(a + w2, b + h2, a, b + h2, r);
-    x.arcTo(a, b + h2, a, b, r);
-    x.arcTo(a, b, a + w2, b, r);
-    x.closePath();
-  }
-  function fitTextOn(x, text, font, maxW) {
-    x.font = font;
-    if (x.measureText(text).width <= maxW) return text;
-    let t = text;
-    while (t.length > 1 && x.measureText(t + '…').width > maxW) t = t.slice(0, -1);
-    return t + '…';
-  }
-
-  $('shareTop').addEventListener('click', async () => {
-    const off = document.createElement('canvas');
-    off.width = W; off.height = H;
-    drawVerdictCard(off.getContext('2d'));
-    const blob = await new Promise(r => off.toBlob(r, 'image/png'));
-    const file = new File([blob], 'volte.png', { type: 'image/png' });
-    const testo = timesFor(song()) + ' volte ' + song().t + ' per ' + kmText() + '.';
-
+  /* Condividere il claim: e una frase e un link, non un'immagine. L'immagine
+     e lo sticker sulla foto, piu sotto. Dove il foglio nativo non c'e, il
+     testo finisce negli appunti. */
+  $('shareClaim').addEventListener('click', async () => {
+    const c = song();
+    const frase = kmText() + ' sembrano tanti. Sono ' + timesFor(c) + ' volte ' + c.t + ' di ' + c.w + '.';
+    const etichetta = $('shareClaimLabel');
     try {
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share({ files: [file], text: testo });
-        return;
-      }
       if (navigator.share) {
-        await navigator.share({ title: 'Volte', text: testo, url: location.href });
+        await navigator.share({ title: 'Volte', text: frase, url: location.href });
         return;
       }
-    } catch (e) { /* l'utente ha annullato: non è un errore */ }
-
-    $('savedImg').src = URL.createObjectURL(blob);
-    $('saved').classList.add('open');
-    $('saved').scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'center' });
+    } catch (e) { return; }   /* annullato dall'utente: non e un errore */
+    try {
+      await navigator.clipboard.writeText(frase + ' ' + location.href);
+      etichetta.textContent = 'Copiato';
+      setTimeout(() => { etichetta.textContent = 'Condividi la frase'; }, 1800);
+    } catch (e) {
+      etichetta.textContent = 'Copia a mano dalla barra';
+      setTimeout(() => { etichetta.textContent = 'Condividi la frase'; }, 2400);
+    }
   });
 
   /* Trascinamento dell'etichetta. Tre cose che prima non andavano:
