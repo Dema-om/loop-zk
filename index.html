@@ -14,7 +14,7 @@
 <meta property="og:image" content="https://inloop.zetakiwi.com/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="5 km sembrano tanti. Sono 16 volte Sportswear.">
+<meta property="og:image:alt" content="5 km sembrano tanti. Ma sono 16 volte Sportswear.">
 <meta property="og:locale" content="it_IT">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
@@ -533,7 +533,7 @@
   <header>
     <h1 class="claim-line1" id="cLine1"><span class="d">5 km</span> sembrano tanti.</h1>
     <div class="claim-block">
-      <p class="claim-line2 show" id="cLine2">Sono <span class="n">15</span> volte <span class="t">Sportswear</span>.</p>
+      <p class="claim-line2 show" id="cLine2">Ma sono <span class="n">15</span> volte <span class="t">Sportswear</span>.</p>
       <p class="claim-who" id="cWho">Dark Polo Gang · 1:59</p>
     </div>
     <p class="thesis">I chilometri restano quelli. Contati in canzoni pesano meno, perché ascoltare un pezzo che ti piace è una cosa che faresti comunque.</p>
@@ -906,19 +906,27 @@
     }, 180);
   }
   if (!reduced) timer = setInterval(nextHero, 3200);
-  /* La vetrina si ferma al primo gesto vero: un tocco, una rotella, un tasto.
-     NON allo scroll: ricaricando la pagina il browser ripristina la posizione e
-     spara un evento di scroll da solo, che spegneva la vetrina prima ancora che
-     l'utente la vedesse. Rotella e touch coprono comunque l'intenzione di
-     scorrere, e nascono da un dito. */
-  ['pointerdown', 'touchstart', 'wheel', 'keydown'].forEach(ev =>
-    window.addEventListener(ev, stopRotation, { once: true, passive: true }));
+  /* La vetrina si ferma per due motivi soli, e nessuno dei due e "hai toccato
+     lo schermo". Prima bastava un touchstart qualsiasi, ma sul telefono il
+     primo tocco e quello con cui scorri: la vetrina moriva al primo dito e
+     sembrava non partire mai.
+     1) Scegli qualcosa. Ogni comando chiama stopRotation da se: da quel
+        momento la frase e tua e non deve piu cambiare da sola.
+     2) Il claim esce dallo schermo. Piu sotto la stessa canzone comanda il
+        risultato e la card da condividere: se continuasse a girare, ti
+        cambierebbe i numeri sotto gli occhi mentre guardi altro. */
+  if (timer && 'IntersectionObserver' in window) {
+    const occhio = new IntersectionObserver(voci => {
+      if (voci.some(v => !v.isIntersecting)) { stopRotation(); occhio.disconnect(); }
+    }, { threshold: 0 });
+    occhio.observe(document.querySelector('header'));
+  }
 
   function renderHero() {
     const c = song();
     caricaCopertina(c);
     $('cLine1').innerHTML = '<span class="d">' + kmText() + '</span> sembrano tanti.';
-    $('cLine2').innerHTML = 'Sono <span class="n">' + timesFor(c) + '</span> volte <span class="t">' + c.t + '</span>.';
+    $('cLine2').innerHTML = 'Ma sono <span class="n">' + timesFor(c) + '</span> volte <span class="t">' + c.t + '</span>.';
     $('cWho').textContent = c.w + ' · ' + durLabel(c.s);
   }
 
@@ -1004,6 +1012,7 @@
      generare otto richieste, una per lettera. E la vecchia riga passava
      l'evento stesso come messaggio, che finiva a schermo come [object Event]. */
   $('q').addEventListener('input', () => {
+    stopRotation();
     const q = $('q').value.trim();
     clearTimeout(ricercaTimer);
     if (!q) { ricercaN++; lista = catalog.slice(0, 5); renderResults(); return; }
@@ -1133,8 +1142,8 @@
     if (esatti) { stopRotation(); syncWheelFrom(parseTime($('exTime').value) || 1800); recalcExact(); }
     else { exact = null; update(); }
   }
-  $('tabStima').addEventListener('click', () => setPane(false));
-  $('tabEsatti').addEventListener('click', () => setPane(true));
+  $('tabStima').addEventListener('click', () => { stopRotation(); setPane(false); });
+  $('tabEsatti').addEventListener('click', () => { stopRotation(); setPane(true); });
 
   /* ================= la storia: un solo renderer su canvas ================= */
   const cv = $('cv');
@@ -1290,7 +1299,7 @@
     /* La frase e quella intera del claim, nelle sue due parti: la seconda va
        sempre a capo, come in cima al sito. */
     const parte1 = kmText() + ' sembrano tanti.';
-    const parte2 = 'Sono ' + n + ' volte ' + c.t + '.';
+    const parte2 = 'Ma sono ' + n + ' volte ' + c.t + '.';
     const impagina = px => wrapOn(parte1, F(900, px), inner).concat(wrapOn(parte2, F(900, px), inner));
 
     let size = 66, righe = impagina(size);
@@ -1499,7 +1508,7 @@
      testo finisce negli appunti. */
   $('shareClaim').addEventListener('click', async () => {
     const c = song();
-    const frase = kmText() + ' sembrano tanti. Sono ' + timesFor(c) + ' volte ' + c.t + ' di ' + c.w + '.';
+    const frase = kmText() + ' sembrano tanti. Ma sono ' + timesFor(c) + ' volte ' + c.t + ' di ' + c.w + '.';
     const etichetta = $('shareClaimLabel');
     try {
       if (navigator.share) {
