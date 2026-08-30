@@ -271,9 +271,12 @@
     border-radius: 999px; padding: 4px 16px;
   }
   .search svg { flex: none; color: var(--soft); }
+  /* 16px e il minimo: sotto questa misura iPhone ingrandisce la pagina appena
+     tocchi il campo, e la vista salta. Era l'unico campo del sito a stare
+     sotto, tutti gli altri sono fra 18 e 20, ed era l'unico a far quel salto. */
   .search input {
-    flex: 1; min-width: 0; font: inherit; font-size: 14px; font-weight: 600;
-    color: var(--ink); background: none; border: none; padding: 9px 0;
+    flex: 1; min-width: 0; font: inherit; font-size: 16px; font-weight: 600;
+    color: var(--ink); background: none; border: none; padding: 8px 0;
   }
   .search input::placeholder { color: var(--soft); font-weight: 600; }
   .search input:focus { outline: none; }
