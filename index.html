@@ -385,7 +385,9 @@
   .stage.movable canvas:active { cursor: grabbing; }
   .stage canvas:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; }
 
-  .themes { display: flex; gap: 8px; justify-content: center; margin-top: 14px; flex-wrap: wrap; }
+  /* Due per due invece di una fila che va a capo: "Dalla copertina" e molto
+     piu lungo degli altri tre e lasciava "Notte" da sola in fondo. */
+  .themes { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
   .themes button {
     font: inherit; font-weight: 700; font-size: 12px; color: var(--ink);
     background: var(--card); border: 1px solid var(--line);
@@ -783,22 +785,47 @@
     img.src = c.art;
   }
 
-  /* Due colori presi dalla copertina: la media generale e una versione cupa,
-     cosi il gradiente e davvero "dalla copertina" e non dal nome del brano. */
+  /* Due colori presi dalla copertina, per un gradiente che e davvero "dalla
+     copertina" e non dal nome del brano.
+     La media dei pixel NON va bene: su una foto affollata i colori si annullano
+     a vicenda e viene sempre grigio fango. Si cerca invece il colore che
+     DOMINA, raggruppando i pixel in scatole di colore simile e scegliendo la
+     piu affollata fra quelle vive, con l'affollamento pesato dalla vivacita.
+     Il quasi-nero e il quasi-bianco si scartano: sono lo sfondo, non il colore
+     del disco. Se una copertina e davvero grigia si torna alla media. */
   function tintaDa(img) {
     try {
-      const n = 12, o = document.createElement('canvas');
+      const n = 24, o = document.createElement('canvas');
       o.width = n; o.height = n;
       const g = o.getContext('2d', { willReadFrequently: true });
       g.drawImage(img, 0, 0, n, n);
       const d = g.getImageData(0, 0, n, n).data;
-      let r = 0, v = 0, b = 0;
-      for (let i = 0; i < d.length; i += 4) { r += d[i]; v += d[i + 1]; b += d[i + 2]; }
-      const t = d.length / 4;
-      r = Math.round(r / t); v = Math.round(v / t); b = Math.round(b / t);
-      const mix = (x, f) => Math.max(0, Math.min(255, Math.round(x * f)));
-      return ['rgb(' + mix(r, 1.18) + ',' + mix(v, 1.18) + ',' + mix(b, 1.18) + ')',
-              'rgb(' + mix(r, 0.28) + ',' + mix(v, 0.28) + ',' + mix(b, 0.28) + ')'];
+      const scatole = new Map();
+      let mr = 0, mv = 0, mb = 0, tot = 0;
+      for (let i = 0; i < d.length; i += 4) {
+        const r = d[i], v = d[i + 1], b = d[i + 2];
+        mr += r; mv += v; mb += b; tot++;
+        const max = Math.max(r, v, b), min = Math.min(r, v, b);
+        if (max < 40 || min > 225) continue;          /* fondo nero o bianco */
+        const sat = max === 0 ? 0 : (max - min) / max;
+        if (sat < 0.18) continue;                     /* grigio, non e un colore */
+        const k = (r >> 5) + ',' + (v >> 5) + ',' + (b >> 5);
+        const s = scatole.get(k) || { r: 0, v: 0, b: 0, n: 0, peso: 0 };
+        s.r += r; s.v += v; s.b += b; s.n++; s.peso += sat;
+        scatole.set(k, s);
+      }
+      let capo = null;
+      scatole.forEach(s => { if (!capo || s.peso > capo.peso) capo = s; });
+      let r, v, b;
+      if (capo) { r = capo.r / capo.n; v = capo.v / capo.n; b = capo.b / capo.n; }
+      else { r = mr / tot; v = mv / tot; b = mb / tot; }
+      /* Il colore dominante puo essere chiarissimo o scurissimo: si porta a una
+         luminosita utile, cosi il gradiente ha sempre lo stesso carattere. */
+      const luce = (0.299 * r + 0.587 * v + 0.114 * b) / 255;
+      const f = Math.max(0.55, Math.min(1.7, 0.52 / Math.max(luce, 0.06)));
+      const mix = (x, k) => Math.max(0, Math.min(255, Math.round(x * k)));
+      return ['rgb(' + mix(r, f) + ',' + mix(v, f) + ',' + mix(b, f) + ')',
+              'rgb(' + mix(r, f * 0.22) + ',' + mix(v, f * 0.22) + ',' + mix(b, f * 0.22) + ')'];
     } catch (e) { return null; }
   }
 
