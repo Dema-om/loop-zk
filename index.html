@@ -67,7 +67,14 @@
   .claim-line2.fade { opacity: 0; transition: opacity 0.18s; }
   .claim-line2.show { opacity: 1; transition: opacity 0.25s; }
   .claim-who { font-size: 14px; font-weight: 600; color: var(--soft); margin: 6px 0 0; }
-  .claim-hint { font-size: 13px; color: var(--soft); margin: 10px 0 0; min-height: 1.4em; }
+  /* Il percorso in quattro parole: dice cosa succede prima ancora di scorrere. */
+  .path {
+    display: flex; flex-wrap: wrap; align-items: center;
+    gap: 4px 6px; margin: 14px 0 0; padding: 0; list-style: none;
+    font-size: 12px; font-weight: 700; color: var(--soft);
+  }
+  .path li { display: flex; align-items: center; gap: 6px; }
+  .path li + li::before { content: "→"; color: var(--orange); font-weight: 800; }
   /* Il claim cambia da solo: serve un modo esplicito per fermarlo, non solo
      l'impostazione di sistema per ridurre le animazioni. */
   .pause {
@@ -328,7 +335,12 @@
       <p class="claim-line2 show" id="cLine2">Sono <span class="n">15</span> volte <span class="t">Sportswear</span>.</p>
       <p class="claim-who" id="cWho">Dark Polo Gang · 1:59</p>
     </div>
-    <p class="claim-hint" id="cHint">Quanto dura la tua corsa in canzoni?</p>
+    <ol class="path" aria-label="Come funziona">
+      <li>I dati della corsa</li>
+      <li>La tua canzone</li>
+      <li>Quante volte</li>
+      <li>In storia</li>
+    </ol>
     <button class="pause" type="button" id="pause">Ferma il cambio canzone</button>
   </header>
 
@@ -380,7 +392,7 @@
         <p class="explain" id="exactNote">Cambiane due e il terzo si aggiorna da solo.</p>
       </div>
 
-      <button class="swap" type="button" id="swap">Ho già corso: metti i dati esatti</button>
+      <button class="swap" type="button" id="swap">Inserisci i dati esatti dell'ultima corsa</button>
     </div>
   </section>
 
@@ -402,7 +414,7 @@
     <div class="tank" id="tank" role="img" aria-label="Un blocco per ogni riascolto"></div>
     <p class="coach" id="coach">Oggi <b>5 km</b> sono 16 volte Sportswear.</p>
     <p class="fine" id="fine">La corsa dura 30 min · Sportswear dura 1:59</p>
-    <p class="repeat">Poi <b>repeat</b> su quella canzone, che è un tap in qualsiasi app, e parti.</p>
+    <p class="repeat">Adesso mettila in <b>repeat</b> e parti.</p>
   </section>
 
   <section class="why" aria-label="Perché funziona">
@@ -414,7 +426,7 @@
 
   <section class="share">
     <h2>Condividi sulle storie</h2>
-    <p>Questa è l'etichetta che andrà sulla tua storia. Scatta una foto adesso, o prendine una dal rullino, e finisce lì sotto. Esce un PNG a 1080×1920 pronto per la storia, e la foto non lascia mai il telefono.</p>
+    <p>Questa è l'etichetta che finirà sulla tua storia. Scatta una foto o prendine una dal rullino: esce un PNG a 1080×1920, e l'immagine non lascia il telefono.</p>
 
     <div class="stage">
       <canvas id="cv" width="1080" height="1920" tabindex="0" role="img"
@@ -536,9 +548,6 @@
     $('cLine1').innerHTML = '<span class="d">' + kmText() + '</span> sembrano tanti.';
     $('cLine2').innerHTML = 'Sono <span class="n">' + timesFor(c) + '</span> volte <span class="t">' + c.t + '</span>.';
     $('cWho').textContent = c.w + ' · ' + durLabel(c.s);
-    $('cHint').textContent = picked
-      ? 'Questa è la tua frase. Provane un\'altra, o condividila qui sotto.'
-      : 'Quanto dura la tua corsa in canzoni?';
   }
 
   /* ----- passo 1: la corsa ----- */
@@ -659,7 +668,9 @@
   function setPane(esatti) {
     $('paneStima').hidden = esatti;
     $('paneEsatti').hidden = !esatti;
-    $('swap').textContent = esatti ? 'Torna alla stima' : 'Ho già corso: metti i dati esatti';
+    $('swap').textContent = esatti
+      ? 'Torna alla corsa da programmare'
+      : 'Inserisci i dati esatti dell\'ultima corsa';
     if (esatti) { stopRotation(); recalcExact(); $('exKm').focus(); }
     else { exact = null; update(); }
   }
@@ -797,8 +808,18 @@
     ctx.fillText('volte.run', w - PAD, PAD + 218);
     ctx.textAlign = 'left';
 
+    /* Lo spazio del blocco numero si MISURA, non si indovina: riservarne 330
+       fissi troncava "Blinding Lights" senza motivo. */
+    const nStr = String(timesFor(c));
+    ctx.font = F(800, 26); ctx.letterSpacing = '3px';
+    const wLabel = ctx.measureText('IN LOOP').width;
+    ctx.letterSpacing = '0px';
+    ctx.font = F(900, 100); const wNum = ctx.measureText(nStr).width;
+    ctx.font = F(800, 46); const wVolte = ctx.measureText(' volte').width;
+    ctx.font = F(600, 26); const wSite = ctx.measureText('volte.run').width;
+    const bigW = Math.max(wLabel, wNum + wVolte, wSite) + 40;
+
     /* colonna centrale: brano, artista, corsa */
-    const bigW = 330;
     const tx = PAD + COV + 30, tw = w - tx - PAD - bigW;
     ctx.fillStyle = inkC; ctx.font = F(800, 46);
     ctx.fillText(fitText(c.t, F(800, 46), tw), tx, PAD + 76);
