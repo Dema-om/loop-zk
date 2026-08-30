@@ -280,8 +280,9 @@
   .results .cover {
     width: 32px; height: 32px; border-radius: 8px; background: var(--chip);
     display: flex; align-items: center; justify-content: center;
-    color: var(--green-text); flex: none;
+    color: var(--green-text); flex: none; overflow: hidden;
   }
+  .results .cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
   .results button[aria-pressed="true"] .cover { background: var(--green); color: var(--on-brand); }
   .results .name { min-width: 0; }
   .results .name span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -713,6 +714,11 @@
       righe, così un brano dal nome lunghissimo non rompe la composizione.</li>
       <li><b>Un solo motore di disegno.</b> L'anteprima e il file finale escono dallo stesso codice, quindi
       quello che vedi è esattamente il PNG che salvi.</li>
+      <li><b>Le copertine si caricano in un modo preciso.</b> Un'immagine presa da un altro sito
+      «contamina» il canvas e blocca il salvataggio del PNG: vanno chieste dichiarando l'origine.
+      Provato: senza quella riga il file non esce, e l'errore arriva solo al momento di salvare.</li>
+      <li><b>La ricerca aspetta un attimo.</b> Chi scrive «bohemian» non deve produrre otto richieste,
+      una per lettera, e se una risposta lenta arriva dopo una più recente viene scartata.</li>
     </ul>
   </section>
 
@@ -734,8 +740,8 @@
   const fmt2 = n => n.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   const clock = s => Math.floor(s / 60) + ':' + String(Math.round(s % 60)).padStart(2, '0');
 
-  /* Catalogo del mockup. Sportswear (1:59) e As It Was (2:47) sono verificate;
-     le altre sono durate di uso comune, da sostituire con la ricerca iTunes nel sito vero. */
+  /* Brani di partenza, mostrati prima che l'utente scriva. Appena scrive,
+     i risultati arrivano dall'archivio di Apple con durate e copertine vere. */
   const catalog = [
     { s: 119, t: 'Sportswear', w: 'Dark Polo Gang' },
     { s: 200, t: 'Blinding Lights', w: 'The Weeknd' },
@@ -749,6 +755,77 @@
     { s: 192, t: 'Brividi', w: 'Mahmood e Blanco' }
   ];
   const heroPicks = catalog.slice(0, 5);
+  let lista = catalog.slice(0, 5);   /* cosa si vede adesso nella lista */
+
+  /* ---------- l'archivio di Apple ----------
+     Gratuito, senza chiavi, e dal browser passa i controlli di origine.
+     Le copertine vanno caricate con crossOrigin: senza, il canvas si
+     "contamina" e il PNG non esce piu. Verificato, non e teoria. */
+  const cacheCopertine = new Map();
+  function caricaCopertina(c) {
+    if (!c.art || c.img) return;
+    if (cacheCopertine.has(c.art)) { c.img = cacheCopertine.get(c.art); return; }
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      c.img = img;
+      c.tinta = tintaDa(img);   /* il colore dello sfondo esce dalla copertina vera */
+      cacheCopertine.set(c.art, img);
+      render();
+    };
+    img.onerror = () => { c.art = null; };   /* si torna al segnaposto colorato */
+    img.src = c.art;
+  }
+
+  /* Due colori presi dalla copertina: la media generale e una versione cupa,
+     cosi il gradiente e davvero "dalla copertina" e non dal nome del brano. */
+  function tintaDa(img) {
+    try {
+      const n = 12, o = document.createElement('canvas');
+      o.width = n; o.height = n;
+      const g = o.getContext('2d', { willReadFrequently: true });
+      g.drawImage(img, 0, 0, n, n);
+      const d = g.getImageData(0, 0, n, n).data;
+      let r = 0, v = 0, b = 0;
+      for (let i = 0; i < d.length; i += 4) { r += d[i]; v += d[i + 1]; b += d[i + 2]; }
+      const t = d.length / 4;
+      r = Math.round(r / t); v = Math.round(v / t); b = Math.round(b / t);
+      const mix = (x, f) => Math.max(0, Math.min(255, Math.round(x * f)));
+      return ['rgb(' + mix(r, 1.18) + ',' + mix(v, 1.18) + ',' + mix(b, 1.18) + ')',
+              'rgb(' + mix(r, 0.28) + ',' + mix(v, 0.28) + ',' + mix(b, 0.28) + ')'];
+    } catch (e) { return null; }
+  }
+
+  let ricercaTimer = null, ricercaN = 0;
+  async function cercaSuApple(q) {
+    const mia = ++ricercaN;
+    try {
+      const r = await fetch('https://itunes.apple.com/search?media=music&entity=song&limit=12&country=IT&term=' +
+        encodeURIComponent(q));
+      const j = await r.json();
+      if (mia !== ricercaN) return;   /* una ricerca piu recente ha gia risposto */
+      const visti = new Set();
+      lista = j.results
+        .filter(x => x.trackTimeMillis && x.trackName && x.artistName)
+        .filter(x => {
+          const k = (x.trackName + '|' + x.artistName).toLowerCase();
+          if (visti.has(k)) return false;   /* lo stesso brano torna su piu album */
+          visti.add(k); return true;
+        })
+        .slice(0, 6)
+        .map(x => ({
+          s: Math.round(x.trackTimeMillis / 1000),
+          t: x.trackName,
+          w: x.artistName,
+          art: x.artworkUrl100 ? x.artworkUrl100.replace('100x100bb', '600x600bb') : null
+        }));
+      renderResults();
+    } catch (e) {
+      if (mia !== ricercaN) return;
+      lista = [];
+      renderResults('Non riesco a raggiungere l\'archivio di Apple. Controlla la connessione e riprova.');
+    }
+  }
 
   let km = 5;
   let paceSec = 360;
@@ -800,6 +877,7 @@
 
   function renderHero() {
     const c = song();
+    caricaCopertina(c);
     $('cLine1').innerHTML = '<span class="d">' + kmText() + '</span> sembrano tanti.';
     $('cLine2').innerHTML = 'Sono <span class="n">' + timesFor(c) + '</span> volte <span class="t">' + c.t + '</span>.';
     $('cWho').textContent = c.w + ' · ' + durLabel(c.s);
@@ -841,30 +919,30 @@
      browser il punto di ancoraggio: da li il salto della pagina toccando il
      ritmo. I numeri delle righe si aggiornano al loro posto. */
   let righe = [];
-  function renderResults() {
-    const q = $('q').value.trim().toLowerCase();
-    const found = q
-      ? catalog.filter(c => (c.t + ' ' + c.w).toLowerCase().includes(q))
-      : catalog.slice(0, 5);
+  function renderResults(messaggio) {
     const el = $('results');
     el.textContent = '';
     righe = [];
-    if (!found.length) {
+    if (messaggio || !lista.length) {
       const p = document.createElement('p');
       p.className = 'empty';
-      p.innerHTML = 'Nessuna canzone con <b>' + $('q').value.trim() + '</b>. Nel mockup il catalogo è di dieci brani: sul sito vero la ricerca pesca dall\'archivio Apple, con titolo, artista e durata veri.';
+      p.textContent = messaggio || 'Nessuna canzone con «' + $('q').value.trim() + '». Prova col titolo o con l\'artista.';
       el.appendChild(p);
       return;
     }
-    found.forEach(c => {
+    lista.forEach(c => {
+      caricaCopertina(c);
       const b = document.createElement('button');
       b.type = 'button';
-      b.innerHTML =
-        '<span class="cover" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor"><path d="M4 2.5v9l7-4.5z"/></svg></span>' +
+      const cover = c.art
+        ? '<span class="cover"><img src="' + c.art.replace('600x600bb', '100x100bb') + '" alt="" loading="lazy"></span>'
+        : '<span class="cover" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor"><path d="M4 2.5v9l7-4.5z"/></svg></span>';
+      b.innerHTML = cover +
         '<span class="name"><span>' + c.t + '</span><span class="artist">' + c.w + '</span></span>' +
         '<span class="times"><span class="n"></span><small>' + durLabel(c.s) + '</small></span>';
       b.addEventListener('click', () => {
         picked = c;
+        caricaCopertina(c);
         stopRotation();
         update();
       });
@@ -873,6 +951,7 @@
     });
     refreshRighe();
   }
+
   function refreshRighe() {
     righe.forEach(({ el, c }) => {
       const n = timesFor(c);
@@ -882,7 +961,16 @@
     });
   }
 
-  $('q').addEventListener('input', renderResults);
+  /* Si aspetta un attimo prima di chiedere: chi scrive «bohemian» non deve
+     generare otto richieste, una per lettera. E la vecchia riga passava
+     l'evento stesso come messaggio, che finiva a schermo come [object Event]. */
+  $('q').addEventListener('input', () => {
+    const q = $('q').value.trim();
+    clearTimeout(ricercaTimer);
+    if (!q) { ricercaN++; lista = catalog.slice(0, 5); renderResults(); return; }
+    renderResults('Cerco «' + q + '»…');
+    ricercaTimer = setTimeout(() => cercaSuApple(q), 320);
+  });
 
   /* ----- dati esatti: la card cambia faccia, non si allunga -----
      Tre campi legati fra loro. Distanza, tempo e ritmo sono la stessa cosa
@@ -1061,6 +1149,13 @@
     for (let i = 0; i < c.t.length; i++) h = (h * 31 + c.t.charCodeAt(i)) % 360;
     ctx.save();
     roundRect(x, y, size, size, Math.round(size * 0.13)); ctx.clip();
+    if (c.img) {   /* copertina vera */
+      ctx.drawImage(c.img, x, y, size, size);
+      ctx.restore();
+      ctx.strokeStyle = 'rgba(0,0,0,0.12)'; ctx.lineWidth = 2;
+      roundRect(x, y, size, size, Math.round(size * 0.13)); ctx.stroke();
+      return;
+    }
     const g = ctx.createLinearGradient(x, y, x + size, y + size);
     g.addColorStop(0, 'hsl(' + h + ', 62%, 52%)');
     g.addColorStop(1, 'hsl(' + ((h + 55) % 360) + ', 58%, 30%)');
@@ -1135,10 +1230,13 @@
     let a, b;
     if (sfondo === 'cover') {
       const c = song();
-      let h = 0;
-      for (let i = 0; i < c.t.length; i++) h = (h * 31 + c.t.charCodeAt(i)) % 360;
-      a = 'hsl(' + h + ', 58%, 42%)';
-      b = 'hsl(' + ((h + 40) % 360) + ', 52%, 12%)';
+      if (c.tinta) { [a, b] = c.tinta; }
+      else {
+        let h = 0;
+        for (let i = 0; i < c.t.length; i++) h = (h * 31 + c.t.charCodeAt(i)) % 360;
+        a = 'hsl(' + h + ', 58%, 42%)';
+        b = 'hsl(' + ((h + 40) % 360) + ', 52%, 12%)';
+      }
     } else {
       [a, b] = TINTE[sfondo] || TINTE[0];
     }
@@ -1482,7 +1580,7 @@
     render();
   }
 
-  renderResults();   /* la lista si costruisce una volta sola */
+  renderResults();
   aggiornaComandi();
   update();
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(render);
