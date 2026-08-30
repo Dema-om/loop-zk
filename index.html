@@ -858,6 +858,7 @@
   let picked = null;
   let sfondo = 'cover';   /* 'cover' oppure l'indice di una tinta */
   let badgeY = 0.78;
+  let badgeS = 1;   /* quanto e grande l'etichetta: 1 e la misura di partenza */
   let photo = null;
   let versione = 'frase';   /* 'frase' oppure 'dati' */
 
@@ -1359,24 +1360,31 @@
      il trascinamento. Prima il limite del disegno e quello del dito erano due
      numeri diversi, quindi ai bordi il dito si muoveva e l'etichetta no. */
   const BADGE_H = 280, BADGE_M = 60;
-  const badgeMin = () => (SAFE + BADGE_H / 2) / H;
-  const badgeMax = () => (H - SAFE - BADGE_H / 2) / H;
+  const BADGE_W = () => W - BADGE_M * 2;          /* misura base, prima della scala */
+  const badgeH = () => BADGE_H * badgeS;
+  const badgeMin = () => (SAFE + badgeH() / 2) / H;
+  const badgeMax = () => (H - SAFE - badgeH() / 2) / H;
   const clampY = v => Math.min(Math.max(v, badgeMin()), badgeMax());
+  /* Il riquadro vero, gia scalato: lo usano il dito e il limite dei bordi.
+     Il disegno invece lavora sempre sulla misura base e lascia fare alla scala,
+     altrimenti rimpicciolendo cambierebbe anche dove va a capo il titolo. */
   function badgeRect() {
     const cy = clampY(badgeY) * H;
-    return { x: BADGE_M, y: cy - BADGE_H / 2, w: W - BADGE_M * 2, h: BADGE_H, cy };
+    const w = BADGE_W() * badgeS, h = badgeH();
+    return { x: (W - w) / 2, y: cy - h / 2, w, h, cy };
   }
 
   function drawBadge() {
     const c = song();
     const r0 = badgeRect();
-    const M = BADGE_M, PAD = 44, w = r0.w, h = r0.h;
+    const M = BADGE_M, PAD = 44, w = BADGE_W(), h = BADGE_H;
     const cx = W / 2, cy = r0.cy;
     const inkC = '#121212', softC = '#5F6963';
 
     ctx.save();
     ctx.translate(cx, cy);
     ctx.rotate(-1.2 * Math.PI / 180);
+    ctx.scale(badgeS, badgeS);
     ctx.translate(-w / 2, -h / 2);
 
     ctx.save();
@@ -1474,7 +1482,7 @@
     $('shareClaim').hidden = dati;
     $('save').disabled = dati && !photo;
     $('shareHint').innerHTML = dati
-      ? (photo ? '<b>Trascina l\'etichetta</b> per spostarla dove vuoi.'
+      ? (photo ? '<b>Trascina l\'etichetta</b> per spostarla, <b>pizzica</b> per rimpicciolirla.'
                : 'Scatta una foto o prendila dal rullino: l\'etichetta ci finisce sopra.')
       : 'Scegli il colore e condividi.';
   }
@@ -1510,9 +1518,32 @@
      limite del dito non coincideva con quello del disegno. */
   let dragging = false, grabDY = 0;
   const yInCanvas = e => (e.clientY - cv.getBoundingClientRect().top) * (H / cv.getBoundingClientRect().height);
+  const xInCanvas = e => (e.clientX - cv.getBoundingClientRect().left) * (W / cv.getBoundingClientRect().width);
+
+  /* Pizzico a due dita per rimpicciolire l'etichetta.
+     Spotify questo gesto non lo scrive: passa a Instagram uno sticker, ed e
+     l'editor di Instagram a dare pizzico, rotazione e trascinamento. Noi
+     usciamo con un PNG piatto, dove l'etichetta e gia cotta dentro la foto,
+     quindi il gesto ce lo dobbiamo dare da soli. */
+  const SMIN = 0.62, SMAX = 1;
+  const tocchi = new Map();
+  let pinchD0 = 0, pinchS0 = 1;
+  const distanzaFra = () => {
+    const p = [...tocchi.values()];
+    return Math.hypot(p[0].x - p[1].x, p[0].y - p[1].y);
+  };
+  const scala = v => { badgeS = Math.min(Math.max(v, SMIN), SMAX); badgeY = clampY(badgeY); render(); };
 
   cv.addEventListener('pointerdown', e => {
     if (versione !== 'dati') return;           /* si trascina solo l'etichetta */
+    tocchi.set(e.pointerId, { x: xInCanvas(e), y: yInCanvas(e) });
+    if (tocchi.size === 2) {                   /* due dita: si passa al pizzico */
+      dragging = false;
+      pinchD0 = distanzaFra() || 1;
+      pinchS0 = badgeS;
+      e.preventDefault();
+      return;
+    }
     const y = yInCanvas(e), r = badgeRect();
     if (y < r.y - 24 || y > r.y + r.h + 24) return;   /* si afferra l'etichetta, non la foto */
     dragging = true;
@@ -1521,17 +1552,27 @@
     e.preventDefault();
   });
   cv.addEventListener('pointermove', e => {
+    if (tocchi.has(e.pointerId)) tocchi.set(e.pointerId, { x: xInCanvas(e), y: yInCanvas(e) });
+    if (tocchi.size === 2) { scala(pinchS0 * (distanzaFra() / pinchD0)); e.preventDefault(); return; }
     if (!dragging) return;
     badgeY = clampY((yInCanvas(e) - grabDY) / H);
     render();
   });
-  const endDrag = () => { dragging = false; };
+  const endDrag = e => { if (e && e.pointerId !== undefined) tocchi.delete(e.pointerId); dragging = false; };
   cv.addEventListener('pointerup', endDrag);
   cv.addEventListener('pointercancel', endDrag);
+  /* Sul portatile il pizzico del trackpad arriva come rotella col tasto ctrl. */
+  cv.addEventListener('wheel', e => {
+    if (versione !== 'dati' || !e.ctrlKey) return;
+    e.preventDefault();
+    scala(badgeS - e.deltaY * 0.006);
+  }, { passive: false });
   cv.addEventListener('keydown', e => {
     if (versione !== 'dati') return;
     if (e.key === 'ArrowUp') { badgeY = clampY(badgeY - 0.03); render(); e.preventDefault(); }
     if (e.key === 'ArrowDown') { badgeY = clampY(badgeY + 0.03); render(); e.preventDefault(); }
+    if (e.key === '-' || e.key === '_') { scala(badgeS - 0.06); e.preventDefault(); }
+    if (e.key === '+' || e.key === '=') { scala(badgeS + 0.06); e.preventDefault(); }
   });
 
   document.querySelectorAll('#sfondi button').forEach(b => {
