@@ -33,11 +33,20 @@ La foto dell'utente **non lascia il browser**. Non c'è upload, non c'è un serv
 
 ## Da fare
 
-- Ricerca canzone vera con la iTunes Search API (gratuita, senza chiavi, CORS aperto), al posto del catalogo di dieci brani del mockup
-- Copertine vere al posto dei segnaposto colorati, con la riserva sui diritti delle immagini
-- Condivisione nativa del telefono al posto del download
-- `lang`, viewport e meta per l'anteprima social
+- Immagine per l'anteprima social (`og:image`): il meta è tolto finché non esiste il file
 - Scelta dell'etichetta fra i quattro concept in `design/`
+
+## Come va online
+
+Il sito sta su Vercel, progetto `inloop` del team zetakiwi, con `inloop.zetakiwi.com`
+puntato lì da Cloudflare (CNAME, proxy spento: col proxy acceso si finisce in un ciclo
+di reindirizzamenti).
+
+Il progetto **non è ancora collegato a GitHub**, quindi le modifiche non vanno online da
+sole. L'app di Vercel su GitHub è installata sull'account, ma vede solo `jet-netto` e
+`ZETAKIWI`: `loop-zk` è nata dopo e non è nell'elenco. Si aggiunge da
+`github.com/settings/installations` → Vercel → Configure, e da lì il progetto si collega
+in `vercel.com/zetakiwi/inloop/settings/git`.
 
 ## Sviluppo
 
