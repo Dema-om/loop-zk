@@ -1,4 +1,4 @@
-<title>La riga dei dati</title>
+<title>Lo sticker</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;800;900&display=swap">
 <style>
@@ -16,66 +16,77 @@
   * { box-sizing: border-box; }
   body {
     margin: 0; background: var(--ground); color: var(--ink);
-    font-family: "Figtree", "Avenir Next", Avenir, sans-serif; line-height: 1.5;
+    font-family: "Figtree", "Avenir Next", Avenir, sans-serif; line-height: 1.55;
   }
-  .wrap { max-width: 1080px; margin: 0 auto; padding: 28px 20px 70px; }
-  header { max-width: 46em; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 30px 20px 70px; }
+  header, .section > p, .rules { max-width: 46em; }
+
   .eyebrow {
     font-size: 11px; font-weight: 800; letter-spacing: 0.14em;
     text-transform: uppercase; color: var(--green-text); margin: 0 0 10px;
   }
   h1 {
     font-weight: 900; font-size: clamp(30px, 5.5vw, 46px);
-    line-height: 1.05; letter-spacing: -0.03em; margin: 0 0 12px; text-wrap: balance;
+    line-height: 1.05; letter-spacing: -0.03em; margin: 0 0 14px; text-wrap: balance;
   }
   header p { color: var(--soft); font-size: 15px; margin: 0 0 10px; }
-  header p b { color: var(--ink); }
+  header p b, .section > p b { color: var(--ink); }
+
+  .scale {
+    margin: 24px 0 0; padding: 16px 18px;
+    background: #FFF3E9; border: 1px solid #F6CBAA; border-radius: 16px;
+    font-size: 14px;
+  }
+  .scale b { font-weight: 800; }
 
   .rules {
-    margin: 24px 0 0; padding: 16px 18px;
+    margin: 22px 0 0; padding: 16px 18px;
     background: var(--card); border: 1px solid var(--line); border-radius: 16px;
   }
-  .rules h2 {
+  .rules h3 {
     font-size: 11px; font-weight: 800; letter-spacing: 0.12em;
     text-transform: uppercase; color: var(--soft); margin: 0 0 10px;
   }
   .rules ul { margin: 0; padding-left: 18px; font-size: 14px; }
   .rules li { margin-bottom: 6px; }
   .rules b { font-weight: 800; }
-  .rules code {
+  code {
     font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
     font-size: 13px; background: var(--chip); border-radius: 5px; padding: 1px 5px;
   }
 
-  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; margin-top: 38px; }
-  @media (max-width: 860px) { .grid { grid-template-columns: 1fr; } }
+  .section { margin-top: 54px; }
+  .section > h2 {
+    font-weight: 900; font-size: clamp(24px, 4vw, 32px);
+    letter-spacing: -0.025em; margin: 0 0 8px;
+  }
+  .section > p { color: var(--soft); font-size: 15px; margin: 0 0 8px; }
 
-  .v .tag {
+  .stack { display: grid; gap: 30px; margin-top: 26px; }
+  .row .tag {
     display: inline-block; font-size: 11px; font-weight: 800;
     letter-spacing: 0.1em; text-transform: uppercase;
     background: var(--chip); border: 1px solid var(--line);
     border-radius: 999px; padding: 4px 11px; color: var(--soft);
   }
-  .v h3 { font-weight: 900; font-size: 20px; letter-spacing: -0.02em; margin: 10px 0 6px; }
-  .v p { font-size: 14px; color: var(--soft); margin: 0 0 4px; }
-  .v p.verdict { color: var(--ink); font-weight: 600; }
-  .v canvas {
-    display: block; width: 100%; height: auto; margin: 14px 0 0;
+  .row h3 { font-weight: 900; font-size: 21px; letter-spacing: -0.02em; margin: 10px 0 6px; }
+  .row p { font-size: 14px; color: var(--soft); margin: 0 0 4px; max-width: 46em; }
+  .row p.verdict { color: var(--ink); font-weight: 600; }
+  .row canvas {
+    display: block; width: 100%; max-width: 720px; height: auto; margin: 14px 0 0;
+    border-radius: 16px; border: 1px solid var(--line); background: #FFFFFF;
+  }
+
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; margin-top: 26px; }
+  @media (max-width: 860px) { .grid3 { grid-template-columns: 1fr; } }
+  .grid3 canvas {
+    display: block; width: 100%; height: auto; margin: 12px 0 0;
     border-radius: 20px; border: 1px solid var(--line);
     box-shadow: 0 14px 40px rgba(18, 18, 18, 0.13);
   }
 
-  .zoom { margin-top: 44px; }
-  .zoom h2 { font-weight: 900; font-size: 22px; letter-spacing: -0.02em; margin: 0 0 6px; }
-  .zoom p { color: var(--soft); font-size: 14px; margin: 0 0 16px; }
-  .zoom canvas {
-    display: block; width: 100%; max-width: 620px; height: auto;
-    border-radius: 18px; border: 1px solid var(--line); margin-bottom: 16px;
-    background: #FFFFFF;
-  }
-
   footer {
-    margin-top: 46px; border-top: 1px solid var(--line);
+    margin-top: 54px; border-top: 1px solid var(--line);
     padding-top: 22px; color: var(--soft); font-size: 13px; max-width: 46em;
   }
   footer b { color: var(--ink); }
@@ -84,67 +95,104 @@
 <div class="wrap">
   <header>
     <p class="eyebrow">Volte · sticker</p>
-    <h1>Tre modi di scrivere la corsa</h1>
-    <p>Lo sticker resta quello, cambia solo la riga in basso. Prima diceva <b>«5 km di corsa in 30 min»</b>, che è una frase travestita da dato: dice «corsa» quando i numeri lo dicono già, e mette un «in» dove va un separatore.</p>
+    <h1>Lo sticker, rifatto con le regole dei widget</h1>
+    <p>Due ricerche: una sugli sticker di condivisione veri (Strava, Garmin, Nike Run Club), una sui widget e sulle complicazioni degli orologi. La seconda ha detto la cosa più utile, e non era sulla riga dei dati.</p>
 
-    <div class="rules">
-      <h2>Cosa dice la ricerca</h2>
-      <ul>
-        <li>Il trio del settore è <b>distanza, tempo, passo</b>. Strava e Garmin mettono quelli e la mappa, niente altro.</li>
-        <li>In uno spazio piccolo si reggono <b>due metriche, tre al massimo</b>. La prima da tagliare è quella che si ricava dalle altre.</li>
-        <li>Il passo si scrive <code>6:00/km</code> senza spazio, e quell'unità <b>dice «corsa» da sola</b>: la parola e l'icona diventano ridondanti.</li>
-        <li>Separatore: <b>punto mediano spaziato</b>. La barra è dura, la virgola trasforma i dati in prosa.</li>
-        <li>Etichette solo in maiuscoletto e solo sopra il numero, mai accanto.</li>
-        <li>Cifre tabulari sempre, così i numeri non ballano quando cambiano.</li>
-      </ul>
+    <div class="scale">
+      <b>La misura che cambia tutto.</b> Lo sticker è 960×290 px su una storia da 1080×1920.
+      Ma una storia su un telefono è alta circa 393 punti, quindi <b>un pixel dello sticker vale 0,36 punti</b>:
+      i nostri 290 px sono <b>105 punti veri</b>, cioè l'altezza di un widget stretto o di mezza complicazione da orologio.
+      Non stiamo disegnando una card. Stiamo disegnando un widget, e finora l'ho riempito come se fosse una card.
     </div>
 
-    <p style="margin-top:18px"><b>Una cosa però non la copio.</b> La ricerca dice di scrivere <code>5,04 km</code>, perché il decimale segnala una misura vera. Ma noi siamo <b>prima</b> della corsa: quello non è un dato misurato, è un obiettivo che l'utente ha scelto toccando «5 km». Scriverlo con i decimali sarebbe fingere una precisione che non abbiamo. Quindi resta tondo.</p>
+    <div class="rules">
+      <h3>Le regole che ne escono</h3>
+      <ul>
+        <li>Apple mette un tetto secco: <b>massimo quattro informazioni</b> in un widget piccolo. Il nostro sticker ne ha sei.</li>
+        <li>La copertina <b>non conta</b> come informazione: non si legge, si riconosce. Ma sopra non ci va niente.</li>
+        <li><b>Un solo numero grande.</b> Se ce ne sono due, non ce n'è nessuno.</li>
+        <li>Le frasi costano il triplo del dato: <code>16</code> con sotto <code>IN LOOP</code> occupa un terzo di «In loop per 16 volte».</li>
+        <li>Testo minimo <b>30 px assoluti, 36 px ragionevoli</b>. Molto più grande di quanto viene istintivo a questa larghezza.</li>
+        <li>Margini <b>44 px</b>, e <b>30 px</b> attorno alla copertina.</li>
+        <li>Fondo pieno, non velo: sopra una foto qualsiasi il velo non garantisce niente.</li>
+        <li>Via icone, etichette ovvie e decimali. Se serve tagliare ancora: prima l'etichetta, poi i minuti.</li>
+      </ul>
+    </div>
   </header>
 
-  <div class="grid">
-    <section class="v">
-      <span class="tag">1</span>
-      <h3>Due metriche</h3>
-      <p><code>5 KM · 30 MIN</code></p>
-      <p class="verdict">Il più leggibile. Non dice che è una corsa: lo deve capire dal contesto.</p>
-      <canvas id="v1" width="1080" height="1920" aria-label="Variante 1"></canvas>
-    </section>
+  <section class="section">
+    <h2>Tre gerarchie</h2>
+    <p>Stessi contenuti, tre modi di pesarli. Qui sono su fondo bianco a grandezza quasi reale, per guardare la composizione senza la foto che distrae.</p>
 
-    <section class="v">
-      <span class="tag">2</span>
-      <h3>Col passo</h3>
-      <p><code>5 km · 30 min · 6:00/km</code></p>
-      <p class="verdict">Il <code>/km</code> dichiara la corsa senza scriverlo. È la formula di Strava.</p>
-      <canvas id="v2" width="1080" height="1920" aria-label="Variante 2"></canvas>
-    </section>
+    <div class="stack">
+      <div class="row">
+        <span class="tag">A · quella di adesso</span>
+        <h3>La frase</h3>
+        <p>«In loop per 16 volte» scritta per esteso, poi titolo, artista e dati. Sei informazioni tutte allo stesso peso.</p>
+        <p class="verdict">Si legge bene qui, ma a 105 punti veri diventa un muro di testo piccolo.</p>
+        <canvas id="a" width="1160" height="400" aria-label="Gerarchia A"></canvas>
+      </div>
 
-    <section class="v">
-      <span class="tag">3</span>
-      <h3>Con le etichette</h3>
-      <p><code>DISTANZA 5 km · TEMPO 30 min</code></p>
-      <p class="verdict">Zero ambiguità, ma ruba altezza allo sticker e lo fa somigliare a un cruscotto.</p>
-      <canvas id="v3" width="1080" height="1920" aria-label="Variante 3"></canvas>
-    </section>
-  </div>
+      <div class="row">
+        <span class="tag">B · la raccomandazione</span>
+        <h3>Il numero</h3>
+        <p>La frase sparisce e diventa dato: <code>16</code> grande a destra con <code>IN LOOP</code> sotto. A sinistra la copertina, in mezzo titolo, artista e corsa in tre righe di peso calante.</p>
+        <p class="verdict">Il più leggibile di slancio. Ma perde la parola «volte», che è il concept.</p>
+        <canvas id="b" width="1160" height="400" aria-label="Gerarchia B"></canvas>
+      </div>
 
-  <section class="zoom">
-    <h2>Le tre righe da vicino</h2>
-    <p>Stessa scala, una sotto l'altra, senza foto intorno.</p>
-    <canvas id="z" width="1240" height="560" aria-label="Le tre righe ingrandite"></canvas>
+      <div class="row">
+        <span class="tag">C · la via di mezzo</span>
+        <h3>Il numero che parla</h3>
+        <p>Come B, ma il blocco grande dice <code>16 volte</code> invece di <code>16</code>, con <code>IN LOOP</code> come etichetta sopra. Il concept sopravvive, la frase no.</p>
+        <p class="verdict">Tiene la battuta e la gerarchia. Costa un po' di larghezza al titolo.</p>
+        <canvas id="c" width="1160" height="400" aria-label="Gerarchia C"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>La riga dei dati</h2>
+    <p>Dentro la gerarchia scelta, come si scrive la corsa. Prima diceva <b>«5 km di corsa in 30 min»</b>: una frase travestita da dato, che dice «corsa» quando i numeri lo dicono già e mette un «in» dove va un separatore.</p>
+    <p><b>Una cosa della ricerca non la copio.</b> Dice di scrivere <code>5,04 km</code>, perché il decimale segnala una misura vera. Vale per chi condivide una corsa fatta. Noi siamo prima: quello è un obiettivo che l'utente ha scelto toccando «5 km», e mettere i decimali fingerebbe una precisione che non abbiamo.</p>
+
+    <div class="grid3">
+      <div class="row">
+        <span class="tag">1</span>
+        <h3>Due metriche</h3>
+        <p><code>5 KM · 30 MIN</code></p>
+        <p class="verdict">Il più pulito. Non dichiara che è una corsa.</p>
+        <canvas id="v1" width="1080" height="1920" aria-label="Variante 1"></canvas>
+      </div>
+      <div class="row">
+        <span class="tag">2</span>
+        <h3>Col passo</h3>
+        <p><code>5 km · 30 min · 6:00/km</code></p>
+        <p class="verdict">Quel <code>/km</code> dice «corsa» senza scriverlo. Tre metriche sono il tetto.</p>
+        <canvas id="v2" width="1080" height="1920" aria-label="Variante 2"></canvas>
+      </div>
+      <div class="row">
+        <span class="tag">3</span>
+        <h3>Con le etichette</h3>
+        <p><code>DISTANZA 5 km · TEMPO 30 min</code></p>
+        <p class="verdict">Le due ricerche la bocciano: etichette ovvie, e ruba altezza.</p>
+        <canvas id="v3" width="1080" height="1920" aria-label="Variante 3"></canvas>
+      </div>
+    </div>
   </section>
 
   <footer>
-    Esempio: <b>Sportswear</b>, 1:59, per 5 km a ritmo normale. Dimmi il numero e lo porto sul sito.
-    Manca ancora la ricerca sui widget: se dice qualcosa di diverso sulla gerarchia, ti aggiorno questa pagina.
+    Esempio: <b>Sportswear</b>, 1:59, per 5 km a ritmo normale.
+    Se me la devi chiedere: gerarchia <b>C</b> con la riga <b>2</b>, perché tiene la battuta e lascia che sia il passo a dire che stai correndo.
+    Dimmi lettera e numero e lo porto sul sito.
   </footer>
 </div>
 
 <script>
   const song = { t: 'Sportswear', w: 'Dark Polo Gang' };
   const times = 16;
-  const GREEN = '#1DB954', GREEN_T = '#0E7A38', ORANGE = '#FC4C02';
-  const INK = '#121212', SOFT = '#5F6963', LINE = '#E2E7E0';
+  const GREEN_T = '#0E7A38', ORANGE = '#FC4C02';
+  const INK = '#121212', SOFT = '#5F6963', LINE = '#E2E7E0', SEP = '#C9D2C6';
   const F = (w, s) => w + ' ' + s + 'px Figtree, Avenir Next, Avenir, sans-serif';
 
   function roundRect(ctx, x, y, w, h, r) {
@@ -163,21 +211,6 @@
     while (t.length > 1 && ctx.measureText(t + '…').width > maxW) t = t.slice(0, -1);
     return t + '…';
   }
-  function photo(ctx) {
-    const g = ctx.createLinearGradient(0, 0, 0, 1920);
-    g.addColorStop(0, '#2C3E63'); g.addColorStop(0.45, '#C4653C'); g.addColorStop(1, '#3A2A24');
-    ctx.fillStyle = g; ctx.fillRect(0, 0, 1080, 1920);
-    ctx.fillStyle = '#F6C88A';
-    ctx.beginPath(); ctx.arc(700, 720, 120, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = '#241A18';
-    ctx.beginPath();
-    ctx.moveTo(0, 1920); ctx.lineTo(430, 900); ctx.lineTo(650, 900); ctx.lineTo(1080, 1920);
-    ctx.closePath(); ctx.fill();
-    ctx.strokeStyle = 'rgba(255,255,255,0.35)'; ctx.lineWidth = 14;
-    ctx.setLineDash([70, 90]);
-    ctx.beginPath(); ctx.moveTo(540, 1920); ctx.lineTo(540, 910); ctx.stroke();
-    ctx.setLineDash([]);
-  }
   function cover(ctx, x, y, size, radius) {
     let h = 0; for (let i = 0; i < song.t.length; i++) h = (h * 31 + song.t.charCodeAt(i)) % 360;
     ctx.save();
@@ -193,15 +226,28 @@
     ctx.closePath(); ctx.fill();
     ctx.restore();
   }
+  function photo(ctx) {
+    const g = ctx.createLinearGradient(0, 0, 0, 1920);
+    g.addColorStop(0, '#2C3E63'); g.addColorStop(0.45, '#C4653C'); g.addColorStop(1, '#3A2A24');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, 1080, 1920);
+    ctx.fillStyle = '#F6C88A';
+    ctx.beginPath(); ctx.arc(700, 720, 120, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#241A18';
+    ctx.beginPath();
+    ctx.moveTo(0, 1920); ctx.lineTo(430, 900); ctx.lineTo(650, 900); ctx.lineTo(1080, 1920);
+    ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.35)'; ctx.lineWidth = 14;
+    ctx.setLineDash([70, 90]);
+    ctx.beginPath(); ctx.moveTo(540, 1920); ctx.lineTo(540, 910); ctx.stroke();
+    ctx.setLineDash([]);
+  }
 
-  /* le tre righe: ognuna disegna a partire da (x, baseline) e non torna a capo */
+  /* ---- le tre righe dei dati ---- */
   function riga1(ctx, x, y) {
-    ctx.font = F(800, 34);
-    ctx.letterSpacing = '1.5px';
-    ctx.fillStyle = ORANGE;
+    ctx.font = F(800, 36); ctx.letterSpacing = '1.5px'; ctx.fillStyle = ORANGE;
     ctx.fillText('5 KM', x, y);
     let cx = x + ctx.measureText('5 KM').width + 16;
-    ctx.fillStyle = '#C9D2C6'; ctx.fillText('·', cx, y);
+    ctx.fillStyle = SEP; ctx.fillText('·', cx, y);
     cx += ctx.measureText('·').width + 16;
     ctx.fillStyle = ORANGE; ctx.fillText('30 MIN', cx, y);
     ctx.letterSpacing = '0px';
@@ -210,50 +256,32 @@
     const parts = ['5 km', '30 min', '6:00/km'];
     let cx = x;
     parts.forEach((p, i) => {
-      ctx.font = F(800, 34); ctx.fillStyle = ORANGE;
-      ctx.fillText(p, cx, y);
-      cx += ctx.measureText(p).width;
+      ctx.font = F(800, 36); ctx.fillStyle = ORANGE;
+      ctx.fillText(p, cx, y); cx += ctx.measureText(p).width;
       if (i < parts.length - 1) {
-        ctx.fillStyle = '#C9D2C6'; ctx.fillText(' · ', cx, y);
+        ctx.fillStyle = SEP; ctx.fillText(' · ', cx, y);
         cx += ctx.measureText(' · ').width;
       }
     });
   }
   function riga3(ctx, x, y) {
-    /* etichetta sopra, numero sotto: la baseline passata è quella del numero */
     const cols = [['DISTANZA', '5 km'], ['TEMPO', '30 min']];
     let cx = x;
     cols.forEach((c, i) => {
-      ctx.font = F(800, 22); ctx.letterSpacing = '2.5px';
-      ctx.fillStyle = SOFT; ctx.fillText(c[0], cx, y - 42);
-      ctx.letterSpacing = '0px';
+      ctx.font = F(800, 22); ctx.letterSpacing = '2.5px'; ctx.fillStyle = SOFT;
+      ctx.fillText(c[0], cx, y - 42); ctx.letterSpacing = '0px';
       ctx.font = F(800, 36); ctx.fillStyle = ORANGE;
       ctx.fillText(c[1], cx, y);
-      const w = Math.max(ctx.measureText(c[1]).width, 150);
-      cx += w + 54;
-      if (i === 0) {
-        ctx.fillStyle = '#E2E7E0';
-        ctx.fillRect(cx - 34, y - 52, 3, 58);
-      }
+      cx += Math.max(ctx.measureText(c[1]).width, 150) + 54;
+      if (i === 0) { ctx.fillStyle = LINE; ctx.fillRect(cx - 34, y - 52, 3, 58); }
     });
   }
 
-  /* lo sticker: identico nelle tre varianti, cambia solo la riga finale */
-  function sticker(ctxId, drawRiga, alta) {
-    const ctx = document.getElementById(ctxId).getContext('2d');
-    photo(ctx);
-    const M = 60, w = 1080 - M * 2, h = alta ? 320 : 290, x = M, y = 1360;
-    ctx.save();
-    ctx.translate(x + w / 2, y + h / 2); ctx.rotate(-1.2 * Math.PI / 180); ctx.translate(-w / 2, -h / 2);
-    ctx.shadowColor = 'rgba(0,0,0,0.32)'; ctx.shadowBlur = 60; ctx.shadowOffsetY = 18;
-    ctx.fillStyle = '#FFFFFF'; roundRect(ctx, 0, 0, w, h, 40); ctx.fill();
-    ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
-
-    const P = 40, COV = alta ? 240 : 210;
+  /* ---- le tre gerarchie, disegnate dentro un rettangolo 960 x h ---- */
+  function corpoA(ctx, w, h) {
+    const P = 40, COV = 210;
     cover(ctx, P, P, COV, 16);
-    const tx = P + COV + 30, tw = w - tx - P - 160;
-    ctx.textBaseline = 'alphabetic';
-
+    const tx = P + COV + 30, tw = w - tx - P - 170;
     let cx = tx;
     ctx.fillStyle = SOFT; ctx.font = F(600, 40);
     ctx.fillText('In loop per', cx, P + 66);
@@ -263,43 +291,123 @@
     cx += ctx.measureText(String(times)).width + 14;
     ctx.fillStyle = INK; ctx.font = F(800, 44);
     ctx.fillText('volte', cx, P + 66);
-
     ctx.fillStyle = INK; ctx.font = F(800, 38);
     ctx.fillText(fit(ctx, song.t, F(800, 38), tw), tx, P + 122);
     ctx.fillStyle = SOFT; ctx.font = F(600, 32);
     ctx.fillText(fit(ctx, song.w, F(600, 32), tw), tx, P + 166);
-
-    drawRiga(ctx, tx, P + (alta ? 232 : 222));
-
+    riga2(ctx, tx, P + 222);
     ctx.fillStyle = SOFT; ctx.font = F(600, 26);
+    ctx.textAlign = 'right'; ctx.fillText('volte.run', w - P, P + 66); ctx.textAlign = 'left';
+  }
+
+  function corpoB(ctx, w, h) {
+    const P = 44, COV = 210;
+    cover(ctx, P, P, COV, 16);
+    /* colonna del numero, ancorata a destra */
     ctx.textAlign = 'right';
-    ctx.fillText('volte.run', w - P, P + 66);
+    ctx.fillStyle = GREEN_T; ctx.font = F(900, 108);
+    ctx.fillText(String(times), w - P, P + 132);
+    ctx.fillStyle = SOFT; ctx.font = F(800, 28); ctx.letterSpacing = '3px';
+    ctx.fillText('IN LOOP', w - P, P + 180);
+    ctx.letterSpacing = '0px';
+    ctx.font = F(600, 26); ctx.fillStyle = SOFT;
+    ctx.fillText('volte.run', w - P, P + 228);
     ctx.textAlign = 'left';
+    /* colonna centrale */
+    const tx = P + COV + 30, tw = w - tx - P - 230;
+    ctx.fillStyle = INK; ctx.font = F(800, 48);
+    ctx.fillText(fit(ctx, song.t, F(800, 48), tw), tx, P + 76);
+    ctx.fillStyle = SOFT; ctx.font = F(600, 36);
+    ctx.fillText(fit(ctx, song.w, F(600, 36), tw), tx, P + 128);
+    riga2(ctx, tx, P + 196);
+  }
+
+  function corpoC(ctx, w, h) {
+    const P = 44, COV = 210;
+    cover(ctx, P, P, COV, 16);
+    /* blocco grande a destra: etichetta sopra, "16 volte" sotto */
+    ctx.textAlign = 'right';
+    ctx.fillStyle = SOFT; ctx.font = F(800, 26); ctx.letterSpacing = '3px';
+    ctx.fillText('IN LOOP', w - P, P + 40);
+    ctx.letterSpacing = '0px';
+    ctx.font = F(800, 46); ctx.fillStyle = INK;
+    const vw = ctx.measureText(' volte').width;
+    ctx.fillText(' volte', w - P, P + 140);
+    ctx.fillStyle = GREEN_T; ctx.font = F(900, 100);
+    ctx.fillText(String(times), w - P - vw, P + 140);
+    ctx.fillStyle = SOFT; ctx.font = F(600, 26);
+    ctx.fillText('volte.run', w - P, P + 226);
+    ctx.textAlign = 'left';
+    /* colonna centrale */
+    const bigW = 320;
+    const tx = P + COV + 30, tw = w - tx - P - bigW;
+    ctx.fillStyle = INK; ctx.font = F(800, 46);
+    ctx.fillText(fit(ctx, song.t, F(800, 46), tw), tx, P + 76);
+    ctx.fillStyle = SOFT; ctx.font = F(600, 36);
+    ctx.fillText(fit(ctx, song.w, F(600, 36), tw), tx, P + 128);
+    riga2(ctx, tx, P + 196);
+  }
+
+  /* i tre confronti su fondo bianco */
+  function gerarchia(id, corpo) {
+    const cv = document.getElementById(id);
+    const ctx = cv.getContext('2d');
+    ctx.clearRect(0, 0, cv.width, cv.height);
+    ctx.fillStyle = '#F6F8F4'; ctx.fillRect(0, 0, cv.width, cv.height);
+    const w = 960, h = 290, x = (cv.width - w) / 2, y = (cv.height - h) / 2;
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.shadowColor = 'rgba(0,0,0,0.14)'; ctx.shadowBlur = 40; ctx.shadowOffsetY = 12;
+    ctx.fillStyle = '#FFFFFF'; roundRect(ctx, 0, 0, w, h, 40); ctx.fill();
+    ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
+    ctx.textBaseline = 'alphabetic';
+    corpo(ctx, w, h);
     ctx.restore();
   }
 
-  /* le tre righe ingrandite, senza foto */
-  function zoom() {
-    const ctx = document.getElementById('z').getContext('2d');
-    ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0, 0, 1240, 560);
+  /* le tre righe dentro lo sticker C, sopra la foto */
+  function stickerConRiga(id, drawRiga, alta) {
+    const ctx = document.getElementById(id).getContext('2d');
+    photo(ctx);
+    const M = 60, w = 1080 - M * 2, h = alta ? 330 : 290, x = M, y = 1360;
+    ctx.save();
+    ctx.translate(x + w / 2, y + h / 2); ctx.rotate(-1.2 * Math.PI / 180); ctx.translate(-w / 2, -h / 2);
+    ctx.shadowColor = 'rgba(0,0,0,0.32)'; ctx.shadowBlur = 60; ctx.shadowOffsetY = 18;
+    ctx.fillStyle = '#FFFFFF'; roundRect(ctx, 0, 0, w, h, 40); ctx.fill();
+    ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
     ctx.textBaseline = 'alphabetic';
-    const label = (t, y) => {
-      ctx.fillStyle = '#9AA49C'; ctx.font = F(800, 22);
-      ctx.letterSpacing = '2px'; ctx.fillText(t, 60, y); ctx.letterSpacing = '0px';
-    };
-    label('VARIANTE 1', 90); riga1(ctx, 60, 150);
-    ctx.strokeStyle = LINE; ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.moveTo(60, 200); ctx.lineTo(1180, 200); ctx.stroke();
-    label('VARIANTE 2', 260); riga2(ctx, 60, 320);
-    ctx.beginPath(); ctx.moveTo(60, 370); ctx.lineTo(1180, 370); ctx.stroke();
-    label('VARIANTE 3', 430); riga3(ctx, 60, 520);
+
+    const P = 44, COV = 210;
+    cover(ctx, P, P, COV, 16);
+    ctx.textAlign = 'right';
+    ctx.fillStyle = SOFT; ctx.font = F(800, 26); ctx.letterSpacing = '3px';
+    ctx.fillText('IN LOOP', w - P, P + 40); ctx.letterSpacing = '0px';
+    ctx.font = F(800, 46); ctx.fillStyle = INK;
+    const vw = ctx.measureText(' volte').width;
+    ctx.fillText(' volte', w - P, P + 140);
+    ctx.fillStyle = GREEN_T; ctx.font = F(900, 100);
+    ctx.fillText(String(times), w - P - vw, P + 140);
+    ctx.fillStyle = SOFT; ctx.font = F(600, 26);
+    ctx.fillText('volte.run', w - P, P + 226);
+    ctx.textAlign = 'left';
+
+    const bigW = 320;
+    const tx = P + COV + 30, tw = w - tx - P - bigW;
+    ctx.fillStyle = INK; ctx.font = F(800, 46);
+    ctx.fillText(fit(ctx, song.t, F(800, 46), tw), tx, P + 76);
+    ctx.fillStyle = SOFT; ctx.font = F(600, 36);
+    ctx.fillText(fit(ctx, song.w, F(600, 36), tw), tx, P + 128);
+    drawRiga(ctx, tx, P + (alta ? 226 : 196));
+    ctx.restore();
   }
 
   function drawAll() {
-    sticker('v1', riga1, false);
-    sticker('v2', riga2, false);
-    sticker('v3', riga3, true);
-    zoom();
+    gerarchia('a', corpoA);
+    gerarchia('b', corpoB);
+    gerarchia('c', corpoC);
+    stickerConRiga('v1', riga1, false);
+    stickerConRiga('v2', riga2, false);
+    stickerConRiga('v3', riga3, true);
   }
   drawAll();
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(drawAll);
