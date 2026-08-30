@@ -1109,6 +1109,20 @@
     } catch (e) { /* si resta sui brani scritti a mano */ }
   }
 
+  /* La copertina arriva dalla rete, e il PNG puo uscire prima di lei: nello
+     scatto di Matteo la card era gia esportata col segnaposto colorato al
+     posto della copertina vera. Prima di salvare si aspetta, ma non per
+     sempre: dopo tre secondi si esce lo stesso col segnaposto. */
+  function attendiCopertina(c) {
+    if (!c.art || c.img) return Promise.resolve();
+    return new Promise(res => {
+      const scadenza = setTimeout(res, 3000);
+      const guarda = setInterval(() => {
+        if (c.img || !c.art) { clearInterval(guarda); clearTimeout(scadenza); res(); }
+      }, 90);
+    });
+  }
+
   async function copertineDiPartenza() {
     await Promise.all(catalog.slice(0, 5).map(async c => {
       try {
@@ -1520,22 +1534,19 @@
     return t + '…';
   }
 
-  /* La foto sta INTERA: uno scatto verticale è più stretto del 9:16 della storia
-     e riempire il frame taglierebbe via mezza inquadratura. Le bande si riempiono
-     con la stessa foto sfocata. */
+  /* La foto RIEMPIE il quadro, senza bande.
+     Stava dentro con le bande sfocate ai lati per un motivo che non esiste
+     piu: allora si caricava lo screenshot di Strava, e ritagliarlo avrebbe
+     tagliato via i dati della corsa. Ora la foto e uno scatto qualsiasi, e
+     una storia si aspetta di essere piena da bordo a bordo: uno scatto del
+     telefono e 3:4, quindi ritagliando si perdono solo i lati.
+     In piu le bande erano nere davvero dove il browser non sa sfocare, ed
+     era il difetto peggiore proprio sui telefoni. */
   function drawPhoto() {
-    const cover = Math.max(W / photo.width, H / photo.height);
-    if ('filter' in ctx) {
-      ctx.save();
-      ctx.filter = 'blur(60px)';
-      const cw = photo.width * cover, ch = photo.height * cover;
-      ctx.drawImage(photo, (W - cw) / 2, (H - ch) / 2, cw, ch);
-      ctx.restore();
-    } else {
-      ctx.fillStyle = '#101014'; ctx.fillRect(0, 0, W, H);
-    }
-    const fit = Math.min(W / photo.width, H / photo.height);
-    const w = photo.width * fit, h = photo.height * fit;
+    const pw = photo.width || photo.naturalWidth, ph = photo.height || photo.naturalHeight;
+    if (!pw || !ph) return;
+    const cover = Math.max(W / pw, H / ph);
+    const w = pw * cover, h = ph * cover;
     ctx.drawImage(photo, (W - w) / 2, (H - h) / 2, w, h);
   }
 
@@ -1642,8 +1653,19 @@
     ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
   }
 
+  /* Quanto e grande la card della frase. Misurato sugli screenshot: quella di
+     Spotify sta al 74% della larghezza, la sua rimpicciolita a mano al 64%, la
+     nostra stava all'81,5%. 0,8 la porta al 65%, cioe quella che preferisci.
+     Si scala tutto insieme attorno al centro, invece di ritoccare venti numeri
+     uno per uno: cosi le proporzioni interne restano quelle disegnate. */
+  const CARD_K = 0.8;
   function drawPhraseCard() {
     const c = song(), n = timesFor(c);
+    const perno = H / 2 - 20;
+    ctx.save();
+    ctx.translate(W / 2, perno);
+    ctx.scale(CARD_K, CARD_K);
+    ctx.translate(-W / 2, -perno);
     const CW = 880, PAD = 60, inner = CW - PAD * 2, COV = 88;
     /* La frase e quella intera del claim, nelle sue due parti: la seconda va
        sempre a capo, come in cima al sito. */
@@ -1703,6 +1725,7 @@
     ctx.beginPath(); ctx.moveTo(cx + PAD, fy - 34); ctx.lineTo(cx + CW - PAD, fy - 34); ctx.stroke();
     ctx.fillStyle = '#9AA49C'; ctx.font = F(600, 26);
     ctx.fillText('inloop.zetakiwi.com', cx + PAD, fy);
+    ctx.restore();
   }
 
   /* Nella versione con i dati, finche manca la foto il fondo spiega i due
@@ -1823,6 +1846,12 @@
      la versione scelta: la frase in una card bianca, o l'etichetta coi dati. */
   function render() {
     ctx.clearRect(0, 0, W, H);
+    /* Cintura e bretelle: il PNG ha il canale trasparente, e ogni pixel non
+       disegnato in una storia si vede NERO. Un fondo pieno sotto tutto fa si
+       che, se mai qualcosa non arrivasse ai bordi, esca un colore scelto e
+       non una banda nera. */
+    ctx.fillStyle = '#12151A';
+    ctx.fillRect(0, 0, W, H);
     if (versione === 'frase') { drawGradient(); drawPhraseCard(); return; }
     if (photo) drawPhoto(); else drawGradient();
     if (!photo) drawHintDati();
@@ -1939,9 +1968,24 @@
 
   /* Due strade per la stessa cosa: "capture" apre la fotocamera sul telefono,
      e sul desktop ricade nel selettore file, quindi non rompe niente. */
-  function loadFrom(input) {
+  async function loadFrom(input) {
     const f = input.files && input.files[0];
     if (!f) return;
+    /* Uno scatto della fotocamera porta dentro l'orientamento come etichetta,
+       non come pixel girati. Con new Image() succede che il browser giri il
+       disegno ma dichiari le misure non girate (o il contrario): il conto per
+       riempire il riquadro viene fatto sui numeri sbagliati, la foto non
+       arriva ai bordi, e sopra e sotto resta il vuoto, che in una storia si
+       vede nero. createImageBitmap con l'orientamento "dall'immagine" cuoce
+       la rotazione nei pixel, quindi misure e disegno dicono la stessa cosa. */
+    try {
+      if (window.createImageBitmap) {
+        photo = await createImageBitmap(f, { imageOrientation: 'from-image' });
+        document.querySelector('.stage').classList.add('movable');
+        aggiornaComandi(); render();
+        return;
+      }
+    } catch (e) { /* qualche browser non accetta l'opzione: si passa di sotto */ }
     const img = new Image();
     img.onload = () => {
       photo = img;
@@ -1960,6 +2004,8 @@
      Instagram e gia in lista. Dove il foglio non c'e, l'immagine resta a
      schermo da tenere premuta. */
   $('save').addEventListener('click', async () => {
+    await attendiCopertina(song());
+    render();
     render();
     const blob = await new Promise(r => cv.toBlob(r, 'image/png'));
     if (!blob) return;
