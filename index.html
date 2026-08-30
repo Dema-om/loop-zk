@@ -126,14 +126,6 @@
   .share-claim:hover { filter: brightness(0.96); }
   .share-claim:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
 
-  /* Il percorso in quattro parole: dice cosa succede prima ancora di scorrere. */
-  .path {
-    display: flex; flex-wrap: wrap; align-items: center;
-    gap: 4px 6px; margin: 14px 0 0; padding: 0; list-style: none;
-    font-size: 12px; font-weight: 700; color: var(--soft);
-  }
-  .path li { display: flex; align-items: center; gap: 6px; }
-  .path li + li::before { content: "→"; color: var(--orange); font-weight: 800; }
 
   /* ---------- passi ---------- */
   .step { margin-top: 30px; }
@@ -537,12 +529,6 @@
       <p class="claim-who" id="cWho">Dark Polo Gang · 1:59</p>
     </div>
     <p class="thesis">I chilometri restano quelli. Contati in canzoni pesano meno, perché ascoltare un pezzo che ti piace è una cosa che faresti comunque.</p>
-    <ol class="path" aria-label="Come funziona">
-      <li>I dati della corsa</li>
-      <li>La tua canzone</li>
-      <li>Quante volte</li>
-      <li>Condividi</li>
-    </ol>
   </header>
 
   <section class="step run" aria-label="La tua corsa">

@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<title>inLOOP · struttura da sito</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;800;900&display=swap');
+:root{
+  --ground:#FFFFFF;--card:#F6F8F4;--chip:#E8EDE5;--line:#DDE4DA;
+  --ink:#121212;--soft:#5F6963;--green:#1DB954;--green-text:#0E7A38;
+  --orange:#FC4C02;--orange-text:#C23A00;--on-brand:#121212;
+  --notte:#12151A;--notte-soft:#AEB7AF;--notte-line:rgba(255,255,255,.35);
+}
+*{box-sizing:border-box}
+body{margin:0;width:1360px;background:#232624;
+  font-family:"Figtree","Avenir Next",Avenir,sans-serif;line-height:1.5;color:var(--ink)}
+.testa{padding:26px 30px 6px;color:#E8ECE6;max-width:1000px}
+.testa h1{font-size:22px;font-weight:900;margin:0 0 8px;letter-spacing:-.02em}
+.testa p{font-size:13.5px;line-height:1.65;margin:0 0 8px;color:#C9D0C9}
+.testa b{color:#fff}
+.riga{display:grid;grid-template-columns:375px 375px 375px;gap:56px;padding:20px 30px 34px}
+.cap{color:#E8ECE6;font-size:12px;font-weight:800;margin:0 0 8px}
+.cap span{display:block;font-weight:600;color:#9AA49C;font-size:11px;margin-top:2px}
+.tel{width:375px;height:812px;overflow:hidden;position:relative;
+  background:var(--ground);border-radius:26px;box-shadow:0 18px 50px rgba(0,0,0,.45)}
+.tel .scorri{position:absolute;left:0;right:0;top:0}
+
+/* --- LA NOVITA 1: barra che resta --- */
+.barra{position:absolute;top:0;left:0;right:0;z-index:5;height:52px;
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:0 20px;background:rgba(255,255,255,.92);border-bottom:1px solid var(--line)}
+.logo{display:inline-flex;align-items:center;gap:.02em;font-weight:900;font-size:17px;line-height:1;letter-spacing:-.02em}
+.logo svg{width:1.33em;height:.78em;display:block;transform:translateY(-.045em)}
+.vivo{font-size:10px;font-weight:600;color:var(--soft);background:var(--card);
+  border:1px solid var(--line);border-radius:999px;padding:5px 11px;white-space:nowrap}
+.vivo b{color:var(--green-text)}
+.vivo em{font-style:normal;color:var(--orange-text)}
+
+.imp{padding:0 20px}
+.h1{font-weight:900;font-size:34px;line-height:1.08;letter-spacing:-.03em;margin:0}
+.h1 .d{color:var(--orange-text)}
+.h2c{font-weight:900;font-size:34px;line-height:1.08;letter-spacing:-.03em;margin:4px 0 0}
+.h2c .n,.h2c .t{color:var(--green-text)}
+.who{font-size:14px;font-weight:600;color:var(--soft);margin:6px 0 0}
+.tesi{font-size:14.5px;color:var(--soft);margin:12px 0 0}
+.occhiello{display:flex;align-items:center;gap:8px;margin:22px 0 10px;
+  font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--orange-text)}
+.occhiello .num{width:18px;height:18px;border-radius:50%;background:var(--orange);color:var(--on-brand);
+  display:flex;align-items:center;justify-content:center;font-size:10px;letter-spacing:0;flex:none}
+.occhiello.verde{color:var(--green-text)}
+.occhiello.verde .num{background:var(--green)}
+.scheda{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px}
+.tabs{display:flex;gap:18px;margin:0 0 14px;border-bottom:1px solid var(--line)}
+.tabs span{font-size:13px;font-weight:800;color:var(--soft);padding:0 0 10px;margin:0 0 -1px;border-bottom:3px solid transparent}
+.tabs span.on{color:var(--ink);border-bottom-color:var(--orange)}
+.chips{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px}
+.chips b{font-weight:800;font-size:15px;text-align:center;background:var(--chip);
+  border:1px solid var(--line);border-radius:999px;padding:11px 4px}
+.chips b.on{background:var(--orange);border-color:var(--orange);color:var(--on-brand)}
+.sub{margin:18px 0 8px;font-size:13px;font-weight:700}
+.seg{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;background:var(--chip);
+  border:1px solid var(--line);border-radius:16px;padding:5px}
+.seg i{font-style:normal;font-weight:800;font-size:15px;text-align:center;border-radius:12px;padding:9px 4px;line-height:1.2}
+.seg i small{display:block;font-size:11px;font-weight:600;color:var(--soft)}
+.seg i.on{background:var(--orange);color:var(--on-brand)}
+.seg i.on small{color:var(--on-brand);opacity:.72}
+
+.cerca{display:flex;align-items:center;gap:10px;background:var(--chip);border:1px solid var(--line);
+  border-radius:999px;padding:9px 16px;font-size:16px;font-weight:600;color:var(--soft)}
+.riga-b{display:flex;align-items:center;gap:12px;padding:9px 10px;border-radius:12px}
+.riga-b.on{background:#DDF5E6;border:1px solid var(--green)}
+.cov{width:32px;height:32px;border-radius:8px;flex:none}
+.nome{min-width:0;font-size:14px;font-weight:600;line-height:1.25}
+.nome s{display:block;text-decoration:none;color:var(--soft);font-weight:400;font-size:12px}
+.volte{margin-left:auto;text-align:right;font-weight:900;font-size:20px;color:var(--green-text);line-height:1.1}
+.volte small{display:block;font-size:11px;font-weight:600;color:var(--soft)}
+.esito{margin-top:20px;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px}
+.esito p{margin:0;font-size:16px;font-weight:700}
+.esito p b{color:var(--green-text)}
+.tank{margin-top:12px;display:flex;gap:3px;height:24px;border-radius:8px;background:var(--chip);
+  border:1px solid var(--line);padding:3px}
+.tank u{flex:1;border-radius:4px;background:var(--green)}
+.tank u.part{opacity:.34}
+
+/* --- LA NOVITA 2: fascia scura a tutta larghezza --- */
+.fascia{margin-top:26px;background:var(--notte);color:#F4F4F0;padding:30px 20px 26px}
+.fascia h2{color:#FFFFFF;font-weight:900;font-size:28px;line-height:1.06;letter-spacing:-.03em;margin:0 0 8px}
+.fascia .sott{font-size:13.5px;color:var(--notte-soft);margin:0 0 18px}
+.duetab{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:rgba(255,255,255,.10);
+  border-radius:16px;padding:5px;margin-bottom:18px}
+.duetab i{font-style:normal;font-weight:800;font-size:13px;text-align:center;border-radius:12px;padding:9px 4px;line-height:1.15;color:#FFFFFF}
+.duetab i small{display:block;font-size:11px;font-weight:600;color:#AEB7AF}
+.duetab i.on{background:var(--green);color:#0F1112}
+.duetab i.on small{color:#0F1112;opacity:.78}
+.prov{width:172px;margin:0 auto;border-radius:16px;overflow:hidden;
+  background:linear-gradient(180deg,#4d8fd6,#0d1830);height:306px;position:relative;
+  box-shadow:0 14px 34px rgba(0,0,0,.45)}
+.mini{position:absolute;left:14px;right:14px;top:120px;background:#fff;border-radius:10px;padding:10px}
+.mini .tt{font-size:8px;font-weight:800;color:#121212}
+.mini .aa{font-size:7px;color:#5F6963;margin-bottom:5px}
+.mini .fr{font-size:11px;font-weight:900;line-height:1.12;letter-spacing:-.02em}
+.mini .fr em{font-style:normal;color:var(--orange-text)}
+.mini .fr b{color:var(--green-text)}
+.mini .url{font-size:6px;color:#9AA49C;border-top:1px solid #eee;margin-top:6px;padding-top:4px}
+.azioni{margin-top:16px}
+.bt{display:block;width:100%;text-align:center;font-weight:800;font-size:14px;border-radius:999px;padding:13px}
+.bt.pr{background:var(--green);color:#0F1112}
+.bt.gh{border:1.5px solid var(--notte-line);color:#FFFFFF;font-size:13px;padding:11px}
+.due{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+
+/* --- LA NOVITA 3: piede vero, con le scritte cliccabili --- */
+.piede{background:var(--card);border-top:1px solid var(--line);padding:26px 20px 22px}
+.piede .marchio{font-weight:900;font-size:17px;letter-spacing:-.02em;display:flex;align-items:center;gap:.02em}
+.piede .marchio svg{width:1.33em;height:.78em;transform:translateY(-.045em)}
+.piede .paglia{font-size:12.5px;color:var(--soft);margin:8px 0 20px;max-width:30em}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:22px 16px}
+.cols h4{font-size:10.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--soft);margin:0 0 9px}
+.cols a{display:block;font-size:13.5px;font-weight:700;color:var(--ink);text-decoration:none;margin-bottom:8px}
+.cols a u{text-decoration:none;border-bottom:1.5px solid var(--line);padding-bottom:1px}
+.legale{margin-top:22px;padding-top:16px;border-top:1px solid var(--line);
+  font-size:11.5px;color:var(--soft);line-height:1.6}
+.legale a{color:var(--soft)}
+.su{display:inline-block;margin-top:12px;font-size:12px;font-weight:800;color:var(--ink);text-decoration:none;
+  border:1px solid var(--line);border-radius:999px;padding:7px 13px;background:var(--ground)}
+
+.nota{position:absolute;right:-46px;background:var(--green);color:#121212;font-size:11px;font-weight:900;
+  border-radius:6px;padding:3px 7px;z-index:9}
+</style>
+</head>
+<body>
+
+<div class="testa">
+  <h1>Una struttura da sito, non da modulo</h1>
+  <p>Tre schermate del telefono, in fila. Le tre cose nuove sono <b>la barra che resta in alto</b> col numero
+  che ti segue, <b>la fascia scura a tutta larghezza</b> che spacca la pagina in due capitoli, e
+  <b>il piede vero</b> con le scritte cliccabili.</p>
+  <p>Secondo giro. Via il <b>&times;16</b> in alto: al suo posto l'etichetta del concept, che oggi sparisce al
+  primo scroll e invece e la cosa che va tenuta sempre in vista. Sulla fascia scura ogni testo e dichiarato
+  chiaro uno per uno (titolo 18,3 su 1, sottotitolo 8,9, scheda spenta 14,0) e <b>il bordo dei due tasti passa
+  da 1,51 a 3,22</b>: prima era invisibile, per questo sembravano macchie scure.</p>
+</div>
+
+<div class="riga">
+
+  <!-- ============ SCHERMATA 1 ============ -->
+  <div>
+    <p class="cap">1 &middot; l'arrivo<span>la barra resta, il claim gira</span></p>
+    <div class="tel">
+      <div class="barra">
+        <span class="logo">inL<svg viewBox="0 0 34 20"><circle cx="10" cy="10" r="7.6" fill="none" stroke="#1DB954" stroke-width="3.4"/><circle cx="24" cy="10" r="7.6" fill="none" stroke="#FC4C02" stroke-width="3.4"/></svg>P</span>
+        <span class="vivo">Concept <b>Spotify</b> &times; <em>Strava</em> &middot; non ufficiale</span>
+      </div>
+      <div class="scorri" style="top:52px">
+        <div class="imp" style="padding-top:22px">
+          <h1 class="h1"><span class="d">5 km</span> sembrano tanti.</h1>
+          <p class="h2c">Ma sono <span class="n">16</span> volte <span class="t">Sportswear</span>.</p>
+          <p class="who">Dark Polo Gang &middot; 1:59</p>
+          <p class="tesi">I chilometri restano quelli. Contati in canzoni pesano meno, perche ascoltare un
+          pezzo che ti piace e una cosa che faresti comunque.</p>
+          <p class="occhiello"><span class="num">1</span> La tua corsa</p>
+          <div class="scheda">
+            <div class="tabs"><span class="on">Corsa da fare</span><span>Corsa fatta</span></div>
+            <div class="chips"><b>3 km</b><b class="on">5 km</b><b>10 km</b><b>Altro</b></div>
+            <p class="sub">Quanto ci metti a fare un chilometro?</p>
+            <div class="seg"><i>Piano<small>7 min 30</small></i><i class="on">Normale<small>6 min</small></i><i>Forte<small>4 min 45</small></i></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ SCHERMATA 2 ============ -->
+  <div>
+    <p class="cap">2 &middot; lo strumento<span>la fascia scura annuncia il capitolo dopo</span></p>
+    <div class="tel">
+      <div class="barra">
+        <span class="logo">inL<svg viewBox="0 0 34 20"><circle cx="10" cy="10" r="7.6" fill="none" stroke="#1DB954" stroke-width="3.4"/><circle cx="24" cy="10" r="7.6" fill="none" stroke="#FC4C02" stroke-width="3.4"/></svg>P</span>
+        <span class="vivo">Concept <b>Spotify</b> &times; <em>Strava</em> &middot; non ufficiale</span>
+      </div>
+      <div class="scorri" style="top:52px">
+        <div class="imp" style="padding-top:16px">
+          <p class="occhiello verde" style="margin-top:0"><span class="num">2</span> La tua canzone</p>
+          <div class="scheda">
+            <div class="cerca">Cerca una canzone o un artista&hellip;</div>
+            <div style="margin-top:6px">
+              <div class="riga-b on"><span class="cov" style="background:linear-gradient(135deg,#4d8fd6,#1b2f57)"></span><span class="nome">Sportswear<s>Dark Polo Gang</s></span><span class="volte">&times;16<small>1:59</small></span></div>
+              <div class="riga-b"><span class="cov" style="background:linear-gradient(135deg,#e0432b,#5c1108)"></span><span class="nome">Blinding Lights<s>The Weeknd</s></span><span class="volte">&times;9<small>3:20</small></span></div>
+              <div class="riga-b"><span class="cov" style="background:linear-gradient(135deg,#4bb811,#112904)"></span><span class="nome">Tit&iacute; Me Pregunt&oacute;<s>Bad Bunny</s></span><span class="volte">&times;8<small>4:04</small></span></div>
+            </div>
+          </div>
+          <div class="esito">
+            <p>5 km di corsa sono <b>16 volte</b> Sportswear.</p>
+            <div class="tank"><u></u><u></u><u></u><u></u><u></u><u></u><u></u><u></u><u></u><u></u><u></u><u></u><u></u><u></u><u></u><u class="part"></u></div>
+          </div>
+        </div>
+        <div class="fascia">
+          <h2>Condividi sulle storie</h2>
+          <p class="sott">Due versioni della stessa storia. La frase sta su un colore ed e gia pronta.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ SCHERMATA 3 ============ -->
+  <div>
+    <p class="cap">3 &middot; la chiusura<span>la fascia scura, poi un piede vero</span></p>
+    <div class="tel">
+      <div class="scorri">
+        <div class="fascia" style="margin-top:0;padding-top:22px">
+          <div class="duetab"><i class="on">La frase<small>senza dati</small></i><i>I dati<small>l'etichetta sulla corsa</small></i></div>
+          <div class="prov">
+            <div class="mini">
+              <div class="tt">Sportswear</div>
+              <div class="aa">Dark Polo Gang &middot; 1:59</div>
+              <div class="fr"><em>5 km</em> sembrano tanti.<br>Ma sono <b>16</b> volte<br><b>Sportswear.</b></div>
+              <div class="url">inloop.zetakiwi.com</div>
+            </div>
+          </div>
+          <div class="azioni">
+            <div class="due"><span class="bt gh">Scatta una foto</span><span class="bt gh">Dal rullino</span></div>
+            <span class="bt pr">Condividi</span>
+          </div>
+        </div>
+
+        <div class="piede">
+          <span class="marchio">inL<svg viewBox="0 0 34 20"><circle cx="10" cy="10" r="7.6" fill="none" stroke="#1DB954" stroke-width="3.4"/><circle cx="24" cy="10" r="7.6" fill="none" stroke="#FC4C02" stroke-width="3.4"/></svg>P</span>
+          <p class="paglia">Quanto dura la tua corsa in canzoni. Un concept su Spotify e Strava.</p>
+          <div class="cols">
+            <div>
+              <h4>Il progetto</h4>
+              <a href="#"><u>Cos'e questo</u></a>
+              <a href="#"><u>Come e fatto</u></a>
+              <a href="#"><u>Perche non c'e Spotify</u></a>
+            </div>
+            <div>
+              <h4>Matteo</h4>
+              <a href="#"><u>Chi l'ha fatto</u></a>
+              <a href="#"><u>LinkedIn</u></a>
+              <a href="#"><u>Gli altri progetti</u></a>
+            </div>
+          </div>
+          <p class="legale">Concept non ufficiale. Non affiliato a Spotify n&eacute; a Strava: i loro nomi e
+          i loro colori sono citati come materiale dell'esercizio.<br>
+          Niente account, niente tracciamento, nessun dato raccolto. La tua foto non lascia il telefono.<br>
+          &copy; 2026 Matteo De Marco</p>
+          <a class="su" href="#">Torna su &uarr;</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
