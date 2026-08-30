@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>inLOOP · quanto dura la tua corsa in canzoni</title>
 <meta name="description" content="Cinque chilometri sembrano tanti, ma sono sedici volte la tua canzone preferita. inLOOP traduce la distanza in riascolti e ti prepara la storia da condividere.">
-<meta name="theme-color" content="#F6F8F4">
+<meta name="theme-color" content="#FFFFFF">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="inLOOP">
 <meta property="og:title" content="inLOOP · quanto dura la tua corsa in canzoni">
@@ -25,12 +25,20 @@
      Il verde appartiene alla musica, l'arancio alla corsa: mai sullo stesso
      elemento, mai gradienti, ground neutro chiaro. */
   :root {
-    --ground: #F6F8F4;
-    --card: #FFFFFF;
+    /* Le superfici sono una scala: pagina, card, e dentro la card i chip.
+       Ogni gradino vale una differenza di chiaro, ed e quella a far sembrare
+       un bottone un bottone. Qui la scala e rovesciata rispetto a prima
+       (pagina bianca, card grigie) e i gradini sotto sono stati riportati
+       alla stessa distanza di prima: card sulla pagina 1,069 come sempre,
+       chip sulla card 1,112 contro il 1,132 di prima. Rovesciando e basta,
+       senza riscendere i chip, quel secondo gradino crollava a 1,060 e i
+       bottoni sparivano dentro la card. */
+    --ground: #FFFFFF;
+    --card: #F6F8F4;
     --ink: #121212;
     --soft: #5F6963;
-    --line: #E2E7E0;
-    --chip: #EEF2EC;
+    --line: #DDE4DA;
+    --chip: #E8EDE5;
     --green: #1DB954;
     --green-soft: #DDF5E6;
     --orange: #FC4C02;
