@@ -76,15 +76,6 @@
   }
   .path li { display: flex; align-items: center; gap: 6px; }
   .path li + li::before { content: "→"; color: var(--orange); font-weight: 800; }
-  /* Il claim cambia da solo: serve un modo esplicito per fermarlo, non solo
-     l'impostazione di sistema per ridurre le animazioni. */
-  .pause {
-    font: inherit; font-size: 12px; font-weight: 700; color: var(--ink);
-    background: var(--chip); border: 1px solid var(--line); border-radius: 999px;
-    padding: 7px 14px; margin-top: 10px; cursor: pointer;
-  }
-  .pause:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
-  .pause[hidden] { display: none; }
 
   /* ---------- passi ---------- */
   .step { margin-top: 30px; }
@@ -160,7 +151,8 @@
   .swap:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
   .exact-why { font-size: 13px; color: var(--soft); margin: 0 0 14px; }
   .exact-fields { display: flex; gap: 14px; flex-wrap: wrap; }
-  .exact-fields label {
+  .exact-fields label,
+  .exact-fields .field {
     display: flex; flex-direction: column; gap: 5px;
     font-size: 11px; font-weight: 800; letter-spacing: 0.1em;
     text-transform: uppercase; color: var(--soft);
@@ -173,6 +165,38 @@
   }
   .exact-fields input:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
   .exact-fields input.derived { background: #FFF3E9; border-color: #F6CBAA; }
+  /* La rotella: gli stessi scatti della sveglia, fatti con lo scroll a
+     scatto del browser. Serve dove il valore ha due parti e un intervallo
+     noto; per la distanza si scrive e basta, e piu veloce. */
+  .wheel {
+    position: relative; display: flex; align-items: center; justify-content: center;
+    gap: 2px; padding: 0 8px;
+    background: var(--chip); border: 1px solid var(--line); border-radius: 12px;
+  }
+  .wheel-band {
+    position: absolute; left: 6px; right: 6px; top: 50%;
+    transform: translateY(-50%); height: 40px; border-radius: 9px;
+    background: #FFFFFF; box-shadow: inset 0 0 0 1px var(--line);
+    pointer-events: none;
+  }
+  .wheel-col {
+    position: relative; width: 50px; height: 120px; overflow-y: scroll;
+    scroll-snap-type: y mandatory; scrollbar-width: none;
+    padding: 40px 0; text-align: center;
+    -webkit-mask-image: linear-gradient(transparent, #000 32%, #000 68%, transparent);
+    mask-image: linear-gradient(transparent, #000 32%, #000 68%, transparent);
+  }
+  .wheel-col::-webkit-scrollbar { display: none; }
+  .wheel-col:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; border-radius: 8px; }
+  .wheel-col div {
+    height: 40px; line-height: 40px; scroll-snap-align: center;
+    font-weight: 800; font-size: 20px; color: var(--soft);
+    font-variant-numeric: tabular-nums;
+  }
+  .wheel-col div.on { color: var(--ink); }
+  .wheel-sep { font-weight: 900; font-size: 20px; color: var(--ink); }
+  @media (prefers-reduced-motion: reduce) { .wheel-col { scroll-behavior: auto; } }
+
   .exact-fields small {
     font-weight: 600; font-size: 11px; letter-spacing: 0.06em; text-align: center;
   }
@@ -229,42 +253,57 @@
     border-radius: 20px; padding: 18px;
     box-shadow: 0 8px 30px rgba(18, 18, 18, 0.05);
   }
-  /* Il risultato e la risposta del sito: deve sembrare una risposta, non una
-     nota a pie di pagina. Il verde entra come superficie sotto il numero. */
-  .result { display: flex; align-items: center; gap: 16px; }
-  .big-n {
+  /* Il risultato e la risposta del sito, quindi ha la faccia della cosa che si
+     condivide: superficie verde piena, testo scuro, un numero solo. I dati
+     della corsa restano arancioni ma dentro una pastiglia bianca, cosi i due
+     colori di marca non si toccano mai. */
+  .verdict {
+    position: relative;
     background: var(--green); color: var(--on-brand);
-    border-radius: 18px; padding: 14px 16px; text-align: center; flex: none; min-width: 108px;
+    border-radius: 22px; padding: 22px 22px 20px;
   }
-  .big-n span {
-    display: block; font-weight: 900; font-size: 48px; line-height: 1;
-    letter-spacing: -0.03em; font-variant-numeric: tabular-nums;
+  .v-label {
+    margin: 0; font-size: 11px; font-weight: 800;
+    letter-spacing: 0.14em; text-transform: uppercase; opacity: 0.66;
   }
-  .big-n small {
-    display: block; margin-top: 6px; font-size: 10px; font-weight: 800;
-    letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.7;
+  .v-number {
+    margin: 4px 0 0; font-weight: 900; font-size: clamp(40px, 12vw, 56px);
+    line-height: 1; letter-spacing: -0.035em;
   }
-  .result-song { min-width: 0; }
-  .rs-title {
-    margin: 0; font-weight: 900; font-size: 21px; letter-spacing: -0.02em;
+  .v-number span { font-variant-numeric: tabular-nums; }
+  .v-song {
+    margin: 12px 0 0; font-weight: 900; font-size: 20px; letter-spacing: -0.02em;
     overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   }
-  .rs-artist { margin: 2px 0 0; font-size: 14px; font-weight: 600; color: var(--soft); }
-  .rs-run {
-    margin: 10px 0 0; font-size: 15px; font-weight: 800;
-    color: var(--orange-text); font-variant-numeric: tabular-nums;
+  .v-artist { margin: 1px 0 0; font-size: 14px; font-weight: 600; opacity: 0.72; }
+  .v-run {
+    display: inline-block; margin: 14px 0 0;
+    background: #FFFFFF; color: var(--orange-text);
+    border-radius: 999px; padding: 8px 15px;
+    font-size: 14px; font-weight: 800; font-variant-numeric: tabular-nums;
   }
+  .share-btn {
+    position: absolute; top: 16px; right: 16px;
+    width: 40px; height: 40px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(255, 255, 255, 0.9); color: var(--ink);
+    border: none; cursor: pointer;
+  }
+  .share-btn:hover { background: #FFFFFF; }
+  .share-btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
 
-  /* Un blocco per riascolto: il numero si vede, non si legge soltanto. */
+  /* Un blocco per riascolto: il numero si vede, non si legge soltanto.
+     Dentro il verde i blocchi sono scuri su un binario chiaro. */
   .tank {
-    margin-top: 18px;
-    display: flex; gap: 3px; align-items: stretch; height: 30px;
+    margin-top: 16px;
+    display: flex; gap: 3px; align-items: stretch; height: 26px;
     border-radius: 8px; overflow: hidden;
-    background: var(--chip); border: 1px solid var(--line); padding: 3px;
+    background: rgba(255, 255, 255, 0.3); padding: 3px;
   }
-  .tank span { flex: 1; border-radius: 4px; background: var(--orange); min-width: 2px; }
-  .tank span.part { opacity: 0.35; }
-  .fine { font-size: 12px; color: var(--soft); margin: 6px 0 0; font-variant-numeric: tabular-nums; }
+  .tank span { flex: 1; border-radius: 4px; background: var(--on-brand); min-width: 2px; }
+  .tank span.part { opacity: 0.34; }
+
+  .fine { font-size: 12px; color: var(--soft); margin: 14px 0 0; font-variant-numeric: tabular-nums; }
   .repeat {
     margin: 14px 0 0; padding-top: 12px; border-top: 1px solid var(--line);
     font-size: 13px; color: var(--soft);
@@ -316,6 +355,7 @@
   }
   .btn.primary { background: var(--green); border-color: var(--green); color: var(--on-brand); }
   .btn:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
+  .btn[hidden] { display: none; }
   .hint { font-size: 12px; color: var(--soft); margin-top: 10px; text-align: center; }
   .hint b { color: var(--ink); }
 
@@ -368,7 +408,6 @@
       <li>Quante volte</li>
       <li>In storia</li>
     </ol>
-    <button class="pause" type="button" id="pause">Ferma il cambio canzone</button>
   </header>
 
   <section class="step run" aria-label="La tua corsa">
@@ -405,11 +444,19 @@
             <input id="exKm" type="text" inputmode="decimal" value="5,04" aria-label="Distanza in chilometri">
             <small>km</small>
           </label>
-          <label>
+          <div class="field">
             <span>Tempo</span>
-            <input id="exTime" type="text" inputmode="numeric" value="30:12" aria-label="Tempo, minuti e secondi">
-            <small>min:sec</small>
-          </label>
+            <div class="wheel" id="wheelTempo">
+              <div class="wheel-band" aria-hidden="true"></div>
+              <div class="wheel-col" id="wMin" role="spinbutton" tabindex="0"
+                   aria-label="Minuti" aria-valuemin="0" aria-valuemax="240" aria-valuenow="30"></div>
+              <span class="wheel-sep" aria-hidden="true">:</span>
+              <div class="wheel-col" id="wSec" role="spinbutton" tabindex="0"
+                   aria-label="Secondi" aria-valuemin="0" aria-valuemax="59" aria-valuenow="12"></div>
+            </div>
+            <small>min : sec</small>
+            <input id="exTime" type="hidden" value="30:12">
+          </div>
           <label>
             <span>Ritmo</span>
             <input id="exPace" type="text" inputmode="numeric" value="5:59" aria-label="Ritmo, minuti e secondi al chilometro">
@@ -438,17 +485,22 @@
   </section>
 
   <section class="outcome" aria-label="Il risultato" aria-live="polite">
-    <div class="result">
-      <div class="big-n"><span id="bigTimes">16</span><small>volte in loop</small></div>
-      <div class="result-song">
-        <p class="rs-title" id="rsTitle">Sportswear</p>
-        <p class="rs-artist" id="rsArtist">Dark Polo Gang</p>
-        <p class="rs-run" id="rsRun">5 km · 30 min · 6:00/km</p>
-      </div>
+    <div class="verdict">
+      <button class="share-btn" type="button" id="shareTop" aria-label="Condividi questo risultato">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+          <path d="M9 12V2.5M9 2.5 5.6 5.9M9 2.5l3.4 3.4" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M3 10.5v3.9A1.6 1.6 0 0 0 4.6 16h8.8a1.6 1.6 0 0 0 1.6-1.6v-3.9" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <p class="v-label">In loop per</p>
+      <p class="v-number"><span id="bigTimes">16</span> volte</p>
+      <p class="v-song" id="rsTitle">Sportswear</p>
+      <p class="v-artist" id="rsArtist">Dark Polo Gang</p>
+      <div class="tank" id="tank" role="img" aria-label="Un blocco per ogni riascolto"></div>
+      <p class="v-run" id="rsRun">5 km · 30 min · 6:00/km</p>
     </div>
-    <div class="tank" id="tank" role="img" aria-label="Un blocco per ogni riascolto"></div>
-    <p class="fine" id="fine">Sportswear dura 1:59, e la corsa 30 minuti.</p>
-    <p class="repeat">Adesso mettila in <b>repeat</b> e parti.</p>
+    <p class="fine" id="fine">Sportswear dura 1:59, e la corsa 30 min.</p>
+    <p class="repeat">Adesso mettila in <b>loop</b> e parti.</p>
   </section>
 
   <section class="share">
@@ -472,7 +524,7 @@
       <button class="btn" type="button" id="upload">Prendila dal rullino</button>
     </div>
     <div class="cta">
-      <button class="btn" type="button" id="save">Genera il PNG</button>
+      <button class="btn" type="button" id="save" hidden>Genera il PNG</button>
     </div>
     <p class="hint" id="shareHint"><b>Trascina l'etichetta</b> per spostarla dove vuoi.</p>
 
@@ -487,7 +539,7 @@
     <h3>Cos'è questo</h3>
     <p>Volte è un concept: immagina che Spotify e Strava facciano una cosa insieme, e la prova su un gesto solo,
     contare la corsa in canzoni. Non è affiliato a nessuna delle due: i loro colori stanno qui perché sono il materiale dell'esercizio.</p>
-    <p>Niente account e niente permessi, di proposito. Il repeat è un tap dentro la tua app di musica,
+    <p>Niente account e niente permessi, di proposito. Il loop è un tap dentro la tua app di musica,
     quindi questo sito non ha bisogno di collegarsi a niente per servire a qualcosa.</p>
     <p>L'ho fatto io, Matteo De Marco.</p>
     <a class="me" href="https://www.linkedin.com/in/matteodemarcoo" target="_blank" rel="noopener">
@@ -553,10 +605,7 @@
   /* ----- claim: gira finché non tocchi niente ----- */
   let timer = null;
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  function stopRotation() {
-    clearInterval(timer); timer = null;
-    const p = $('pause'); if (p) p.hidden = true;
-  }
+  function stopRotation() { clearInterval(timer); timer = null; }
   function nextHero() {
     const el = $('cLine2');
     el.classList.remove('show'); el.classList.add('fade');
@@ -567,8 +616,10 @@
     }, 180);
   }
   if (!reduced) timer = setInterval(nextHero, 3200);
-  $('pause').hidden = reduced;
-  $('pause').addEventListener('click', () => { stopRotation(); $('cLine2').focus(); });
+  /* La vetrina si ferma al primo segno di vita: uno scroll, un tocco, un tasto.
+     Senza bottone di pausa, ma senza restare in movimento addosso a chi legge. */
+  ['scroll', 'pointerdown', 'keydown', 'wheel'].forEach(ev =>
+    window.addEventListener(ev, stopRotation, { once: true, passive: true }));
 
   function renderHero() {
     const c = song();
@@ -675,7 +726,7 @@
 
     /* il campo ricavato si riscrive da solo e si colora, gli altri no */
     ['exKm', 'exTime', 'exPace'].forEach(id => $(id).classList.remove('derived'));
-    if (d === 'time' && t) { $('exTime').value = clock(t); $('exTime').classList.add('derived'); }
+    if (d === 'time' && t) { $('exTime').value = clock(t); syncWheelFrom(t); }
     if (d === 'pace' && pc) { $('exPace').value = clock(pc); $('exPace').classList.add('derived'); }
     if (d === 'km' && k) { $('exKm').value = fmt2(k); $('exKm').classList.add('derived'); }
 
@@ -688,8 +739,58 @@
     update();
   }
 
+  /* ----- la rotella del tempo ----- */
+  const ROW = 40;
+  function buildWheel(el, max, pad2) {
+    for (let i = 0; i <= max; i++) {
+      const d = document.createElement('div');
+      d.textContent = pad2 ? String(i).padStart(2, '0') : String(i);
+      el.appendChild(d);
+    }
+  }
+  buildWheel($('wMin'), 240, false);
+  buildWheel($('wSec'), 59, true);
+
+  const wheelValue = el => Math.round(el.scrollTop / ROW);
+  function paintWheel(el) {
+    const v = wheelValue(el);
+    [...el.children].forEach((d, i) => d.classList.toggle('on', i === v));
+    el.setAttribute('aria-valuenow', v);
+    el.setAttribute('aria-valuetext', v + (el.id === 'wMin' ? ' minuti' : ' secondi'));
+  }
+  function setWheel(el, v, smooth) {
+    el.scrollTo({ top: v * ROW, behavior: (smooth && !reduced) ? 'smooth' : 'auto' });
+    paintWheel(el);
+  }
+  function wheelSeconds() { return wheelValue($('wMin')) * 60 + wheelValue($('wSec')); }
+  function syncWheelFrom(sec) {
+    setWheel($('wMin'), Math.min(Math.floor(sec / 60), 240), false);
+    setWheel($('wSec'), Math.round(sec % 60), false);
+  }
+
+  let wheelTimer = null;
+  function onWheelScroll(el) {
+    paintWheel(el);
+    clearTimeout(wheelTimer);
+    wheelTimer = setTimeout(() => {
+      $('exTime').value = clock(wheelSeconds());
+      touched('time');
+      recalcExact();
+    }, 130);
+  }
+  ['wMin', 'wSec'].forEach(id => {
+    const el = $(id);
+    el.addEventListener('scroll', () => onWheelScroll(el), { passive: true });
+    /* la rotella si guida anche da tastiera: lo scroll da solo non basta */
+    el.addEventListener('keydown', e => {
+      const max = id === 'wMin' ? 240 : 59;
+      const v = wheelValue(el);
+      if (e.key === 'ArrowUp') { setWheel(el, Math.max(v - 1, 0), true); onWheelScroll(el); e.preventDefault(); }
+      if (e.key === 'ArrowDown') { setWheel(el, Math.min(v + 1, max), true); onWheelScroll(el); e.preventDefault(); }
+    });
+  });
+
   $('exKm').addEventListener('input', () => { touched('km'); recalcExact(); });
-  $('exTime').addEventListener('input', () => { touched('time'); recalcExact(); });
   $('exPace').addEventListener('input', () => { touched('pace'); recalcExact(); });
 
   function setPane(esatti) {
@@ -698,7 +799,7 @@
     $('swap').textContent = esatti
       ? 'Torna alla corsa da programmare'
       : 'Inserisci i dati esatti dell\'ultima corsa';
-    if (esatti) { stopRotation(); recalcExact(); $('exKm').focus(); }
+    if (esatti) { stopRotation(); syncWheelFrom(parseTime($('exTime').value) || 1800); recalcExact(); $('exKm').focus(); }
     else { exact = null; update(); }
   }
   $('swap').addEventListener('click', () => setPane($('paneEsatti').hidden));
@@ -876,6 +977,85 @@
     drawBadge();
   }
 
+  /* Condivisione rapida del risultato: la stessa scheda verde, disegnata a
+     misura di storia. Il telefono la passa a Instagram col foglio nativo;
+     dove il foglio non c'è, l'immagine resta a schermo da tenere premuta. */
+  function drawVerdictCard(x) {
+    const c = song(), n = timesFor(c);
+    x.fillStyle = '#1DB954'; x.fillRect(0, 0, W, H);
+    x.strokeStyle = 'rgba(255,255,255,0.16)'; x.lineWidth = 6;
+    [W * 0.66, W * 0.48].forEach(r => { x.beginPath(); x.arc(W / 2, H / 2, r, 0, Math.PI * 2); x.stroke(); });
+
+    const L = 110;
+    let y = H / 2 - 300;
+    x.textBaseline = 'alphabetic'; x.textAlign = 'left';
+    x.fillStyle = 'rgba(18,18,18,0.66)'; x.font = F(800, 34);
+    x.letterSpacing = '5px'; x.fillText('IN LOOP PER', L, y); x.letterSpacing = '0px';
+
+    y += 150;
+    x.fillStyle = '#121212'; x.font = F(900, 190);
+    x.fillText(n + ' volte', L, y);
+
+    y += 110;
+    x.font = F(900, 62);
+    x.fillText(fitTextOn(x, c.t, F(900, 62), W - L * 2), L, y);
+    y += 62;
+    x.fillStyle = 'rgba(18,18,18,0.7)'; x.font = F(600, 42);
+    x.fillText(fitTextOn(x, c.w, F(600, 42), W - L * 2), L, y);
+
+    /* pastiglia bianca coi dati della corsa */
+    y += 110;
+    const run = kmText() + ' \u00B7 ' + timeText() + ' \u00B7 ' + paceText();
+    x.font = F(800, 42);
+    const pw = x.measureText(run).width + 64;
+    x.fillStyle = '#FFFFFF';
+    roundRectOn(x, L, y - 52, pw, 84, 42); x.fill();
+    x.fillStyle = '#C23A00';
+    x.fillText(run, L + 32, y);
+
+    x.fillStyle = 'rgba(18,18,18,0.6)'; x.font = F(600, 36);
+    x.fillText('volte.run', L, H - 300);
+  }
+  function roundRectOn(x, a, b, w2, h2, r) {
+    x.beginPath(); x.moveTo(a + r, b);
+    x.arcTo(a + w2, b, a + w2, b + h2, r);
+    x.arcTo(a + w2, b + h2, a, b + h2, r);
+    x.arcTo(a, b + h2, a, b, r);
+    x.arcTo(a, b, a + w2, b, r);
+    x.closePath();
+  }
+  function fitTextOn(x, text, font, maxW) {
+    x.font = font;
+    if (x.measureText(text).width <= maxW) return text;
+    let t = text;
+    while (t.length > 1 && x.measureText(t + '…').width > maxW) t = t.slice(0, -1);
+    return t + '…';
+  }
+
+  $('shareTop').addEventListener('click', async () => {
+    const off = document.createElement('canvas');
+    off.width = W; off.height = H;
+    drawVerdictCard(off.getContext('2d'));
+    const blob = await new Promise(r => off.toBlob(r, 'image/png'));
+    const file = new File([blob], 'volte.png', { type: 'image/png' });
+    const testo = timesFor(song()) + ' volte ' + song().t + ' per ' + kmText() + '.';
+
+    try {
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], text: testo });
+        return;
+      }
+      if (navigator.share) {
+        await navigator.share({ title: 'Volte', text: testo, url: location.href });
+        return;
+      }
+    } catch (e) { /* l'utente ha annullato: non è un errore */ }
+
+    $('savedImg').src = URL.createObjectURL(blob);
+    $('saved').classList.add('open');
+    $('saved').scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'center' });
+  });
+
   /* trascinamento dell'etichetta */
   let dragging = false;
   cv.addEventListener('pointerdown', e => {
@@ -908,7 +1088,7 @@
     const f = input.files && input.files[0];
     if (!f) return;
     const img = new Image();
-    img.onload = () => { photo = img; render(); };
+    img.onload = () => { photo = img; $('save').hidden = false; render(); };
     img.src = URL.createObjectURL(f);
   }
   $('upload').addEventListener('click', () => $('file').click());
@@ -917,8 +1097,6 @@
   $('shot').addEventListener('change', () => loadFrom($('shot')));
 
   $('save').addEventListener('click', () => {
-    /* senza foto il PNG conterrebbe il riquadro tratteggiato: meglio chiederla */
-    if (!photo) { $('shot').click(); return; }
     render();
     cv.toBlob(b => {
       if (!b) return;
