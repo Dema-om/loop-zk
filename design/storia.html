@@ -1,0 +1,260 @@
+<title>La storia da condividere</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;800;900&display=swap">
+<style>
+  :root {
+    --ground: #F6F8F4;
+    --card: #FFFFFF;
+    --ink: #121212;
+    --soft: #5F6963;
+    --line: #E2E7E0;
+    --chip: #EEF2EC;
+    --green: #1DB954;
+    --green-text: #0E7A38;
+    --orange: #FC4C02;
+    --orange-text: #C23A00;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--ground); color: var(--ink);
+    font-family: "Figtree", "Avenir Next", Avenir, sans-serif; line-height: 1.55;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 30px 20px 70px; }
+  header, .note { max-width: 46em; }
+  .eyebrow {
+    font-size: 11px; font-weight: 800; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--green-text); margin: 0 0 10px;
+  }
+  h1 {
+    font-weight: 900; font-size: clamp(30px, 5.5vw, 46px);
+    line-height: 1.05; letter-spacing: -0.03em; margin: 0 0 14px; text-wrap: balance;
+  }
+  header p { color: var(--soft); font-size: 15px; margin: 0 0 10px; }
+  header p b { color: var(--ink); }
+  .note {
+    margin: 22px 0 0; padding: 16px 18px;
+    background: var(--card); border: 1px solid var(--line); border-radius: 16px;
+    font-size: 14px;
+  }
+  .note b { font-weight: 800; }
+
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; margin-top: 40px; }
+  @media (max-width: 900px) { .grid3 { grid-template-columns: 1fr; } }
+  .v .tag {
+    display: inline-block; font-size: 11px; font-weight: 800;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    background: var(--chip); border: 1px solid var(--line);
+    border-radius: 999px; padding: 4px 11px; color: var(--soft);
+  }
+  .v h2 { font-weight: 900; font-size: 21px; letter-spacing: -0.02em; margin: 10px 0 6px; }
+  .v p { font-size: 14px; color: var(--soft); margin: 0 0 4px; }
+  .v p.verdict { color: var(--ink); font-weight: 600; }
+  .v canvas {
+    display: block; width: 100%; height: auto; margin: 14px 0 0;
+    border-radius: 22px; border: 1px solid var(--line);
+    box-shadow: 0 14px 40px rgba(18, 18, 18, 0.16);
+  }
+  footer {
+    margin-top: 50px; border-top: 1px solid var(--line);
+    padding-top: 22px; color: var(--soft); font-size: 13px; max-width: 46em;
+  }
+  footer b { color: var(--ink); }
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Volte · la seconda immagine</p>
+    <h1>La storia senza foto, in stile Spotify</h1>
+    <p>La scheda scura del risultato funziona bene sulla pagina, quindi vale la pena farne anche un'immagine a tutto schermo, per chi vuole postare senza scattare niente.</p>
+    <p>Resta separata da <b>quella sulla foto</b>: l'etichetta serve quando hai uno scatto tuo, questa quando non ce l'hai. Sono due usi diversi, non due versioni della stessa cosa.</p>
+
+    <div class="note">
+      <b>La domanda a cui rispondere.</b> Con quanti dati? Il claim per esteso è la cosa più riconoscibile
+      del progetto, ma più roba metti e più il numero perde peso. Le tre varianti provano tre dosi diverse:
+      solo la frase, la frase più i dati, e la scheda pura.
+    </div>
+  </header>
+
+  <div class="grid3">
+    <section class="v">
+      <span class="tag">1</span>
+      <h2>Solo la frase</h2>
+      <p>Il claim per esteso, la copertina piccola con artista e durata, niente altro. Zero dati della corsa.</p>
+      <p class="verdict">Il più leggibile a distanza e il più «nostro». Non dice però che hai corso.</p>
+      <canvas id="s1" width="1080" height="1920" aria-label="Variante 1, solo la frase"></canvas>
+    </section>
+
+    <section class="v">
+      <span class="tag">2</span>
+      <h2>Frase e dati</h2>
+      <p>La stessa frase, con sotto la riga della corsa in arancio. Un dato in più, un livello in più.</p>
+      <p class="verdict">Racconta tutto in una schermata. È quello che sceglierei.</p>
+      <canvas id="s2" width="1080" height="1920" aria-label="Variante 2, frase e dati"></canvas>
+    </section>
+
+    <section class="v">
+      <span class="tag">3</span>
+      <h2>La scheda</h2>
+      <p>Copertina grande, numero enorme e tre colonne di dati sotto, come una schermata di fine anno.</p>
+      <p class="verdict">Il più ricco e il più anonimo: potrebbe essere di chiunque.</p>
+      <canvas id="s3" width="1080" height="1920" aria-label="Variante 3, la scheda"></canvas>
+    </section>
+  </div>
+
+  <footer>
+    Esempio: <b>Sportswear</b> della Dark Polo Gang, 1:59, per 5 km a ritmo normale, cioè 16 volte.
+    Dimmi il numero e la collego al sito, accanto allo sticker.
+  </footer>
+</div>
+
+<script>
+  const song = { t: 'Sportswear', w: 'Dark Polo Gang', s: 119 };
+  const KM = '5 km', TEMPO = '30 min', RITMO = '6:00/km', N = 16, DUR = '1:59';
+  const BG = '#14171B', WHITE = '#F4F4F0', GREY = '#9AA49C';
+  const GREEN = '#1DB954', ORANGE = '#FF7A3C';
+  const F = (w, s) => w + ' ' + s + 'px Figtree, Avenir Next, Avenir, sans-serif';
+  const SAFE = 260;
+
+  function roundRect(x, a, b, w, h, r) {
+    x.beginPath(); x.moveTo(a + r, b);
+    x.arcTo(a + w, b, a + w, b + h, r);
+    x.arcTo(a + w, b + h, a, b + h, r);
+    x.arcTo(a, b + h, a, b, r);
+    x.arcTo(a, b, a + w, b, r);
+    x.closePath();
+  }
+  function cover(x, a, b, size, radius) {
+    let h = 0; for (let i = 0; i < song.t.length; i++) h = (h * 31 + song.t.charCodeAt(i)) % 360;
+    x.save();
+    roundRect(x, a, b, size, size, radius); x.clip();
+    const g = x.createLinearGradient(a, b, a + size, b + size);
+    g.addColorStop(0, 'hsl(' + h + ', 62%, 52%)');
+    g.addColorStop(1, 'hsl(' + ((h + 55) % 360) + ', 58%, 30%)');
+    x.fillStyle = g; x.fillRect(a, b, size, size);
+    x.fillStyle = 'rgba(255,255,255,0.16)';
+    x.beginPath();
+    x.moveTo(a, b + size * 0.72); x.lineTo(a + size, b + size * 0.34);
+    x.lineTo(a + size, b + size); x.lineTo(a, b + size);
+    x.closePath(); x.fill();
+    x.restore();
+  }
+  /* il claim su piu righe, con le parole colorate al punto giusto */
+  function claimLines(x, lines, left, top, size, lead) {
+    x.font = F(900, size);
+    x.textBaseline = 'alphabetic';
+    let y = top;
+    lines.forEach(riga => {
+      let cx = left;
+      riga.forEach(pezzo => {
+        x.fillStyle = pezzo[1];
+        x.fillText(pezzo[0], cx, y);
+        cx += x.measureText(pezzo[0]).width;
+      });
+      y += lead;
+    });
+    return y;
+  }
+  function base(x) {
+    x.fillStyle = BG; x.fillRect(0, 0, 1080, 1920);
+    x.strokeStyle = 'rgba(255,255,255,0.05)'; x.lineWidth = 4;
+    x.beginPath(); x.arc(540, 960, 700, 0, Math.PI * 2); x.stroke();
+    x.beginPath(); x.arc(540, 960, 520, 0, Math.PI * 2); x.stroke();
+    x.fillStyle = GREY; x.font = F(600, 34); x.textAlign = 'left';
+    x.fillText('volte.run', 100, 1920 - SAFE + 60);
+  }
+
+  /* ---------- 1: solo la frase ---------- */
+  function v1() {
+    const x = document.getElementById('s1').getContext('2d');
+    base(x);
+    const L = 100;
+    let y = claimLines(x, [
+      [[KM + ' ', ORANGE], ['sembrano', WHITE]],
+      [['tanti.', WHITE]],
+      [['Sono ', WHITE], [String(N), GREEN], [' volte', WHITE]],
+      [[song.t, GREEN], ['.', WHITE]]
+    ], L, 640, 96, 108);
+
+    cover(x, L, y + 40, 150, 18);
+    x.fillStyle = WHITE; x.font = F(800, 44);
+    x.fillText(song.w, L + 180, y + 100);
+    x.fillStyle = GREY; x.font = F(600, 38);
+    x.fillText(DUR, L + 180, y + 152);
+  }
+
+  /* ---------- 2: frase e dati ---------- */
+  function v2() {
+    const x = document.getElementById('s2').getContext('2d');
+    base(x);
+    const L = 100;
+    let y = claimLines(x, [
+      [[KM + ' ', ORANGE], ['sembrano', WHITE]],
+      [['tanti.', WHITE]],
+      [['Sono ', WHITE], [String(N), GREEN], [' volte', WHITE]],
+      [[song.t, GREEN], ['.', WHITE]]
+    ], L, 580, 96, 108);
+
+    cover(x, L, y + 30, 130, 16);
+    x.fillStyle = WHITE; x.font = F(800, 40);
+    x.fillText(song.w, L + 158, y + 80);
+    x.fillStyle = GREY; x.font = F(600, 34);
+    x.fillText(DUR, L + 158, y + 128);
+
+    /* la riga della corsa, staccata da una linea sottile */
+    const ly = y + 230;
+    x.strokeStyle = 'rgba(255,255,255,0.14)'; x.lineWidth = 3;
+    x.beginPath(); x.moveTo(L, ly); x.lineTo(1080 - L, ly); x.stroke();
+
+    x.font = F(800, 44);
+    let cx = L;
+    [KM, TEMPO, RITMO].forEach((p, i) => {
+      x.fillStyle = ORANGE; x.fillText(p, cx, ly + 76);
+      cx += x.measureText(p).width;
+      if (i < 2) {
+        x.fillStyle = 'rgba(255,255,255,0.3)';
+        x.fillText(' · ', cx, ly + 76);
+        cx += x.measureText(' · ').width;
+      }
+    });
+  }
+
+  /* ---------- 3: la scheda ---------- */
+  function v3() {
+    const x = document.getElementById('s3').getContext('2d');
+    base(x);
+    x.textAlign = 'center';
+    cover(x, 540 - 190, 470, 380, 26);
+
+    x.fillStyle = WHITE; x.font = F(900, 62);
+    x.fillText(song.t, 540, 950);
+    x.fillStyle = GREY; x.font = F(600, 40);
+    x.fillText(song.w + ' · ' + DUR, 540, 1006);
+
+    x.fillStyle = GREY; x.font = F(800, 30);
+    x.letterSpacing = '5px';
+    x.fillText('IN LOOP PER', 540, 1140);
+    x.letterSpacing = '0px';
+    x.fillStyle = GREEN; x.font = F(900, 190);
+    x.fillText(N + ' volte', 540, 1300);
+
+    /* tre colonne di dati, etichetta sopra e numero sotto */
+    const cols = [['DISTANZA', KM], ['TEMPO', TEMPO], ['RITMO', RITMO]];
+    const w = 880 / 3;
+    cols.forEach((c, i) => {
+      const cx = 100 + w * i + w / 2;
+      x.fillStyle = GREY; x.font = F(800, 26);
+      x.letterSpacing = '3px'; x.fillText(c[0], cx, 1470); x.letterSpacing = '0px';
+      x.fillStyle = ORANGE; x.font = F(900, 46);
+      x.fillText(c[1], cx, 1534);
+      if (i < 2) {
+        x.strokeStyle = 'rgba(255,255,255,0.14)'; x.lineWidth = 3;
+        x.beginPath(); x.moveTo(100 + w * (i + 1), 1440); x.lineTo(100 + w * (i + 1), 1550); x.stroke();
+      }
+    });
+    x.textAlign = 'left';
+  }
+
+  function drawAll() { v1(); v2(); v3(); }
+  drawAll();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(drawAll);
+</script>

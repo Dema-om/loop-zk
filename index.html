@@ -510,11 +510,10 @@
       <p class="v-label">In loop per</p>
       <p class="v-number"><span id="bigTimes">16</span> volte</p>
       <p class="v-song" id="rsTitle">Sportswear</p>
-      <p class="v-artist" id="rsArtist">Dark Polo Gang</p>
+      <p class="v-artist"><span id="rsArtist">Dark Polo Gang</span> · <span id="rsDur">1:59</span></p>
       <div class="tank" id="tank" role="img" aria-label="Un blocco per ogni riascolto"></div>
       <p class="v-run" id="rsRun">5 km · 30 min · 6:00/km</p>
     </div>
-    <p class="fine" id="fine">Sportswear dura 1:59, e la corsa 30 min.</p>
     <p class="repeat">Adesso mettila in <b>loop</b> e parti.</p>
   </section>
 
@@ -657,7 +656,8 @@
       const free = b.dataset.km === 'free';
       $('freeBox').classList.toggle('open', free);
       km = free ? readFreeKm() : parseFloat(b.dataset.km);
-      if (free) $('freeKm').focus();
+      /* Niente focus automatico: aprirebbe la tastiera addosso al campo appena
+         comparso. Ci si arriva col tocco, e li il valore vecchio si seleziona. */
       stopRotation(); update();
     });
   });
@@ -810,7 +810,9 @@
   ['exKm', 'exPace', 'freeKm'].forEach(id => {
     const el = $(id);
     el.addEventListener('focus', () => el.select());
-    el.addEventListener('pointerup', e => { if (el.selectionStart === el.selectionEnd) el.select(); });
+    /* Su alcuni telefoni il tocco rimette il cursore dopo il focus: si
+       riseleziona al frame dopo, cosi si scrive sempre sopra. */
+    el.addEventListener('pointerup', () => setTimeout(() => el.select(), 0));
   });
 
   $('exKm').addEventListener('input', () => { touched('km'); recalcExact(); });
@@ -1129,8 +1131,8 @@
     $('bigTimes').textContent = n;
     $('rsTitle').textContent = c.t;
     $('rsArtist').textContent = c.w;
+    $('rsDur').textContent = durLabel(c.s);
     $('rsRun').textContent = kmText() + ' · ' + timeText() + ' · ' + paceText();
-    $('fine').textContent = c.t + ' dura ' + durLabel(c.s) + ', e la corsa ' + timeText() + '.';
 
     render();
   }
