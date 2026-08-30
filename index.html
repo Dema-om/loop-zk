@@ -141,50 +141,33 @@
   .seg button:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
   .explain { font-size: 12px; color: var(--soft); margin: 10px 0 0; }
 
-  /* I dati esatti stanno in secondo piano di proposito: chi pianifica non li
-     vede, chi ha già corso li trova. Un bottone di testo, non un campo aperto. */
-  .exact-toggle {
-    font: inherit; font-size: 13px; font-weight: 700;
-    color: var(--orange-text); background: none; border: none;
-    padding: 14px 0 0; margin: 0; cursor: pointer;
+  /* I dati esatti non si aggiungono alla stima: la sostituiscono. Un solo
+     comando grigio in fondo alla card fa da interruttore fra le due facce. */
+  .swap {
+    font: inherit; font-size: 12px; font-weight: 700; color: var(--soft);
+    background: none; border: none; padding: 16px 0 0; margin: 0; cursor: pointer;
     text-decoration: underline; text-underline-offset: 3px;
   }
-  .exact-toggle:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
-  .exact-toggle[aria-expanded="true"] { display: none; }
-  .exact {
-    margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line);
-  }
-  .exact[hidden] { display: none; }
-  .exact-why { font-size: 12px; color: var(--soft); margin: 0 0 12px; }
-  .exact-fields { display: flex; gap: 12px; flex-wrap: wrap; }
+  .swap:hover { color: var(--ink); }
+  .swap:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
+  .exact-why { font-size: 13px; color: var(--soft); margin: 0 0 14px; }
+  .exact-fields { display: flex; gap: 14px; flex-wrap: wrap; }
   .exact-fields label {
-    display: flex; align-items: center; gap: 8px;
-    font-size: 13px; font-weight: 700; color: var(--soft);
+    display: flex; flex-direction: column; gap: 5px;
+    font-size: 11px; font-weight: 800; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--soft);
   }
   .exact-fields input {
-    width: 104px; font: inherit; font-weight: 800; font-size: 18px; text-align: center;
+    width: 118px; font: inherit; font-weight: 800; font-size: 20px; text-align: center;
     color: var(--ink); background: var(--chip); border: 1px solid var(--line);
-    border-radius: 12px; padding: 9px 8px; font-variant-numeric: tabular-nums;
+    border-radius: 12px; padding: 10px 8px; font-variant-numeric: tabular-nums;
+    letter-spacing: 0; text-transform: none;
   }
   .exact-fields input:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
-  .exact-fields small { font-weight: 600; font-size: 12px; }
-  .exact-out {
-    margin: 12px 0 0; font-size: 14px; font-weight: 800;
-    color: var(--orange-text); font-variant-numeric: tabular-nums;
+  .exact-fields input.derived { background: #FFF3E9; border-color: #F6CBAA; }
+  .exact-fields small {
+    font-weight: 600; font-size: 11px; letter-spacing: 0.06em; text-align: center;
   }
-  .exact-off {
-    font: inherit; font-size: 12px; font-weight: 700; color: var(--soft);
-    background: none; border: none; padding: 10px 0 0; cursor: pointer;
-    text-decoration: underline; text-underline-offset: 3px;
-  }
-  .exact-off:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
-  /* Con i dati esatti accesi la stima e scavalcata: si spegne, ma resta
-     toccabile, e toccarla riporta alla stima. */
-  .card-ui.overridden .chips,
-  .card-ui.overridden .seg,
-  .card-ui.overridden .sub-label,
-  .card-ui.overridden .explain,
-  .card-ui.overridden .free { opacity: 0.4; }
 
   /* ---------- canzoni, con il numero già addosso ---------- */
   .search {
@@ -352,31 +335,31 @@
   <section class="step run" aria-label="La tua corsa">
     <h2 class="step-head"><span class="num">1</span> La tua corsa</h2>
     <div class="card-ui">
-      <div class="chips" id="dists" role="group" aria-label="Distanza">
-        <button data-km="3" aria-pressed="false">3 km</button>
-        <button data-km="5" aria-pressed="true">5 km</button>
-        <button data-km="10" aria-pressed="false">10 km</button>
-        <button data-km="free" aria-pressed="false">Altro</button>
-      </div>
-      <label class="free" id="freeBox">
-        <span>Scrivi i km:</span>
-        <input id="freeKm" type="text" inputmode="decimal" value="7,4" aria-label="Chilometri">
-        <span>km</span>
-      </label>
+      <!-- Due volti della stessa card: si scambiano, non si sommano. -->
+      <div id="paneStima">
+        <div class="chips" id="dists" role="group" aria-label="Distanza">
+          <button data-km="3" aria-pressed="false">3 km</button>
+          <button data-km="5" aria-pressed="true">5 km</button>
+          <button data-km="10" aria-pressed="false">10 km</button>
+          <button data-km="free" aria-pressed="false">Altro</button>
+        </div>
+        <label class="free" id="freeBox">
+          <span>Scrivi i km:</span>
+          <input id="freeKm" type="text" inputmode="decimal" value="7,4" aria-label="Chilometri">
+          <span>km</span>
+        </label>
 
-      <p class="sub-label">Quanto ci metti a fare un chilometro?</p>
-      <div class="seg" id="levels" role="group" aria-label="Ritmo">
-        <button data-pace="450" aria-pressed="false">Piano<small>7 min 30</small></button>
-        <button data-pace="360" aria-pressed="true">Normale<small>6 min</small></button>
-        <button data-pace="285" aria-pressed="false">Forte<small>4 min 45</small></button>
+        <p class="sub-label">Quanto ci metti a fare un chilometro?</p>
+        <div class="seg" id="levels" role="group" aria-label="Ritmo">
+          <button data-pace="450" aria-pressed="false">Piano<small>7 min 30</small></button>
+          <button data-pace="360" aria-pressed="true">Normale<small>6 min</small></button>
+          <button data-pace="285" aria-pressed="false">Forte<small>4 min 45</small></button>
+        </div>
+        <p class="explain">Se non lo sai, lascia Normale: è il ritmo di chi corre chiacchierando.</p>
       </div>
-      <p class="explain">Se non lo sai, lascia Normale: è il ritmo di chi corre chiacchierando.</p>
 
-      <button class="exact-toggle" type="button" id="exactOn" aria-expanded="false" aria-controls="exactBox">
-        Hai già corso? Metti i dati esatti
-      </button>
-      <div class="exact" id="exactBox" hidden>
-        <p class="exact-why">Copia distanza e tempo dalla tua app: il ritmo lo calcoliamo noi, e sullo sticker finiscono i numeri veri invece di quelli tondi.</p>
+      <div id="paneEsatti" hidden>
+        <p class="exact-why">Copia i numeri dalla schermata di fine corsa, come li leggi.</p>
         <div class="exact-fields">
           <label>
             <span>Distanza</span>
@@ -388,10 +371,16 @@
             <input id="exTime" type="text" inputmode="numeric" value="30:12" aria-label="Tempo, minuti e secondi">
             <small>min:sec</small>
           </label>
+          <label>
+            <span>Ritmo</span>
+            <input id="exPace" type="text" inputmode="numeric" value="5:59" aria-label="Ritmo, minuti e secondi al chilometro">
+            <small>al km</small>
+          </label>
         </div>
-        <p class="exact-out" id="exactOut">Ritmo: 5:59 al km</p>
-        <button class="exact-off" type="button" id="exactOff">Torna alla stima</button>
+        <p class="explain" id="exactNote">Cambiane due e il terzo si aggiorna da solo.</p>
       </div>
+
+      <button class="swap" type="button" id="swap">Ho già corso: metti i dati esatti</button>
     </div>
   </section>
 
@@ -567,7 +556,6 @@
       $('freeBox').classList.toggle('open', free);
       km = free ? readFreeKm() : parseFloat(b.dataset.km);
       if (free) $('freeKm').focus();
-      leaveExact();          /* toccare la stima riporta alla stima */
       stopRotation(); update();
     });
   });
@@ -578,7 +566,6 @@
       document.querySelectorAll('#levels button').forEach(x => x.setAttribute('aria-pressed', 'false'));
       b.setAttribute('aria-pressed', 'true');
       paceSec = parseInt(b.dataset.pace, 10);
-      leaveExact();          /* toccare la stima riporta alla stima */
       stopRotation(); update();
     });
   });
@@ -617,56 +604,66 @@
   }
   $('q').addEventListener('input', renderResults);
 
-  /* ----- dati esatti: opzionale, e vince sulla stima quando e acceso ----- */
+  /* ----- dati esatti: la card cambia faccia, non si allunga -----
+     Tre campi legati fra loro. Distanza, tempo e ritmo sono la stessa cosa
+     detta in tre modi: ne bastano due, il terzo si ricava. Teniamo memoria
+     degli ultimi due toccati e ricalcoliamo l'altro, così l'utente puo
+     ricopiare dalla sua app nell'ordine che vuole. */
+  let recent = ['km', 'time'];
+  function touched(f) {
+    recent = [f, ...recent.filter(x => x !== f)];
+  }
+  const derivedField = () => ['km', 'time', 'pace'].find(f => f !== recent[0] && f !== recent[1]);
+
   function parseTime(v) {
     /* accetta "30:12", "30.12", "1:02:33" e anche i minuti secchi "30" */
     const parts = String(v).trim().replace(/[.,]/g, ':').split(':').map(x => parseInt(x, 10));
-    if (parts.some(isNaN) || !parts.length) return null;
+    if (!parts.length || parts.some(isNaN)) return null;
     if (parts.length === 1) return parts[0] * 60;
     if (parts.length === 2) return parts[0] * 60 + parts[1];
     return parts[0] * 3600 + parts[1] * 60 + parts[2];
   }
-  function readExact() {
-    const k = parseFloat(($('exKm').value || '').replace(',', '.'));
-    const t = parseTime($('exTime').value);
-    if (!isFinite(k) || k <= 0 || !t || t <= 0) return null;
-    return { km: Math.min(k, 300), sec: Math.min(t, 86400) };
-  }
-  function markOverride(on) {
-    const card = $('exactBox').closest('.card-ui');
-    if (card) card.classList.toggle('overridden', on);
-  }
-  function leaveExact() {
-    exact = null;
-    markOverride(false);
-    $('exactOn').setAttribute('aria-expanded', 'false');
-    $('exactBox').hidden = true;
-  }
-  function refreshExact() {
-    const e = readExact();
-    if (e) {
-      exact = e;
-      $('exactOut').textContent = 'Ritmo: ' + clock(Math.round(e.sec / e.km)) + ' al km';
-      markOverride(true);
+  const readKm = () => {
+    const v = parseFloat(($('exKm').value || '').replace(',', '.'));
+    return (isFinite(v) && v > 0) ? Math.min(v, 300) : null;
+  };
+
+  function recalcExact() {
+    const d = derivedField();
+    const km0 = readKm(), t0 = parseTime($('exTime').value), p0 = parseTime($('exPace').value);
+    let k = km0, t = t0, pc = p0;
+
+    if (d === 'time' && k && pc) t = Math.round(k * pc);
+    else if (d === 'pace' && k && t) pc = Math.round(t / k);
+    else if (d === 'km' && t && pc) k = Math.round((t / pc) * 100) / 100;
+
+    /* il campo ricavato si riscrive da solo e si colora, gli altri no */
+    ['exKm', 'exTime', 'exPace'].forEach(id => $(id).classList.remove('derived'));
+    if (d === 'time' && t) { $('exTime').value = clock(t); $('exTime').classList.add('derived'); }
+    if (d === 'pace' && pc) { $('exPace').value = clock(pc); $('exPace').classList.add('derived'); }
+    if (d === 'km' && k) { $('exKm').value = fmt2(k); $('exKm').classList.add('derived'); }
+
+    if (k && t) {
+      exact = { km: k, sec: t };
+      $('exactNote').textContent = 'Cambiane due e il terzo si aggiorna da solo.';
     } else {
-      $('exactOut').textContent = 'Servono una distanza e un tempo validi.';
+      $('exactNote').textContent = 'Servono almeno due valori validi.';
     }
     update();
   }
-  $('exactOn').addEventListener('click', () => {
-    $('exactOn').setAttribute('aria-expanded', 'true');
-    $('exactBox').hidden = false;
-    $('exKm').focus();
-    stopRotation();
-    refreshExact();
-  });
-  $('exactOff').addEventListener('click', () => {
-    leaveExact();
-    $('exactOn').focus();
-    update();
-  });
-  $('exKm').addEventListener('input', refreshExact);
-  $('exTime').addEventListener('input', refreshExact);
+
+  $('exKm').addEventListener('input', () => { touched('km'); recalcExact(); });
+  $('exTime').addEventListener('input', () => { touched('time'); recalcExact(); });
+  $('exPace').addEventListener('input', () => { touched('pace'); recalcExact(); });
+
+  function setPane(esatti) {
+    $('paneStima').hidden = esatti;
+    $('paneEsatti').hidden = !esatti;
+    $('swap').textContent = esatti ? 'Torna alla stima' : 'Ho già corso: metti i dati esatti';
+    if (esatti) { stopRotation(); recalcExact(); $('exKm').focus(); }
+    else { exact = null; update(); }
+  }
+  $('swap').addEventListener('click', () => setPane($('paneEsatti').hidden));
 
   /* ================= la storia: un solo renderer su canvas ================= */
   const cv = $('cv');
