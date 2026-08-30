@@ -1,4 +1,4 @@
-<title>Volte</title>
+<title>inLOOP</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;800;900&display=swap">
 <style>
@@ -287,21 +287,8 @@
      condivide, e sta piu sotto. Qui resta la frase, la barra e le due azioni. */
   .out-line { margin: 0 0 14px; font-size: 17px; font-weight: 700; }
   .out-line b { color: var(--green-text); font-variant-numeric: tabular-nums; }
-  .out-foot {
-    display: flex; align-items: center; justify-content: space-between;
-    gap: 14px; flex-wrap: wrap; margin-top: 14px;
-  }
-  .repeat { margin: 0; font-size: 13px; color: var(--soft); }
+  .repeat { margin: 14px 0 0; font-size: 13px; color: var(--soft); }
   .repeat b { color: var(--ink); }
-  .share-claim {
-    display: inline-flex; align-items: center; gap: 8px;
-    padding: 9px 16px; margin: 0;
-    font: inherit; font-size: 13px; font-weight: 800;
-    color: var(--on-brand); background: var(--green);
-    border: none; border-radius: 999px; cursor: pointer;
-  }
-  .share-claim:hover { filter: brightness(0.96); }
-  .share-claim:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
 
   /* Un blocco per riascolto: il numero si vede, non si legge soltanto.
      Dentro il verde i blocchi sono scuri su un binario chiaro. */
@@ -388,6 +375,12 @@
   .btn.primary { background: var(--green); border-color: var(--green); color: var(--on-brand); }
   .btn:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
   .btn[hidden] { display: none; }
+  .btn.wide { min-width: 240px; }
+  /* Grigio quando non si puo premere: l'etichetta ha bisogno di una foto sotto. */
+  .btn[disabled] {
+    background: var(--chip); border-color: var(--line); color: var(--soft);
+    cursor: not-allowed;
+  }
   .hint { font-size: 12px; color: var(--soft); margin-top: 10px; text-align: center; }
   .hint b { color: var(--ink); }
 
@@ -405,6 +398,10 @@
   }
   .about h3 { font-size: 15px; font-weight: 900; margin: 0 0 8px; letter-spacing: -0.01em; }
   .about p { font-size: 14px; color: var(--soft); margin: 0 0 10px; }
+  .det-head {
+    margin: 20px 0 8px; font-size: 11px; font-weight: 800;
+    letter-spacing: 0.12em; text-transform: uppercase; color: var(--orange-text);
+  }
   .details { margin: 0; padding-left: 20px; font-size: 14px; color: var(--soft); }
   .details li { margin-bottom: 10px; }
   .details b { color: var(--ink); font-weight: 800; }
@@ -427,7 +424,7 @@
 
 <div class="wrap">
   <nav>
-    <div class="logo">Volte<span class="dot">.</span>run</div>
+    <div class="logo">in<span class="dot">LOOP</span></div>
     <a class="concept-tag" href="#about">Concept <b>Spotify</b> × <em>Strava</em> · non ufficiale</a>
   </nav>
 
@@ -442,7 +439,7 @@
       <li>I dati della corsa</li>
       <li>La tua canzone</li>
       <li>Quante volte</li>
-      <li>In storia</li>
+      <li>Condividi</li>
     </ol>
   </header>
 
@@ -451,8 +448,8 @@
     <div class="card-ui">
       <!-- Due schede della stessa card: si vedono entrambe, si scambiano con un tocco. -->
       <div class="tabs" role="group" aria-label="Tipo di corsa">
-        <button type="button" id="tabStima" aria-pressed="true">Da programmare</button>
-        <button type="button" id="tabEsatti" aria-pressed="false">Già corsa</button>
+        <button type="button" id="tabStima" aria-pressed="true">Corsa da fare</button>
+        <button type="button" id="tabEsatti" aria-pressed="false">Corsa fatta</button>
       </div>
       <div id="paneStima">
         <div class="chips" id="dists" role="group" aria-label="Distanza">
@@ -524,18 +521,9 @@
   </section>
 
   <section class="outcome" aria-label="Il risultato" aria-live="polite">
-    <p class="out-line" id="outLine">Sono <b>16 volte</b> Sportswear per 5 km.</p>
+    <p class="out-line" id="outLine">5 km di corsa sono <b>16 volte</b> Sportswear.</p>
     <div class="tank" id="tank" role="img" aria-label="Un blocco per ogni riascolto"></div>
-    <div class="out-foot">
-      <p class="repeat">Adesso mettila in <b>loop</b> e parti.</p>
-      <button class="share-claim" type="button" id="shareClaim">
-        <svg width="15" height="15" viewBox="0 0 18 18" fill="none" aria-hidden="true">
-          <path d="M9 12V2.5M9 2.5 5.6 5.9M9 2.5l3.4 3.4" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M3 10.5v3.9A1.6 1.6 0 0 0 4.6 16h8.8a1.6 1.6 0 0 0 1.6-1.6v-3.9" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>
-        </svg>
-        <span id="shareClaimLabel">Condividi la frase</span>
-      </button>
-    </div>
+    <p class="repeat">Adesso mettila in <b>loop</b> e parti.</p>
   </section>
 
   <section class="share">
@@ -562,12 +550,15 @@
     <div class="cta">
       <input type="file" id="file" accept="image/*" class="sr" tabindex="-1" aria-hidden="true">
       <input type="file" id="shot" accept="image/*" capture="environment" class="sr" tabindex="-1" aria-hidden="true">
-      <button class="btn primary" type="button" id="save">Genera il PNG</button>
-    </div>
-    <div class="cta">
       <button class="btn" type="button" id="take">Scatta una foto</button>
       <button class="btn" type="button" id="upload">Prendila dal rullino</button>
     </div>
+    <div class="cta">
+      <button class="btn primary wide" type="button" id="save">Genera il PNG</button>
+    </div>
+    <button class="swap" type="button" id="shareClaim">
+      <span id="shareClaimLabel">Condividi solo la frase, come testo</span>
+    </button>
     <p class="hint" id="shareHint"><b>Trascina l'etichetta</b> per spostarla dove vuoi.</p>
 
     <div class="saved" id="saved">
@@ -579,14 +570,11 @@
 
   <section class="about" id="about">
     <h3>Cos'è questo</h3>
-    <p>Volte è un concept: immagina che Spotify e Strava facciano una cosa insieme, e la prova su un gesto solo,
-    contare la corsa in canzoni. Non è affiliato a nessuna delle due: i loro colori stanno qui perché sono il materiale dell'esercizio.</p>
-    <p>Il punto di partenza è vero. Nel 2023 le due app <b>si erano davvero parlate</b>: Strava aveva messo il
-    lettore di Spotify dentro la schermata di registrazione, e poi ha chiuso l'integrazione. Questo sito
-    prende quel filo e prova un'altra direzione: non i comandi del lettore dentro l'app di corsa,
-    ma la musica come <b>unità di misura</b> della fatica.</p>
-    <p>Niente account e niente permessi, di proposito. Il loop è un tap dentro la tua app di musica,
-    quindi questo sito non ha bisogno di collegarsi a niente per servire a qualcosa.</p>
+    <p><b>I chilometri restano quelli.</b> Contati in canzoni pesano meno, perché ascoltare un pezzo
+    che ti piace è una cosa che faresti comunque. inLOOP fa solo questo: prende una distanza e te la
+    ridice in riascolti, poi te la dà pronta da mettere in storia.</p>
+    <p>È un concept dichiarato su Spotify e Strava, e non è affiliato a nessuna delle due:
+    i loro colori stanno qui perché sono il materiale dell'esercizio.</p>
   </section>
 
   <section class="about">
@@ -597,42 +585,87 @@
     <p>Mi occupo di AI e di come si costruiscono prodotti con l'AI, quello che oggi si chiama vibe coding
     o AI building. Mi interessano il marketing e i dati, e mi interessano la musica e lo sport: questo
     progetto è il punto in cui si incontrano.</p>
+    <p>Il punto di partenza è un fatto vero: nel 2023 Spotify e Strava <b>si erano davvero parlate</b>,
+    con il lettore di Spotify dentro la schermata di registrazione di Strava, e poi Strava ha chiuso
+    l'integrazione. Da lì ho provato un'altra direzione: non i comandi del lettore dentro l'app di corsa,
+    ma la musica come <b>unità di misura</b> della fatica.</p>
     <p>Sto costruendo una serie di progetti come questo, che servono a due cose insieme: risolvere qualcosa
     di piccolo per bene, e raccontare come ragiono. Ne pubblicherò altri.
     <b>Lavoro nell'AI e sono aperto a proposte.</b></p>
     <a class="me" href="https://www.linkedin.com/in/matteodemarcoo" target="_blank" rel="noopener">
       Matteo De Marco su LinkedIn
+      <svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+        <path d="M4 10 10 4M10 4H5.2M10 4v4.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
     </a>
   </section>
 
   <section class="about">
-    <h3>Le cose piccole</h3>
-    <p>Un concept si giudica dai dettagli che nessuno nota finché non mancano. Questi li ho messi apposta,
-    e quasi tutti nascono da una cosa vista rotta da qualche altra parte.</p>
+    <h3>Accortezze di design e sviluppo</h3>
+    <p>Un concept si giudica dai dettagli che nessuno nota finché non mancano. Quasi tutti questi
+    nascono da una cosa vista rotta da qualche altra parte, o da un errore che ho fatto e poi corretto.</p>
+
+    <p class="det-head">Le scelte grosse</p>
+    <ul class="details">
+      <li><b>Prima della corsa, non dopo.</b> Chiedere lo screenshot di Strava significava chiedere dati
+      già scritti dentro l'immagine, e produceva etichette che si contraddicevano da sole: il ritmo scelto
+      a mano contro il ritmo stampato nello screenshot.</li>
+      <li><b>Una canzone, non una playlist.</b> Una playlist che non puoi esportare su Spotify è inutile.
+      Una canzone in loop invece è un tap dentro qualsiasi app: il sito dà il numero e lo esegui da solo.</li>
+      <li><b>Nessuna integrazione con Spotify, e non per pigrizia.</b> Da marzo 2025 per uscire dalla
+      modalità sviluppo dell'API servono 250.000 utenti attivi al mese, e la modalità sviluppo è scesa a
+      cinque utenti. La ricerca userà l'archivio di Apple, gratuito e senza chiavi.</li>
+      <li><b>Niente account, niente server.</b> Tutto avviene nel browser: la foto non viene caricata da
+      nessuna parte, quindi non c'è niente da promettere sulla privacy perché non c'è niente da custodire.</li>
+    </ul>
+
+    <p class="det-head">Quello che si legge</p>
     <ul class="details">
       <li><b>Il testo si legge davvero.</b> Bianco su verde Spotify fa 2,59 a 1 e su arancio Strava 3,31,
-      sotto il minimo di leggibilità. Quindi i colori di marca fanno da superficie con testo scuro sopra,
-      come fa Spotify sui suoi bottoni, e diventano testo solo dove il fondo è scuro.</li>
-      <li><b>L'etichetta non finisce sotto Instagram.</b> In alto la storia ha la barra di avanzamento e in basso
-      il campo «rispondi»: c'è un limite invalicabile a 260 pixel dai bordi, anche trascinando.</li>
-      <li><b>La tua foto resta intera.</b> Uno scatto verticale è più stretto del formato storia: riempire il frame
-      taglierebbe via mezza inquadratura, quindi sta dentro e le bande si riempiono con la stessa foto sfocata.</li>
-      <li><b>Si afferra l'etichetta, non la foto.</b> Prima un tocco qualsiasi la teletrasportava sotto il dito,
-      e ai bordi c'erano zone morte perché il limite del dito non coincideva con quello del disegno.</li>
-      <li><b>La tastiera non si apre da sola.</b> Su telefono il focus automatico copre proprio i campi appena
-      comparsi. E toccando un campo il valore si seleziona, così ci scrivi sopra invece di cancellare cifra per cifra.</li>
-      <li><b>Distanza, tempo e ritmo sono la stessa cosa detta in tre modi.</b> Ne compili due e il terzo si
-      calcola da solo, evidenziato, in qualunque ordine tu ricopi dalla tua app.</li>
-      <li><b>La rotella solo dove serve.</b> Sul tempo, che ha due parti e un intervallo noto. Per la distanza
-      si scrive e basta, è più veloce.</li>
-      <li><b>Niente cursore che balla.</b> Cifre a larghezza fissa ovunque ci siano numeri che cambiano.</li>
-      <li><b>I decimali solo quando sono veri.</b> Cinque chilometri scelti da un chip sono tondi; 5,04 km
-      ricopiati dall'app sono misurati. Scrivere i decimali su una stima fingerebbe una precisione che non c'è.</li>
-      <li><b>Il claim si ferma appena lo tocchi.</b> Le cose che si muovono da sole vanno sempre potute fermare,
-      e nel frattempo non devono cambiare i numeri sotto gli occhi di chi legge.</li>
-      <li><b>Niente slider.</b> Per valori discreti col pollice sono imprecisi e non mostrano dove sei.</li>
-      <li><b>La foto non lascia il telefono.</b> Tutto avviene nel browser: nessun caricamento, nessun server,
-      niente da promettere sulla privacy perché non c'è niente da custodire.</li>
+      sotto il minimo. Quindi i colori di marca fanno da superficie con testo scuro sopra, come fa Spotify
+      sui suoi bottoni, e diventano testo solo dove il fondo è scuro.</li>
+      <li><b>L'arancione è quello giusto.</b> Usavo #FC5200 preso da una ricerca, ma quello di Strava è
+      #FC4C02. Un dettaglio che in un concept sui marchi altrui non puoi sbagliare.</li>
+      <li><b>Il passo non si scrive più «7:30 /km».</b> Non si capisce. Ora la domanda è «quanto ci metti a
+      fare un chilometro» e le risposte sono Piano, Normale e Forte con i minuti sotto.</li>
+      <li><b>La parola «corsa» non serve.</b> L'unità <b>/km</b> la dichiara da sola: scriverla sarebbe
+      dirlo due volte.</li>
+      <li><b>Cifre a larghezza fissa</b> ovunque ci siano numeri che cambiano, così non ballano.</li>
+      <li><b>I decimali solo quando sono veri.</b> Cinque chilometri scelti da un chip sono tondi; 5,04
+      ricopiati dall'app sono misurati. Metterli su una stima fingerebbe una precisione che non c'è.</li>
+    </ul>
+
+    <p class="det-head">Quello che si tocca</p>
+    <ul class="details">
+      <li><b>La tastiera non si apre da sola.</b> Su telefono il focus automatico copre proprio i campi
+      appena comparsi. E toccando un campo il valore si seleziona, così ci scrivi sopra.</li>
+      <li><b>Niente slider.</b> Per valori discreti col pollice sono imprecisi e non mostrano dove sei.
+      La rotella invece c'è, ma solo sul tempo, che ha due parti e un intervallo noto.</li>
+      <li><b>Distanza, tempo e ritmo sono la stessa cosa detta in tre modi.</b> Ne compili due e il terzo
+      si calcola da solo, in qualunque ordine tu ricopi dalla tua app.</li>
+      <li><b>Due schede, non un comando nascosto.</b> Prima un link in fondo ribaltava tutta la card senza
+      dire cosa era cambiato né come tornare indietro.</li>
+      <li><b>Si afferra l'etichetta, non la foto.</b> Prima un tocco qualsiasi la teletrasportava sotto il
+      dito, e ai bordi c'erano zone morte perché il limite del dito non coincideva con quello del disegno.</li>
+      <li><b>La pagina non salta.</b> Ricostruivo la lista delle canzoni a ogni cambio, e sostituire nodi
+      sopra la vista fa perdere al browser l'ancoraggio dello scroll.</li>
+      <li><b>Il claim si ferma appena lo tocchi.</b> Le cose che si muovono da sole vanno sempre potute
+      fermare, e intanto non devono cambiare i numeri sotto gli occhi di chi legge.</li>
+    </ul>
+
+    <p class="det-head">Quello che esce</p>
+    <ul class="details">
+      <li><b>L'etichetta non finisce sotto Instagram.</b> In alto la storia ha la barra di avanzamento e in
+      basso il campo «rispondi»: c'è un limite invalicabile a 260 pixel dai bordi, anche trascinando.</li>
+      <li><b>La tua foto resta intera.</b> Uno scatto verticale è più stretto del formato storia: riempire
+      il frame taglierebbe via mezza inquadratura, quindi sta dentro e le bande si riempiono con la stessa
+      foto sfocata.</li>
+      <li><b>Il titolo non si tronca senza motivo.</b> Riservavo uno spazio fisso al numero e mangiava i
+      titoli lunghi: ora quella larghezza si misura sul contenuto vero.</li>
+      <li><b>La card si adatta al titolo.</b> Il corpo del testo scende finché la frase non sta in tre
+      righe, così un brano dal nome lunghissimo non rompe la composizione.</li>
+      <li><b>Un solo motore di disegno.</b> L'anteprima e il file finale escono dallo stesso codice, quindi
+      quello che vedi è esattamente il PNG che salvi.</li>
     </ul>
   </section>
 
@@ -1032,32 +1065,42 @@
 
   function drawPhraseCard() {
     const c = song(), n = timesFor(c);
+    const CW = 880, PAD = 60, inner = CW - PAD * 2, COV = 88;
+    const frase = kmText() + ' di corsa sono ' + n + ' volte ' + c.t + '.';
 
-    const CW = 880, PAD = 64, inner = CW - PAD * 2, COV = 92;
-    const bigFont = F(900, 68);
-    const frase = kmText() + ' sembrano tanti. Sono ' + n + ' volte ' + c.t + '.';
-    const righe = wrapOn(frase, bigFont, inner);
-    const cardH = PAD * 2 + COV + 66 + righe.length * 84;
-    const cx = (W - CW) / 2, cy = (H - cardH) / 2 - 30;
+    /* Il corpo si adatta al titolo: si scende finche la frase non sta in tre
+       righe. Un titolo lunghissimo non deve poter rompere la card. */
+    let size = 68, righe = wrapOn(frase, F(900, size), inner);
+    while (righe.length > 3 && size > 40) {
+      size -= 4;
+      righe = wrapOn(frase, F(900, size), inner);
+    }
+    if (righe.length > 3) righe = righe.slice(0, 3);
+    const lead = Math.round(size * 1.22);
+
+    const footH = 66;
+    const cardH = PAD * 2 + COV + 34 + righe.length * lead + footH;
+    const cx = (W - CW) / 2, cy = (H - cardH) / 2 - 20;
 
     ctx.save();
-    ctx.shadowColor = 'rgba(0,0,0,0.42)'; ctx.shadowBlur = 70; ctx.shadowOffsetY = 20;
+    ctx.shadowColor = 'rgba(0,0,0,0.34)'; ctx.shadowBlur = 70; ctx.shadowOffsetY = 20;
     ctx.fillStyle = '#FFFFFF';
     roundRect(cx, cy, CW, cardH, 44); ctx.fill();
     ctx.restore();
 
-    /* riga del brano in alto, come nella card di Spotify */
+    /* riga del brano in alto */
     drawCover(cx + PAD, cy + PAD, COV, c);
     ctx.textBaseline = 'alphabetic'; ctx.textAlign = 'left';
-    ctx.fillStyle = '#121212'; ctx.font = F(800, 40);
-    ctx.fillText(fitText(c.t, F(800, 40), inner - COV - 26), cx + PAD + COV + 26, cy + PAD + 40);
-    ctx.fillStyle = '#5F6963'; ctx.font = F(600, 32);
-    ctx.fillText(c.w + ' \u00B7 ' + durLabel(c.s), cx + PAD + COV + 26, cy + PAD + 82);
+    const tx = cx + PAD + COV + 24, tw = inner - COV - 24;
+    ctx.fillStyle = '#121212'; ctx.font = F(800, 38);
+    ctx.fillText(fitText(c.t, F(800, 38), tw), tx, cy + PAD + 38);
+    ctx.fillStyle = '#5F6963'; ctx.font = F(600, 30);
+    ctx.fillText(fitText(c.w + ' \u00B7 ' + durLabel(c.s), F(600, 30), tw), tx, cy + PAD + 76);
 
-    /* la frase, con i pezzi colorati come sul sito */
+    /* la frase, coi pezzi colorati */
     const titolo = c.t.split(' ');
-    let y = cy + PAD + COV + 92;
-    ctx.font = bigFont;
+    let y = cy + PAD + COV + 34 + Math.round(size * 0.86);
+    ctx.font = F(900, size);
     righe.forEach(parole => {
       let x = cx + PAD;
       parole.forEach((w, i) => {
@@ -1070,16 +1113,35 @@
         ctx.fillText(testo, x, y);
         x += ctx.measureText(testo).width;
       });
-      y += 84;
+      y += lead;
     });
 
-    /* il sito, fuori dalla card */
-    ctx.fillStyle = 'rgba(255,255,255,0.62)'; ctx.font = F(600, 34);
-    ctx.textAlign = 'center';
-    ctx.shadowColor = 'rgba(0,0,0,0.45)'; ctx.shadowBlur = 14;
-    ctx.fillText('volte.run', W / 2, cy + cardH + 80);
-    ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0;
-    ctx.textAlign = 'left';
+    /* il marchio dentro la card, sotto una linea sottile */
+    const fy = cy + cardH - PAD + 6;
+    ctx.strokeStyle = '#E2E7E0'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(cx + PAD, fy - 34); ctx.lineTo(cx + CW - PAD, fy - 34); ctx.stroke();
+    ctx.fillStyle = '#9AA49C'; ctx.font = F(600, 26);
+    ctx.fillText('inloop.zetakiwi.com', cx + PAD, fy);
+  }
+
+  /* Nella versione con i dati, finche manca la foto il fondo spiega i due
+     passi e una freccia indica l'etichetta. Con la foto sparisce tutto. */
+  function drawHintDati() {
+    const r = badgeRect();
+    ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+    const L = 100;
+    let y = r.y - 300;
+    ctx.fillStyle = 'rgba(255,255,255,0.92)'; ctx.font = F(800, 46);
+    ctx.fillText('1. Carica una foto', L, y);
+    ctx.fillText('2. Trascina l\'etichetta', L, y + 70);
+    ctx.strokeStyle = 'rgba(255,255,255,0.6)'; ctx.lineWidth = 5;
+    ctx.beginPath();
+    ctx.moveTo(L + 14, y + 118);
+    ctx.lineTo(L + 14, r.y - 34);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(L - 8, r.y - 58); ctx.lineTo(L + 14, r.y - 30); ctx.lineTo(L + 36, r.y - 58);
+    ctx.stroke();
   }
 
   /* Una sola fonte di verita per dove sta l'etichetta: la usano il disegno e
@@ -1128,7 +1190,7 @@
     ctx.fillStyle = '#0E7A38'; ctx.font = F(900, 100);
     ctx.fillText(String(timesFor(c)), w - PAD - vw, PAD + 140);
     ctx.fillStyle = softC; ctx.font = F(600, 26);
-    ctx.fillText('volte.run', w - PAD, PAD + 218);
+    ctx.fillText('inloop.zetakiwi.com', w - PAD, PAD + 218);
     ctx.textAlign = 'left';
 
     /* Lo spazio del blocco numero si MISURA, non si indovina: riservarne 330
@@ -1139,7 +1201,7 @@
     ctx.letterSpacing = '0px';
     ctx.font = F(900, 100); const wNum = ctx.measureText(nStr).width;
     ctx.font = F(800, 46); const wVolte = ctx.measureText(' volte').width;
-    ctx.font = F(600, 26); const wSite = ctx.measureText('volte.run').width;
+    ctx.font = F(600, 26); const wSite = ctx.measureText('inloop.zetakiwi.com').width;
     const bigW = Math.max(wLabel, wNum + wVolte, wSite) + 40;
 
     /* colonna centrale: brano, artista, corsa */
@@ -1171,18 +1233,28 @@
   function render() {
     ctx.clearRect(0, 0, W, H);
     if (photo) drawPhoto(); else drawGradient();
-    if (versione === 'frase') drawPhraseCard(); else drawBadge();
+    if (versione === 'frase') { drawPhraseCard(); return; }
+    if (!photo) drawHintDati();
+    drawBadge();
   }
 
+  /* "La frase" e finita da sola. "I dati" e un'etichetta, e un'etichetta ha
+     bisogno di qualcosa sotto: senza foto il PNG resta grigio. */
   function setVersione(v) {
     versione = v;
     $('vFrase').setAttribute('aria-pressed', v === 'frase' ? 'true' : 'false');
     $('vDati').setAttribute('aria-pressed', v === 'dati' ? 'true' : 'false');
-    $('sfondi').hidden = !!photo;
-    $('shareHint').innerHTML = v === 'dati'
-      ? '<b>Trascina l\'etichetta</b> per spostarla dove vuoi.'
-      : 'La frase sta al centro. Aggiungi una foto e le finisce sopra.';
+    aggiornaComandi();
     render();
+  }
+  function aggiornaComandi() {
+    const serveFoto = versione === 'dati' && !photo;
+    $('sfondi').hidden = !!photo || versione === 'dati';
+    $('save').disabled = serveFoto;
+    $('shareHint').innerHTML = versione === 'dati'
+      ? (photo ? '<b>Trascina l\'etichetta</b> per spostarla dove vuoi.'
+               : 'Serve una foto sotto: scattala o prendila dal rullino.')
+      : 'La card è pronta. Se vuoi, mettila sopra una tua foto.';
   }
   $('vFrase').addEventListener('click', () => setVersione('frase'));
   $('vDati').addEventListener('click', () => setVersione('dati'));
@@ -1196,7 +1268,7 @@
     const etichetta = $('shareClaimLabel');
     try {
       if (navigator.share) {
-        await navigator.share({ title: 'Volte', text: frase, url: location.href });
+        await navigator.share({ title: 'inLOOP', text: frase, url: location.href });
         return;
       }
     } catch (e) { return; }   /* annullato dall'utente: non e un errore */
@@ -1258,7 +1330,7 @@
     img.onload = () => {
       photo = img;
       document.querySelector('.stage').classList.add('movable');
-      $('sfondi').hidden = true;
+      aggiornaComandi();
       render();
     };
     img.src = URL.createObjectURL(f);
@@ -1298,12 +1370,13 @@
     tank.setAttribute('aria-label', n + ' riascolti riempiono ' + kmText() +
       (n > 60 ? ' (ne vedi i primi 60)' : ''));
 
-    $('outLine').innerHTML = 'Sono <b>' + n + ' volte</b> ' + c.t + ' per ' + kmText() + '.';
+    $('outLine').innerHTML = kmText() + ' di corsa sono <b>' + n + ' volte</b> ' + c.t + '.';
 
     render();
   }
 
   renderResults();   /* la lista si costruisce una volta sola */
+  aggiornaComandi();
   update();
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(render);
 </script>
