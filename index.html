@@ -421,7 +421,15 @@
      azioni: stanno sopra, in secondo piano. Il testo e un ripiego, quindi e un
      link. Tre pesi diversi per tre cose diverse. */
   .cta-photo[hidden] { display: none; }
-  .cta-photo { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
+  /* Passando da "La frase" a "I dati" sparivano le quattro pastiglie del
+     colore e comparivano i due tasti della foto: 61 px di differenza, e tutto
+     quello che stava sotto saltava. I due stati ora pesano uguale. */
+  .cta-photo {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px;
+    min-height: 88px; align-content: center;
+  }
+  .themes { min-height: 88px; align-content: center; }
+  .hint { min-height: 39px; }
   .btn {
     font: inherit; font-weight: 800; font-size: 14px; border-radius: 999px;
     padding: 13px 22px; cursor: pointer; border: 1px solid var(--line);
@@ -540,6 +548,12 @@
   .topbar .due em { font-style: normal; color: var(--orange-text); }
   header { padding-top: 30px; }
   header { padding-top: 46px; padding-bottom: 10px; }
+  /* La barra appiccicata sta sopra il contenuto: senza questo, ogni salto a
+     un'ancora infila il pezzo di sotto dietro la barra. Il claim spariva per
+     26 px premendo "Torna su". */
+  #top, #about, #chi, #come, #storie { scroll-margin-top: 84px; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 
   /* ================= LA FASCIA SCURA =================
      L'unica cosa che tocca i bordi dello schermo. Serve a spezzare la pagina
@@ -691,6 +705,7 @@
   /* ================= IL PIEDE =================
      Prima era una riga sola alta 105 pixel: la pagina non si chiudeva, finiva. */
   footer {
+    margin-top: 34px;
     border-top: 1px solid var(--line); background: var(--card);
     padding: 28px 0 calc(26px + env(safe-area-inset-bottom));
     color: var(--soft); font-size: 12px;
@@ -832,7 +847,7 @@
     <p class="out-line" id="outLine">5 km di corsa sono <b>16 volte</b> Sportswear.</p>
     <div class="tank" id="tank" role="img" aria-label="Un blocco per ogni riascolto"></div>
     <p class="repeat">Adesso mettila in <b>loop</b> e parti.</p>
-    <a class="vai" href="#storie">Fatti la storia <span aria-hidden="true">&darr;</span></a>
+    <a class="vai" href="#storie">Condividi una storia <span aria-hidden="true">&darr;</span></a>
   </section>
 
 </div>
@@ -870,9 +885,6 @@
         <button class="btn ghost" type="button" id="upload">Prendila dal rullino</button>
       </div>
       <button class="btn primary wide" type="button" id="save">Condividi</button>
-      <button class="linkbtn" type="button" id="shareClaim">
-        <span id="shareClaimLabel">Condividi solo la frase, come testo</span>
-      </button>
 
       <div class="saved" id="saved">
         <img id="savedImg" alt="La tua storia pronta da salvare">
@@ -1721,11 +1733,18 @@
 
     ctx.textBaseline = 'alphabetic';
     ctx.textAlign = 'right';
+    /* Il numero da solo non dice cosa conta. "IN LOOP PER" no, perche il
+       marchio si chiama gia inLOOP: "ASCOLTATA" invece aggiunge il verbo
+       che mancava. */
+    ctx.font = F(800, 24); ctx.fillStyle = softC;
+    ctx.letterSpacing = '4px';
+    ctx.fillText('ASCOLTATA', w - PAD, PAD + 34);
+    ctx.letterSpacing = '0px';
     ctx.font = F(800, 36); ctx.fillStyle = inkC;
     const vw = ctx.measureText(' volte').width;
-    ctx.fillText(' volte', w - PAD, PAD + 104);
+    ctx.fillText(' volte', w - PAD, PAD + 118);
     ctx.fillStyle = '#0E7A38'; ctx.font = F(900, 96);
-    ctx.fillText(nStr, w - PAD - vw, PAD + 104);
+    ctx.fillText(nStr, w - PAD - vw, PAD + 118);
     ctx.textAlign = 'left';
 
     /* Il titolo scende di corpo prima di rassegnarsi a farsi troncare. */
@@ -1794,7 +1813,6 @@
     const dati = versione === 'dati';
     $('sfondi').hidden = dati;
     document.querySelector('.cta-photo').hidden = !dati;
-    $('shareClaim').hidden = dati;
     $('save').disabled = dati && !photo;
     $('shareHint').innerHTML = dati
       ? (photo ? '<b>Trascina l\'etichetta</b> per spostarla, <b>pizzica</b> per rimpicciolirla.'
@@ -1804,28 +1822,6 @@
   $('vFrase').addEventListener('click', () => setVersione('frase'));
   $('vDati').addEventListener('click', () => setVersione('dati'));
 
-  /* Condividere il claim: e una frase e un link, non un'immagine. L'immagine
-     e lo sticker sulla foto, piu sotto. Dove il foglio nativo non c'e, il
-     testo finisce negli appunti. */
-  $('shareClaim').addEventListener('click', async () => {
-    const c = song();
-    const frase = kmText() + ' sembrano tanti. Ma sono ' + timesFor(c) + ' volte ' + c.t + ' di ' + c.w + '.';
-    const etichetta = $('shareClaimLabel');
-    try {
-      if (navigator.share) {
-        await navigator.share({ title: 'inLOOP', text: frase, url: location.href });
-        return;
-      }
-    } catch (e) { return; }   /* annullato dall'utente: non e un errore */
-    try {
-      await navigator.clipboard.writeText(frase + ' ' + location.href);
-      etichetta.textContent = 'Copiato';
-      setTimeout(() => { etichetta.textContent = 'Condividi la frase'; }, 1800);
-    } catch (e) {
-      etichetta.textContent = 'Copia a mano dalla barra';
-      setTimeout(() => { etichetta.textContent = 'Condividi la frase'; }, 2400);
-    }
-  });
 
   /* Trascinamento dell'etichetta. Tre cose che prima non andavano:
      si poteva trascinare senza foto, un tocco ovunque teletrasportava
