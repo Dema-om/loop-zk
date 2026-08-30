@@ -1049,16 +1049,35 @@
   /* A capo bilanciati: l'avvolgimento avido lascia spesso una parola orfana
      sull'ultima riga, che in un titolo grande si vede subito. Se l'ultima riga
      e molto corta, si tira giu una parola da quella sopra. */
+  /* Una parola piu lunga della riga non si puo mandare a capo fra le parole:
+     va spezzata fra le lettere, altrimenti esce dalla card. Succede davvero,
+     con i titoli attaccati o le parole lunghissime. */
+  function spezzaParola(w, maxW) {
+    const pezzi = []; let cur = '';
+    for (const ch of w) {
+      if (cur && ctx.measureText(cur + ch).width > maxW) { pezzi.push(cur); cur = ch; }
+      else cur += ch;
+    }
+    if (cur) pezzi.push(cur);
+    return pezzi;
+  }
+
   function wrapOn(text, font, maxW) {
     ctx.font = font;
     const words = text.split(' ');
     const lines = []; let line = [];
+    const chiudi = () => { if (line.length) { lines.push(line); line = []; } };
     for (const w of words) {
+      if (ctx.measureText(w).width > maxW) {
+        chiudi();
+        spezzaParola(w, maxW).forEach(pezzo => lines.push([pezzo]));
+        continue;
+      }
       const test = line.concat(w).join(' ');
-      if (ctx.measureText(test).width > maxW && line.length) { lines.push(line); line = [w]; }
+      if (ctx.measureText(test).width > maxW && line.length) { chiudi(); line = [w]; }
       else line.push(w);
     }
-    if (line.length) lines.push(line);
+    chiudi();
 
     for (let giro = 0; giro < 2 && lines.length > 1; giro++) {
       const ultima = lines[lines.length - 1];
