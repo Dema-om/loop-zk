@@ -1,0 +1,365 @@
+<title>Etichette per Volte</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;800;900&display=swap">
+<style>
+  :root {
+    --ground: #F6F8F4;
+    --card: #FFFFFF;
+    --ink: #121212;
+    --soft: #5F6963;
+    --line: #E2E7E0;
+    --chip: #EEF2EC;
+    --green: #1DB954;
+    --green-text: #0E7A38;
+    --orange: #FC4C02;     /* quello vero di Strava, verificato */
+    --orange-text: #C23A00;
+    --on-brand: #121212;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--ground); color: var(--ink);
+    font-family: "Figtree", "Avenir Next", Avenir, sans-serif; line-height: 1.5;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 28px 20px 70px; }
+
+  header { max-width: 46em; }
+  .eyebrow {
+    font-size: 11px; font-weight: 800; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--green-text); margin: 0 0 10px;
+  }
+  h1 {
+    font-weight: 900; font-size: clamp(30px, 5.5vw, 46px);
+    line-height: 1.05; letter-spacing: -0.03em; margin: 0 0 12px; text-wrap: balance;
+  }
+  header p { color: var(--soft); font-size: 15px; margin: 0 0 8px; }
+
+  .must {
+    margin: 26px 0 0; padding: 16px 18px;
+    background: var(--card); border: 1px solid var(--line); border-radius: 16px;
+  }
+  .must h2 {
+    font-size: 11px; font-weight: 800; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--soft); margin: 0 0 10px;
+  }
+  .must ul { margin: 0; padding-left: 18px; font-size: 14px; }
+  .must li { margin-bottom: 4px; }
+  .must b { font-weight: 800; }
+
+  .grid {
+    display: grid; grid-template-columns: repeat(2, 1fr);
+    gap: 34px; margin-top: 40px;
+  }
+  @media (max-width: 760px) { .grid { grid-template-columns: 1fr; } }
+
+  .concept { min-width: 0; }
+  .concept .tag {
+    display: inline-block; font-size: 11px; font-weight: 800;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    background: var(--chip); border: 1px solid var(--line);
+    border-radius: 999px; padding: 4px 11px; color: var(--soft);
+  }
+  .concept h3 {
+    font-weight: 900; font-size: 22px; letter-spacing: -0.02em;
+    margin: 10px 0 6px;
+  }
+  .concept p { font-size: 14px; color: var(--soft); margin: 0 0 4px; }
+  .concept p.verdict { color: var(--ink); font-weight: 600; }
+  .concept canvas {
+    display: block; width: 100%; max-width: 300px; height: auto;
+    margin: 16px 0 0; border-radius: 22px;
+    border: 1px solid var(--line);
+    box-shadow: 0 14px 40px rgba(18, 18, 18, 0.13);
+  }
+
+  footer {
+    margin-top: 50px; border-top: 1px solid var(--line);
+    padding-top: 22px; color: var(--soft); font-size: 13px; max-width: 46em;
+  }
+  footer b { color: var(--ink); }
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Volte · da scegliere</p>
+    <h1>Quattro etichette per la stessa storia</h1>
+    <p>Stessi contenuti, quattro modi di disporli. Sono disegnate a dimensione reale sopra la stessa foto finta, così si confrontano per quello che sono: una cosa che finisce sopra lo scatto di qualcun altro.</p>
+    <p>L'arancione qui è quello vero di Strava, <b>#FC4C02</b>, non quello che avevo usato prima.</p>
+
+    <div class="must">
+      <h2>Cosa deve esserci in tutte</h2>
+      <ul>
+        <li>La <b>copertina</b> del brano (qui è un segnaposto colorato dal titolo)</li>
+        <li><b>Titolo</b> e <b>artista</b></li>
+        <li><b>In loop per 16 volte</b>, con il numero che si vede</li>
+        <li>Che si tratti di una corsa: <b>5 km di corsa in 30 min</b></li>
+        <li>Il sito, piccolo</li>
+      </ul>
+    </div>
+  </header>
+
+  <div class="grid">
+    <section class="concept">
+      <span class="tag">A</span>
+      <h3>Lo sticker</h3>
+      <p>Orizzontale e basso, come lo sticker «now playing» che la gente sa già leggere. Copre poca foto e si appoggia dove vuoi.</p>
+      <p class="verdict">Il più discreto. La corsa però resta una riga di servizio.</p>
+      <canvas id="cA" width="1080" height="1920" aria-label="Concept A, sticker orizzontale"></canvas>
+    </section>
+
+    <section class="concept">
+      <span class="tag">B</span>
+      <h3>Il biglietto</h3>
+      <p>La copertina fa da testata, poi lo strappo e il numero enorme. È un oggetto, non un'etichetta: si guarda prima di leggerlo.</p>
+      <p class="verdict">Il più condivisibile, ma si mangia mezza foto.</p>
+      <canvas id="cB" width="1080" height="1920" aria-label="Concept B, biglietto verticale"></canvas>
+    </section>
+
+    <section class="concept">
+      <span class="tag">C</span>
+      <h3>La riga</h3>
+      <p>Una barra sola, altissima quanto la copertina. Tutto sta in due righe di testo, niente divisori, niente aria sprecata.</p>
+      <p class="verdict">Il più elegante. Il numero però perde la scena.</p>
+      <canvas id="cC" width="1080" height="1920" aria-label="Concept C, riga minima"></canvas>
+    </section>
+
+    <section class="concept">
+      <span class="tag">D</span>
+      <h3>Il disco</h3>
+      <p>La copertina esce dal bordo e tinge tutta l'etichetta col suo colore. Ogni canzone produce una card diversa senza disegnare niente.</p>
+      <p class="verdict">Il più caratteristico. Rischia di litigare con le foto colorate.</p>
+      <canvas id="cD" width="1080" height="1920" aria-label="Concept D, tinta dalla copertina"></canvas>
+    </section>
+  </div>
+
+  <footer>
+    Dati d'esempio: <b>Sportswear</b> della Dark Polo Gang, 1:59, per 5 km a ritmo normale.
+    Dimmi la lettera e la porto sul sito. Si può anche prendere la disposizione di una e il tono di un'altra.
+  </footer>
+</div>
+
+<script>
+  const song = { t: 'Sportswear', w: 'Dark Polo Gang', s: 119 };
+  const km = 5, mins = 30, times = 16;
+  const GREEN = '#1DB954', GREEN_T = '#0E7A38', ORANGE = '#FC4C02';
+  const INK = '#121212', SOFT = '#5F6963', LINE = '#E2E7E0';
+  const F = (w, s) => w + ' ' + s + 'px Figtree, Avenir Next, Avenir, sans-serif';
+
+  function ctxOf(id) { return document.getElementById(id).getContext('2d'); }
+
+  function roundRect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+  function fit(ctx, text, font, maxW) {
+    ctx.font = font;
+    if (ctx.measureText(text).width <= maxW) return text;
+    let t = text;
+    while (t.length > 1 && ctx.measureText(t + '…').width > maxW) t = t.slice(0, -1);
+    return t + '…';
+  }
+
+  /* foto finta: una strada all'alba, serve solo a dare un fondo realistico */
+  function photo(ctx) {
+    const g = ctx.createLinearGradient(0, 0, 0, 1920);
+    g.addColorStop(0, '#2C3E63'); g.addColorStop(0.45, '#C4653C'); g.addColorStop(1, '#3A2A24');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, 1080, 1920);
+    ctx.fillStyle = '#F6C88A';
+    ctx.beginPath(); ctx.arc(700, 720, 120, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#241A18';
+    ctx.beginPath();
+    ctx.moveTo(0, 1920); ctx.lineTo(430, 900); ctx.lineTo(650, 900); ctx.lineTo(1080, 1920);
+    ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.35)'; ctx.lineWidth = 14;
+    ctx.setLineDash([70, 90]);
+    ctx.beginPath(); ctx.moveTo(540, 1920); ctx.lineTo(540, 910); ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  function hueOf(t) { let h = 0; for (let i = 0; i < t.length; i++) h = (h * 31 + t.charCodeAt(i)) % 360; return h; }
+
+  function cover(ctx, x, y, size, radius) {
+    const h = hueOf(song.t);
+    ctx.save();
+    roundRect(ctx, x, y, size, size, radius); ctx.clip();
+    const g = ctx.createLinearGradient(x, y, x + size, y + size);
+    g.addColorStop(0, 'hsl(' + h + ', 62%, 52%)');
+    g.addColorStop(1, 'hsl(' + ((h + 55) % 360) + ', 58%, 30%)');
+    ctx.fillStyle = g; ctx.fillRect(x, y, size, size);
+    ctx.fillStyle = 'rgba(255,255,255,0.16)';
+    ctx.beginPath();
+    ctx.moveTo(x, y + size * 0.72); ctx.lineTo(x + size, y + size * 0.34);
+    ctx.lineTo(x + size, y + size); ctx.lineTo(x, y + size);
+    ctx.closePath(); ctx.fill();
+    ctx.restore();
+  }
+
+  function shadow(ctx, on) {
+    ctx.shadowColor = on ? 'rgba(0,0,0,0.32)' : 'transparent';
+    ctx.shadowBlur = on ? 60 : 0;
+    ctx.shadowOffsetY = on ? 18 : 0;
+  }
+
+  /* riga "In loop per 16 volte" con il numero grande, restituisce la larghezza */
+  function loopLine(ctx, x, baseY, small, big, colNum, colTxt, colSoft) {
+    let cx = x;
+    ctx.fillStyle = colSoft; ctx.font = F(600, small);
+    ctx.fillText('In loop per', cx, baseY);
+    cx += ctx.measureText('In loop per').width + 18;
+    ctx.fillStyle = colNum; ctx.font = F(900, big);
+    ctx.fillText(String(times), cx, baseY);
+    cx += ctx.measureText(String(times)).width + 16;
+    ctx.fillStyle = colTxt; ctx.font = F(800, small + 4);
+    ctx.fillText('volte', cx, baseY);
+    return cx + ctx.measureText('volte').width;
+  }
+
+  /* ---------- A: lo sticker ---------- */
+  function conceptA() {
+    const ctx = ctxOf('cA');
+    photo(ctx);
+    const M = 60, w = 1080 - M * 2, h = 290, x = M, y = 1360;
+    ctx.save();
+    ctx.translate(x + w / 2, y + h / 2); ctx.rotate(-1.2 * Math.PI / 180); ctx.translate(-w / 2, -h / 2);
+    shadow(ctx, true);
+    ctx.fillStyle = '#FFFFFF'; roundRect(ctx, 0, 0, w, h, 40); ctx.fill();
+    shadow(ctx, false);
+    const P = 40, COV = 210;
+    cover(ctx, P, P, COV, 16);
+    const tx = P + COV + 30, tw = w - tx - P;
+    ctx.textBaseline = 'alphabetic';
+    loopLine(ctx, tx, P + 74, 42, 66, GREEN_T, INK, SOFT);
+    ctx.fillStyle = INK; ctx.font = F(800, 40);
+    ctx.fillText(fit(ctx, song.t, F(800, 40), tw), tx, P + 130);
+    ctx.fillStyle = SOFT; ctx.font = F(600, 34);
+    ctx.fillText(fit(ctx, song.w, F(600, 34), tw), tx, P + 176);
+    ctx.fillStyle = ORANGE; ctx.font = F(800, 34);
+    ctx.fillText(km + ' km di corsa in ' + mins + ' min', tx, P + 226);
+    ctx.fillStyle = SOFT; ctx.font = F(600, 28);
+    ctx.textAlign = 'right'; ctx.fillText('volte.run', w - P, P + 226); ctx.textAlign = 'left';
+    ctx.restore();
+  }
+
+  /* ---------- B: il biglietto ---------- */
+  function conceptB() {
+    const ctx = ctxOf('cB');
+    photo(ctx);
+    const w = 780, COVH = 500, h = 1010, x = (1080 - w) / 2, y = (1920 - h) / 2;
+    ctx.save();
+    ctx.translate(x + w / 2, y + h / 2); ctx.rotate(-1.5 * Math.PI / 180); ctx.translate(-w / 2, -h / 2);
+    shadow(ctx, true);
+    ctx.fillStyle = '#FFFFFF'; roundRect(ctx, 0, 0, w, h, 44); ctx.fill();
+    shadow(ctx, false);
+
+    /* la copertina fa da testata: quadrata, ma tagliata all'altezza della testata */
+    ctx.save();
+    roundRect(ctx, 0, 0, w, h, 44); ctx.clip();
+    ctx.beginPath(); ctx.rect(0, 0, w, COVH); ctx.clip();
+    cover(ctx, 0, -(w - COVH) / 2, w, 0);
+    ctx.restore();
+
+    ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+    ctx.fillStyle = INK; ctx.font = F(900, 60);
+    ctx.fillText(fit(ctx, song.t, F(900, 60), w - 90), w / 2, COVH + 86);
+    ctx.fillStyle = SOFT; ctx.font = F(600, 36);
+    ctx.fillText(song.w, w / 2, COVH + 136);
+
+    ctx.strokeStyle = LINE; ctx.lineWidth = 4; ctx.setLineDash([16, 14]);
+    ctx.beginPath(); ctx.moveTo(46, COVH + 186); ctx.lineTo(w - 46, COVH + 186); ctx.stroke();
+    ctx.setLineDash([]);
+
+    ctx.fillStyle = SOFT; ctx.font = F(800, 26);
+    ctx.letterSpacing = '5px';
+    ctx.fillText('IN LOOP PER', w / 2, COVH + 246);
+    ctx.letterSpacing = '0px';
+    ctx.fillStyle = GREEN_T; ctx.font = F(900, 130);
+    ctx.fillText(times + ' volte', w / 2, COVH + 370);
+
+    ctx.fillStyle = ORANGE; ctx.font = F(800, 36);
+    ctx.fillText(km + ' km di corsa in ' + mins + ' min', w / 2, COVH + 432);
+    ctx.fillStyle = SOFT; ctx.font = F(600, 26);
+    ctx.fillText('volte.run', w / 2, h - 40);
+    ctx.textAlign = 'left';
+    ctx.restore();
+  }
+
+  /* ---------- C: la riga ---------- */
+  function conceptC() {
+    const ctx = ctxOf('cC');
+    photo(ctx);
+    const M = 60, w = 1080 - M * 2, h = 200, x = M, y = 1420;
+    ctx.save();
+    ctx.translate(x, y);
+    shadow(ctx, true);
+    ctx.fillStyle = '#FFFFFF'; roundRect(ctx, 0, 0, w, h, 30); ctx.fill();
+    shadow(ctx, false);
+    const P = 26, COV = 148;
+    cover(ctx, P, P, COV, 12);
+    const tx = P + COV + 26;
+    ctx.textBaseline = 'alphabetic';
+    const endX = loopLine(ctx, tx, P + 70, 38, 56, GREEN_T, INK, SOFT);
+    ctx.fillStyle = SOFT; ctx.font = F(600, 32);
+    ctx.fillText(fit(ctx, song.t + ' · ' + song.w, F(600, 32), w - tx - 300), tx, P + 122);
+    ctx.textAlign = 'right';
+    ctx.fillStyle = ORANGE; ctx.font = F(800, 34);
+    ctx.fillText(km + ' km in ' + mins + ' min', w - P, P + 70);
+    ctx.fillStyle = SOFT; ctx.font = F(600, 26);
+    ctx.fillText('volte.run', w - P, P + 122);
+    ctx.textAlign = 'left';
+    ctx.restore();
+  }
+
+  /* ---------- D: il disco ---------- */
+  function conceptD() {
+    const ctx = ctxOf('cD');
+    photo(ctx);
+    const M = 60, w = 1080 - M * 2, h = 400, x = M, y = 1300;
+    const hue = hueOf(song.t);
+    ctx.save();
+    ctx.translate(x + w / 2, y + h / 2); ctx.rotate(-1.2 * Math.PI / 180); ctx.translate(-w / 2, -h / 2);
+    shadow(ctx, true);
+    ctx.fillStyle = 'hsl(' + hue + ', 42%, 16%)';
+    roundRect(ctx, 0, 0, w, h, 40); ctx.fill();
+    shadow(ctx, false);
+
+    ctx.save();
+    roundRect(ctx, 0, 0, w, h, 40); ctx.clip();
+    cover(ctx, 0, -30, h + 60, 0);
+    const fade = ctx.createLinearGradient(h - 120, 0, h + 60, 0);
+    fade.addColorStop(0, 'hsla(' + hue + ', 42%, 16%, 0)');
+    fade.addColorStop(1, 'hsl(' + hue + ', 42%, 16%)');
+    ctx.fillStyle = fade; ctx.fillRect(h - 120, 0, 200, h);
+    ctx.restore();
+
+    const tx = h + 70, tw = w - tx - 50;
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillStyle = GREEN;
+    roundRect(ctx, tx, 62, 250, 52, 26); ctx.fill();
+    ctx.fillStyle = INK; ctx.font = F(800, 24);
+    ctx.letterSpacing = '3px';
+    ctx.fillText('IN LOOP PER', tx + 24, 96);
+    ctx.letterSpacing = '0px';
+
+    ctx.fillStyle = '#FFFFFF'; ctx.font = F(900, 96);
+    ctx.fillText(times + ' volte', tx, 210);
+    ctx.font = F(800, 40);
+    ctx.fillText(fit(ctx, song.t, F(800, 40), tw), tx, 268);
+    ctx.fillStyle = 'rgba(255,255,255,0.72)'; ctx.font = F(600, 34);
+    ctx.fillText(fit(ctx, song.w, F(600, 34), tw), tx, 312);
+
+    ctx.fillStyle = '#FF7A3C'; ctx.font = F(800, 34);
+    ctx.fillText(km + ' km di corsa in ' + mins + ' min', tx, 366);
+    /* il sito sale in alto: sulla riga della corsa si sovrapponeva */
+    ctx.fillStyle = 'rgba(255,255,255,0.6)'; ctx.font = F(600, 26);
+    ctx.textAlign = 'right'; ctx.fillText('volte.run', w - 50, 100); ctx.textAlign = 'left';
+    ctx.restore();
+  }
+
+  function drawAll() { conceptA(); conceptB(); conceptC(); conceptD(); }
+  drawAll();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(drawAll);
+</script>

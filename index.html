@@ -1,0 +1,788 @@
+<title>Volte</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;800;900&display=swap">
+<style>
+  /* Concept dichiarato "Spotify × Strava", mobile first, tutto prima della corsa.
+     Il verde appartiene alla musica, l'arancio alla corsa: mai sullo stesso
+     elemento, mai gradienti, ground neutro chiaro. */
+  :root {
+    --ground: #F6F8F4;
+    --card: #FFFFFF;
+    --ink: #121212;
+    --soft: #5F6963;
+    --line: #E2E7E0;
+    --chip: #EEF2EC;
+    --green: #1DB954;
+    --green-soft: #DDF5E6;
+    --orange: #FC5200;
+    /* I due colori di marca sono bellissimi come SUPERFICI e illeggibili come
+       TESTO: bianco su verde fa 2,59:1 e su arancio 3,31:1, sotto il minimo.
+       Quindi: fondo di marca con testo scuro (7,24:1 sul verde, come fa Spotify
+       sui suoi bottoni), e per il testo colorato su chiaro due varianti scure. */
+    --on-brand: #121212;
+    --green-text: #0E7A38;
+    --orange-text: #C43F00;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: "Figtree", "Avenir Next", Avenir, sans-serif;
+    line-height: 1.5;
+  }
+  /* Colonna unica da app: il sito È un tool, anche su desktop resta stretto. */
+  .wrap { max-width: 520px; margin: 0 auto; padding: 0 20px; }
+
+  nav {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 10px; padding: 18px 0;
+  }
+  .logo { font-weight: 900; font-size: 18px; letter-spacing: -0.02em; }
+  .logo .dot { color: var(--green-text); }
+  .concept-tag {
+    font-size: 10px; font-weight: 600; color: var(--soft);
+    border: 1px solid var(--line); background: var(--card);
+    border-radius: 999px; padding: 4px 10px;
+    white-space: nowrap; text-decoration: none;
+  }
+  .concept-tag b { color: var(--green-text); }
+  .concept-tag em { font-style: normal; color: var(--orange-text); }
+  .concept-tag:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
+
+  /* ---------- hero ---------- */
+  header { padding: 24px 0 6px; }
+  .claim-line1, .claim-line2 {
+    font-weight: 900; font-size: clamp(34px, 9vw, 46px);
+    line-height: 1.08; letter-spacing: -0.03em; margin: 0;
+  }
+  .claim-line1 .d { color: var(--orange-text); font-variant-numeric: tabular-nums; }
+  /* Lo spazio si riserva sul blocco, non sulla riga, così l'artista resta
+     attaccato alla frase e il layout non salta cambiando canzone. */
+  .claim-block { min-height: 4.6em; }
+  .claim-line2 { margin-top: 4px; }
+  .claim-line2 .n, .claim-line2 .t { color: var(--green-text); }
+  .claim-line2 .n { font-variant-numeric: tabular-nums; }
+  .claim-line2.fade { opacity: 0; transition: opacity 0.18s; }
+  .claim-line2.show { opacity: 1; transition: opacity 0.25s; }
+  .claim-who { font-size: 14px; font-weight: 600; color: var(--soft); margin: 6px 0 0; }
+  .claim-hint { font-size: 13px; color: var(--soft); margin: 10px 0 0; min-height: 1.4em; }
+  /* Il claim cambia da solo: serve un modo esplicito per fermarlo, non solo
+     l'impostazione di sistema per ridurre le animazioni. */
+  .pause {
+    font: inherit; font-size: 12px; font-weight: 700; color: var(--ink);
+    background: var(--chip); border: 1px solid var(--line); border-radius: 999px;
+    padding: 7px 14px; margin-top: 10px; cursor: pointer;
+  }
+  .pause:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
+  .pause[hidden] { display: none; }
+
+  /* ---------- passi ---------- */
+  .step { margin-top: 30px; }
+  .step-head {
+    display: flex; align-items: center; gap: 8px; margin: 0 0 10px;
+    font-size: 11px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase;
+  }
+  .step-head .num {
+    width: 18px; height: 18px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; letter-spacing: 0; color: var(--on-brand); flex: none;
+  }
+  .step.music .step-head { color: var(--green-text); }
+  .step.music .step-head .num { background: var(--green); }
+  .step.run .step-head { color: var(--orange-text); }
+  .step.run .step-head .num { background: var(--orange); }
+
+  .card-ui {
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 20px; padding: 16px;
+    box-shadow: 0 8px 30px rgba(18, 18, 18, 0.05);
+  }
+
+  /* distanza */
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; }
+  .chips button {
+    font: inherit; font-weight: 800; font-size: 15px; color: var(--ink);
+    background: var(--chip); border: 1px solid var(--line); border-radius: 999px;
+    padding: 11px 20px; cursor: pointer; font-variant-numeric: tabular-nums;
+  }
+  .chips button[aria-pressed="true"] { background: var(--orange); border-color: var(--orange); color: var(--on-brand); }
+  .chips button:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
+  .free { display: none; align-items: center; gap: 8px; margin-top: 12px; font-size: 14px; color: var(--soft); }
+  .free.open { display: flex; }
+  .free input {
+    width: 92px; font: inherit; font-weight: 800; font-size: 18px; text-align: center;
+    color: var(--ink); background: var(--chip); border: 1px solid var(--line);
+    border-radius: 12px; padding: 9px 8px; font-variant-numeric: tabular-nums;
+  }
+  .free input:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
+
+  /* passo */
+  .sub-label {
+    margin: 20px 0 8px; font-size: 13px; font-weight: 700; color: var(--ink);
+  }
+  .seg {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;
+    background: var(--chip); border: 1px solid var(--line);
+    border-radius: 16px; padding: 5px;
+  }
+  .seg button {
+    font: inherit; font-weight: 800; font-size: 15px; color: var(--ink);
+    background: none; border: none; border-radius: 12px; padding: 10px 4px;
+    cursor: pointer; line-height: 1.2;
+  }
+  .seg button small {
+    display: block; font-size: 11px; font-weight: 600; color: var(--soft);
+    font-variant-numeric: tabular-nums;
+  }
+  .seg button[aria-pressed="true"] { background: var(--orange); color: var(--on-brand); }
+  .seg button[aria-pressed="true"] small { color: var(--on-brand); opacity: 0.72; }
+  .seg button:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
+  .explain { font-size: 12px; color: var(--soft); margin: 10px 0 0; }
+
+  /* ---------- canzoni, con il numero già addosso ---------- */
+  .search {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--chip); border: 1px solid var(--line);
+    border-radius: 999px; padding: 4px 16px;
+  }
+  .search svg { flex: none; color: var(--soft); }
+  .search input {
+    flex: 1; min-width: 0; font: inherit; font-size: 14px; font-weight: 600;
+    color: var(--ink); background: none; border: none; padding: 9px 0;
+  }
+  .search input::placeholder { color: var(--soft); font-weight: 600; }
+  .search input:focus { outline: none; }
+  .search:focus-within { outline: 2px solid var(--green); outline-offset: 2px; }
+
+  .results { display: grid; gap: 4px; margin-top: 8px; }
+  .results button {
+    display: flex; align-items: center; gap: 12px; width: 100%; text-align: left;
+    font: inherit; font-size: 14px; font-weight: 600; color: var(--ink);
+    background: none; border: 1px solid transparent; border-radius: 12px;
+    padding: 9px 10px; cursor: pointer;
+  }
+  .results button:hover { background: var(--chip); }
+  .results button:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
+  .results button[aria-pressed="true"] { background: var(--green-soft); border-color: var(--green); }
+  .results .cover {
+    width: 32px; height: 32px; border-radius: 8px; background: var(--chip);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--green-text); flex: none;
+  }
+  .results button[aria-pressed="true"] .cover { background: var(--green); color: var(--on-brand); }
+  .results .name { min-width: 0; }
+  .results .name span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .results .artist { color: var(--soft); font-weight: 400; font-size: 12px; }
+  .results .times {
+    margin-left: auto; text-align: right; flex: none;
+    font-weight: 900; font-size: 20px; color: var(--green-text);
+    letter-spacing: -0.02em; font-variant-numeric: tabular-nums; line-height: 1.1;
+  }
+  .results .times small {
+    display: block; font-size: 11px; font-weight: 600; color: var(--soft);
+    letter-spacing: 0; font-variant-numeric: tabular-nums;
+  }
+  .empty { font-size: 13px; color: var(--soft); padding: 10px; }
+  .empty b { color: var(--ink); }
+
+  /* ---------- esito ---------- */
+  .outcome {
+    margin-top: 26px; background: var(--card); border: 1px solid var(--line);
+    border-radius: 20px; padding: 18px;
+    box-shadow: 0 8px 30px rgba(18, 18, 18, 0.05);
+  }
+  /* Un blocco per riascolto: il numero si vede, non si legge soltanto. */
+  .tank {
+    display: flex; gap: 3px; align-items: stretch; height: 30px;
+    border-radius: 8px; overflow: hidden;
+    background: var(--chip); border: 1px solid var(--line); padding: 3px;
+  }
+  .tank span { flex: 1; border-radius: 4px; background: var(--orange); min-width: 2px; }
+  .tank span.part { opacity: 0.35; }
+  .coach { margin: 12px 0 0; font-size: 16px; font-weight: 700; }
+  .coach b { color: var(--orange-text); font-variant-numeric: tabular-nums; }
+  .fine { font-size: 12px; color: var(--soft); margin: 6px 0 0; font-variant-numeric: tabular-nums; }
+  .repeat {
+    margin: 14px 0 0; padding-top: 12px; border-top: 1px solid var(--line);
+    font-size: 13px; color: var(--soft);
+  }
+  .repeat b { color: var(--ink); }
+
+  /* La tesi del sito, dove serve: subito dopo il numero, quando uno pensa
+     "ok, e quindi?". Sta sul ground, senza card, per non sembrare un altro dato. */
+  .why { margin: 26px 0 0; padding: 0 2px; }
+  .why .lab {
+    font-size: 11px; font-weight: 800; font-weight: 800; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--soft); margin: 0 0 8px;
+  }
+  .why p { margin: 0; font-size: 15px; line-height: 1.55; color: var(--ink); }
+  .why p b { font-weight: 800; }
+  .why .last { margin-top: 8px; font-weight: 800; }
+
+  /* ---------- storie ---------- */
+  .share { padding: 44px 0 20px; }
+  h2 {
+    font-weight: 900; font-size: clamp(26px, 7vw, 34px);
+    line-height: 1.05; letter-spacing: -0.03em; margin: 0 0 10px;
+  }
+  .share > p { color: var(--soft); font-size: 14px; margin: 0 0 10px; }
+
+  .stage { margin: 22px auto 0; width: min(300px, 82vw); }
+  .stage canvas {
+    display: block; width: 100%; height: auto; border-radius: 26px;
+    border: 1px solid var(--line); box-shadow: 0 18px 50px rgba(18, 18, 18, 0.14);
+    touch-action: none; cursor: grab;
+  }
+  .stage canvas:active { cursor: grabbing; }
+  .stage canvas:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; }
+
+  .themes { display: flex; gap: 8px; justify-content: center; margin-top: 14px; flex-wrap: wrap; }
+  .themes button {
+    font: inherit; font-weight: 700; font-size: 12px; color: var(--ink);
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 999px; padding: 10px 16px; cursor: pointer;
+  }
+  .themes button[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #FFFFFF; }
+  .themes button:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
+
+  .cta { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; justify-content: center; }
+  .btn {
+    font: inherit; font-weight: 800; font-size: 14px; border-radius: 999px;
+    padding: 13px 22px; cursor: pointer; border: 1px solid var(--line);
+    background: var(--card); color: var(--ink);
+  }
+  .btn.primary { background: var(--green); border-color: var(--green); color: var(--on-brand); }
+  .btn:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
+  .hint { font-size: 12px; color: var(--soft); margin-top: 10px; text-align: center; }
+  .hint b { color: var(--ink); }
+
+  .saved { display: none; margin-top: 18px; text-align: center; }
+  .saved.open { display: block; }
+  .saved img {
+    width: min(220px, 62vw); border-radius: 18px;
+    border: 1px solid var(--line); box-shadow: 0 10px 30px rgba(18, 18, 18, 0.12);
+  }
+
+  /* ---------- cos'è questo ---------- */
+  .about {
+    margin: 30px 0 0; background: var(--card); border: 1px solid var(--line);
+    border-radius: 20px; padding: 20px;
+  }
+  .about h3 { font-size: 15px; font-weight: 900; margin: 0 0 8px; letter-spacing: -0.01em; }
+  .about p { font-size: 14px; color: var(--soft); margin: 0 0 10px; }
+  .about a.me {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 14px; font-weight: 800; color: var(--ink); text-decoration: none;
+    background: var(--chip); border: 1px solid var(--line);
+    border-radius: 999px; padding: 9px 16px;
+  }
+  .about a.me:hover { background: var(--green-soft); border-color: var(--green); }
+  .about a.me:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
+
+  footer {
+    border-top: 1px solid var(--line); padding: 24px 0 44px;
+    color: var(--soft); font-size: 12px;
+  }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+</style>
+
+<div class="wrap">
+  <nav>
+    <div class="logo">Volte<span class="dot">.</span>run</div>
+    <a class="concept-tag" href="#about">Concept <b>Spotify</b> × <em>Strava</em> · non ufficiale</a>
+  </nav>
+
+  <header>
+    <h1 class="claim-line1" id="cLine1"><span class="d">5 km</span> sembrano tanti.</h1>
+    <div class="claim-block">
+      <p class="claim-line2 show" id="cLine2">Sono <span class="n">15</span> volte <span class="t">Sportswear</span>.</p>
+      <p class="claim-who" id="cWho">Dark Polo Gang · 1:59</p>
+    </div>
+    <p class="claim-hint" id="cHint">Quanto dura la tua corsa in canzoni?</p>
+    <button class="pause" type="button" id="pause">Ferma il cambio canzone</button>
+  </header>
+
+  <section class="step run" aria-label="La tua corsa">
+    <h2 class="step-head"><span class="num">1</span> La tua corsa</h2>
+    <div class="card-ui">
+      <div class="chips" id="dists" role="group" aria-label="Distanza">
+        <button data-km="3" aria-pressed="false">3 km</button>
+        <button data-km="5" aria-pressed="true">5 km</button>
+        <button data-km="10" aria-pressed="false">10 km</button>
+        <button data-km="free" aria-pressed="false">Altro</button>
+      </div>
+      <label class="free" id="freeBox">
+        <span>Scrivi i km:</span>
+        <input id="freeKm" type="text" inputmode="decimal" value="7,4" aria-label="Chilometri">
+        <span>km</span>
+      </label>
+
+      <p class="sub-label">Quanto ci metti a fare un chilometro?</p>
+      <div class="seg" id="levels" role="group" aria-label="Ritmo">
+        <button data-pace="450" aria-pressed="false">Piano<small>7 min 30</small></button>
+        <button data-pace="360" aria-pressed="true">Normale<small>6 min</small></button>
+        <button data-pace="285" aria-pressed="false">Forte<small>4 min 45</small></button>
+      </div>
+      <p class="explain">Se non lo sai, lascia Normale: è il ritmo di chi corre chiacchierando.</p>
+    </div>
+  </section>
+
+  <section class="step music" aria-label="La tua canzone">
+    <h2 class="step-head"><span class="num">2</span> La tua canzone</h2>
+    <div class="card-ui">
+      <div class="search">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.8"/>
+          <path d="M11 11l3.2 3.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+        <input id="q" type="search" placeholder="Cerca una canzone o un artista…" aria-label="Cerca una canzone o un artista">
+      </div>
+      <div class="results" id="results"></div>
+    </div>
+  </section>
+
+  <section class="outcome" aria-label="Il risultato" aria-live="polite">
+    <div class="tank" id="tank" role="img" aria-label="Un blocco per ogni riascolto"></div>
+    <p class="coach" id="coach">Oggi <b>5 km</b> sono 16 volte Sportswear.</p>
+    <p class="fine" id="fine">La corsa dura 30 min · Sportswear dura 1:59</p>
+    <p class="repeat">Poi <b>repeat</b> su quella canzone, che è un tap in qualsiasi app, e parti.</p>
+  </section>
+
+  <section class="why" aria-label="Perché funziona">
+    <h2 class="lab">Perché funziona</h2>
+    <p id="whyText">La distanza non si accorcia: <b>5 km</b> restano 5 km. Ma contarli in canzoni li sposta
+    su una misura che non ti pesa, perché ascoltare <b>16 volte</b> un pezzo che ti piace è una cosa che faresti comunque.</p>
+    <p class="last">Non cambia la strada. Cambia quanto sembra lunga.</p>
+  </section>
+
+  <section class="share">
+    <h2>Condividi sulle storie</h2>
+    <p>Questa è l'etichetta che andrà sulla tua storia. Scatta una foto adesso, o prendine una dal rullino, e finisce lì sotto. Esce un PNG a 1080×1920 pronto per la storia, e la foto non lascia mai il telefono.</p>
+
+    <div class="stage">
+      <canvas id="cv" width="1080" height="1920" tabindex="0" role="img"
+              aria-label="Anteprima della storia. Trascina per spostare l'etichetta."></canvas>
+    </div>
+
+    <div class="themes" id="themes" role="group" aria-label="Stile dell'etichetta">
+      <button data-theme="light" aria-pressed="true">Etichetta chiara</button>
+      <button data-theme="dark" aria-pressed="false">Etichetta scura</button>
+    </div>
+
+    <div class="cta">
+      <input type="file" id="file" accept="image/*" class="sr" tabindex="-1" aria-hidden="true">
+      <input type="file" id="shot" accept="image/*" capture="environment" class="sr" tabindex="-1" aria-hidden="true">
+      <button class="btn primary" type="button" id="take">Scatta una foto</button>
+      <button class="btn" type="button" id="upload">Prendila dal rullino</button>
+    </div>
+    <div class="cta">
+      <button class="btn" type="button" id="save">Genera il PNG</button>
+    </div>
+    <p class="hint" id="shareHint"><b>Trascina l'etichetta</b> per spostarla dove vuoi.</p>
+
+    <div class="saved" id="saved">
+      <img id="savedImg" alt="La tua storia pronta da salvare">
+      <p class="hint">Tieni premuto sull'immagine (o tasto destro) e salvala nel rullino.
+      Sul sito vero questo è un download diretto: qui dentro l'anteprima blocca i download.</p>
+    </div>
+  </section>
+
+  <section class="about" id="about">
+    <h3>Cos'è questo</h3>
+    <p>Volte è un concept: un esercizio di design e sviluppo su come sarebbe un incontro tra Spotify e Strava.
+    Non è un prodotto, non è affiliato a nessuna delle due, e i loro colori sono citati apertamente come materiale del concept.</p>
+    <p>Funziona con una canzone sola e nessun account, di proposito: mettere un brano in repeat è un tap in qualsiasi app,
+    quindi il sito non ha bisogno di collegarsi a niente per essere utile.</p>
+    <p>L'ho fatto io, Matteo De Marco. Le altre cose che costruisco stanno qui:</p>
+    <a class="me" href="https://www.linkedin.com/in/matteodemarcoo" target="_blank" rel="noopener">
+      Matteo De Marco su LinkedIn
+    </a>
+  </section>
+
+  <footer>
+    Fatto per chi corre con la stessa canzone nelle orecchie. Niente account, niente tracciamento.
+  </footer>
+</div>
+
+<script>
+  const $ = id => document.getElementById(id);
+  const fmt1 = n => n.toLocaleString('it-IT', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  const kmLabel = n => (Number.isInteger(n) ? n : fmt1(n)) + ' km';
+  const durLabel = s => Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+  const minLabel = s => Math.round(s / 60) + ' min';
+
+  /* Catalogo del mockup. Sportswear (1:59) e As It Was (2:47) sono verificate;
+     le altre sono durate di uso comune, da sostituire con la ricerca iTunes nel sito vero. */
+  const catalog = [
+    { s: 119, t: 'Sportswear', w: 'Dark Polo Gang' },
+    { s: 200, t: 'Blinding Lights', w: 'The Weeknd' },
+    { s: 244, t: 'Tití Me Preguntó', w: 'Bad Bunny' },
+    { s: 167, t: 'As It Was', w: 'Harry Styles' },
+    { s: 355, t: 'Bohemian Rhapsody', w: 'Queen' },
+    { s: 233, t: 'La Noia', w: 'Angelina Mango' },
+    { s: 168, t: 'Bad Habit', w: 'Steve Lacy' },
+    { s: 174, t: 'Flowers', w: 'Miley Cyrus' },
+    { s: 210, t: 'Lose Yourself', w: 'Eminem' },
+    { s: 192, t: 'Brividi', w: 'Mahmood e Blanco' }
+  ];
+  const heroPicks = catalog.slice(0, 5);
+
+  let km = 5;
+  let paceSec = 360;
+  let heroIdx = 0;
+  let picked = null;
+  let theme = 'light';
+  let badgeY = 0.78;
+  let photo = null;
+
+  const target = () => km * paceSec;                    /* secondi di corsa */
+  const song = () => picked || heroPicks[heroIdx];
+  const timesFor = c => Math.ceil(target() / c.s);
+
+  /* ----- claim: gira finché non tocchi niente ----- */
+  let timer = null;
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function stopRotation() {
+    clearInterval(timer); timer = null;
+    const p = $('pause'); if (p) p.hidden = true;
+  }
+  function nextHero() {
+    const el = $('cLine2');
+    el.classList.remove('show'); el.classList.add('fade');
+    setTimeout(() => {
+      heroIdx = (heroIdx + 1) % heroPicks.length;
+      update();
+      el.classList.remove('fade'); el.classList.add('show');
+    }, 180);
+  }
+  if (!reduced) timer = setInterval(nextHero, 3200);
+  $('pause').hidden = reduced;
+  $('pause').addEventListener('click', () => { stopRotation(); $('cLine2').focus(); });
+
+  function renderHero() {
+    const c = song();
+    $('cLine1').innerHTML = '<span class="d">' + kmLabel(km) + '</span> sembrano tanti.';
+    $('cLine2').innerHTML = 'Sono <span class="n">' + timesFor(c) + '</span> volte <span class="t">' + c.t + '</span>.';
+    $('cWho').textContent = c.w + ' · ' + durLabel(c.s);
+    $('cHint').textContent = picked
+      ? 'Questa è la tua frase. Provane un\'altra, o condividila qui sotto.'
+      : 'Quanto dura la tua corsa in canzoni?';
+  }
+
+  /* ----- passo 1: la corsa ----- */
+  /* Mentre si scrive il campo passa per stati incompleti ("7," o vuoto):
+     in quel caso si tiene l'ultimo valore buono invece di saltare a un default. */
+  function readFreeKm() {
+    const v = parseFloat(($('freeKm').value || '').replace(',', '.'));
+    return (isFinite(v) && v > 0) ? Math.min(v, 300) : km;
+  }
+  document.querySelectorAll('#dists button').forEach(b => {
+    b.addEventListener('click', () => {
+      document.querySelectorAll('#dists button').forEach(x => x.setAttribute('aria-pressed', 'false'));
+      b.setAttribute('aria-pressed', 'true');
+      const free = b.dataset.km === 'free';
+      $('freeBox').classList.toggle('open', free);
+      km = free ? readFreeKm() : parseFloat(b.dataset.km);
+      if (free) $('freeKm').focus();
+      stopRotation(); update();
+    });
+  });
+  $('freeKm').addEventListener('input', () => { km = readFreeKm(); update(); });
+
+  document.querySelectorAll('#levels button').forEach(b => {
+    b.addEventListener('click', () => {
+      document.querySelectorAll('#levels button').forEach(x => x.setAttribute('aria-pressed', 'false'));
+      b.setAttribute('aria-pressed', 'true');
+      paceSec = parseInt(b.dataset.pace, 10);
+      stopRotation(); update();
+    });
+  });
+
+  /* ----- passo 2: la canzone, ogni riga porta già il suo numero ----- */
+  function renderResults() {
+    const q = $('q').value.trim().toLowerCase();
+    const found = q
+      ? catalog.filter(c => (c.t + ' ' + c.w).toLowerCase().includes(q))
+      : catalog.slice(0, 5);
+    const el = $('results');
+    el.textContent = '';
+    if (!found.length) {
+      const p = document.createElement('p');
+      p.className = 'empty';
+      p.innerHTML = 'Nessuna canzone con <b>' + $('q').value.trim() + '</b>. Nel mockup il catalogo è di dieci brani: sul sito vero la ricerca pesca dall\'archivio Apple, con titolo, artista e durata veri.';
+      el.appendChild(p);
+      return;
+    }
+    found.forEach(c => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.setAttribute('aria-pressed', picked === c ? 'true' : 'false');
+      b.innerHTML =
+        '<span class="cover" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor"><path d="M4 2.5v9l7-4.5z"/></svg></span>' +
+        '<span class="name"><span>' + c.t + '</span><span class="artist">' + c.w + '</span></span>' +
+        '<span class="times">×' + timesFor(c) + '<small>' + durLabel(c.s) + '</small></span>';
+      b.setAttribute('aria-label', c.t + ', ' + c.w + ', ' + timesFor(c) + ' volte per ' + kmLabel(km));
+      b.addEventListener('click', () => {
+        picked = c;
+        stopRotation();
+        update();
+      });
+      el.appendChild(b);
+    });
+  }
+  $('q').addEventListener('input', renderResults);
+
+  /* ================= la storia: un solo renderer su canvas ================= */
+  const cv = $('cv');
+  const ctx = cv.getContext('2d');
+  const W = cv.width, H = cv.height;
+  const F = (weight, size) => weight + ' ' + size + 'px Figtree, Avenir Next, Avenir, sans-serif';
+  /* In alto Instagram mette la barra di avanzamento, in basso il campo "rispondi":
+     dentro questi 260px non ci va mai niente. */
+  const SAFE = 260;
+
+  function roundRect(x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+  function fitText(text, font, maxW) {
+    ctx.font = font;
+    if (ctx.measureText(text).width <= maxW) return text;
+    let t = text;
+    while (t.length > 1 && ctx.measureText(t + '…').width > maxW) t = t.slice(0, -1);
+    return t + '…';
+  }
+
+  /* La foto sta INTERA: uno scatto verticale è più stretto del 9:16 della storia
+     e riempire il frame taglierebbe via mezza inquadratura. Le bande si riempiono
+     con la stessa foto sfocata. */
+  function drawPhoto() {
+    const cover = Math.max(W / photo.width, H / photo.height);
+    if ('filter' in ctx) {
+      ctx.save();
+      ctx.filter = 'blur(60px)';
+      const cw = photo.width * cover, ch = photo.height * cover;
+      ctx.drawImage(photo, (W - cw) / 2, (H - ch) / 2, cw, ch);
+      ctx.restore();
+    } else {
+      ctx.fillStyle = '#101014'; ctx.fillRect(0, 0, W, H);
+    }
+    const fit = Math.min(W / photo.width, H / photo.height);
+    const w = photo.width * fit, h = photo.height * fit;
+    ctx.drawImage(photo, (W - w) / 2, (H - h) / 2, w, h);
+  }
+
+  /* Senza foto si vede comunque l'etichetta, così sai cosa stai per condividere
+     prima ancora di scattare. Il fondo dice solo che lì andrà la tua immagine. */
+  function drawPlaceholder() {
+    ctx.fillStyle = '#EEF2EC'; ctx.fillRect(0, 0, W, H);
+    ctx.strokeStyle = '#D5DED2'; ctx.lineWidth = 6;
+    ctx.setLineDash([28, 22]);
+    roundRect(70, 70, W - 140, H - 140, 60); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = '#9AA49C';
+    ctx.textAlign = 'center';
+    ctx.font = F(800, 50);
+    ctx.fillText('Qui va la tua foto', W / 2, 560);
+    ctx.font = F(600, 38);
+    ctx.fillText('scattala ora o prendila dal rullino', W / 2, 626);
+    ctx.textAlign = 'left';
+  }
+
+  /* La copertina vera arriva dall'API nel sito online. Qui è un segnaposto
+     generato dal titolo, così ogni brano ha comunque la sua tinta. */
+  function drawCover(x, y, size, c) {
+    let h = 0;
+    for (let i = 0; i < c.t.length; i++) h = (h * 31 + c.t.charCodeAt(i)) % 360;
+    ctx.save();
+    roundRect(x, y, size, size, 22); ctx.clip();
+    const g = ctx.createLinearGradient(x, y, x + size, y + size);
+    g.addColorStop(0, 'hsl(' + h + ', 62%, 52%)');
+    g.addColorStop(1, 'hsl(' + ((h + 55) % 360) + ', 58%, 30%)');
+    ctx.fillStyle = g;
+    ctx.fillRect(x, y, size, size);
+    ctx.fillStyle = 'rgba(255,255,255,0.16)';
+    ctx.beginPath();
+    ctx.moveTo(x, y + size * 0.72);
+    ctx.lineTo(x + size, y + size * 0.34);
+    ctx.lineTo(x + size, y + size);
+    ctx.lineTo(x, y + size);
+    ctx.closePath(); ctx.fill();
+    ctx.restore();
+    ctx.strokeStyle = 'rgba(0,0,0,0.12)'; ctx.lineWidth = 2;
+    roundRect(x, y, size, size, 22); ctx.stroke();
+  }
+
+  /* L'etichetta: copertina e nome in alto, sotto la frase che conta.
+     "Riprodotta 16 volte" si capisce da sola, "IN LOOP PER" no. */
+  function drawBadge() {
+    const c = song();
+    const dark = theme === 'dark';
+    const M = 60, PAD = 52, w = W - M * 2, h = 524;
+    const cx = W / 2, cy = Math.min(Math.max(badgeY * H, SAFE + h / 2), H - SAFE - h / 2);
+    const inkC = dark ? '#F4F4F0' : '#121212';
+    const softC = dark ? '#9AA49C' : '#5F6963';
+
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(-1.5 * Math.PI / 180);
+    ctx.translate(-w / 2, -h / 2);
+
+    ctx.save();
+    ctx.shadowColor = 'rgba(0,0,0,0.28)'; ctx.shadowBlur = 60; ctx.shadowOffsetY = 18;
+    ctx.fillStyle = dark ? '#16181C' : '#FFFFFF';
+    roundRect(0, 0, w, h, 52); ctx.fill();
+    ctx.restore();
+    /* su una foto scura l'etichetta scura sparirebbe: le serve un bordo */
+    if (dark) {
+      ctx.strokeStyle = 'rgba(255,255,255,0.22)'; ctx.lineWidth = 3;
+      roundRect(0, 0, w, h, 52); ctx.stroke();
+    }
+
+    /* riga alta: copertina, titolo, artista */
+    const COV = 168;
+    drawCover(PAD, PAD, COV, c);
+    const tx = PAD + COV + 34, tw = w - tx - PAD;
+    ctx.textBaseline = 'top';
+    const titleFont = F(900, 60);
+    ctx.fillStyle = inkC; ctx.font = titleFont;
+    ctx.fillText(fitText(c.t, titleFont, tw), tx, PAD + 26);
+    ctx.fillStyle = softC; ctx.font = F(600, 40);
+    ctx.fillText(fitText(c.w, F(600, 40), tw), tx, PAD + 100);
+
+    const lineY = PAD + COV + 40;
+    ctx.strokeStyle = dark ? '#2A2E33' : '#E2E7E0';
+    ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(PAD, lineY); ctx.lineTo(w - PAD, lineY); ctx.stroke();
+
+    /* la frase: parole piccole, numero grande, tutte sulla stessa base */
+    const baseY = lineY + 112;
+    ctx.textBaseline = 'alphabetic';
+    let x = PAD;
+    ctx.fillStyle = softC; ctx.font = F(600, 42);
+    ctx.fillText('Riprodotta', x, baseY);
+    x += ctx.measureText('Riprodotta').width + 20;
+    ctx.fillStyle = '#0E7A38'; ctx.font = F(900, 96);
+    const nT = String(timesFor(c));
+    ctx.fillText(nT, x, baseY);
+    x += ctx.measureText(nT).width + 18;
+    ctx.fillStyle = inkC; ctx.font = F(800, 46);
+    ctx.fillText('volte', x, baseY);
+
+    /* piede: distanza e durata, non il passo */
+    const footY = h - PAD - 42;
+    ctx.textBaseline = 'top';
+    ctx.font = F(800, 40);
+    ctx.fillStyle = '#FC5200';
+    const kmT = kmLabel(km), timeT = minLabel(target());
+    ctx.fillText(kmT, PAD, footY);
+    const sepX = PAD + ctx.measureText(kmT).width + 22;
+    ctx.fillStyle = dark ? '#3A4048' : '#C9D2C6';
+    ctx.fillText('\u00B7', sepX, footY);
+    ctx.fillStyle = '#FC5200';
+    ctx.fillText(timeT, sepX + ctx.measureText('\u00B7').width + 22, footY);
+    ctx.fillStyle = softC; ctx.font = F(600, 38);
+    ctx.textAlign = 'right';
+    ctx.fillText('volte.run', w - PAD, footY + 2);
+    ctx.textAlign = 'left';
+
+    ctx.restore();
+  }
+
+  function render() {
+    ctx.clearRect(0, 0, W, H);
+    if (photo) drawPhoto(); else drawPlaceholder();
+    drawBadge();
+  }
+
+  /* trascinamento dell'etichetta */
+  let dragging = false;
+  cv.addEventListener('pointerdown', e => {
+    dragging = true; cv.setPointerCapture(e.pointerId);
+  });
+  cv.addEventListener('pointermove', e => {
+    if (!dragging) return;
+    const r = cv.getBoundingClientRect();
+    badgeY = Math.min(Math.max((e.clientY - r.top) / r.height, 0.1), 0.9);
+    render();
+  });
+  cv.addEventListener('pointerup', () => { dragging = false; });
+  cv.addEventListener('pointercancel', () => { dragging = false; });
+  cv.addEventListener('keydown', e => {
+    if (e.key === 'ArrowUp') { badgeY = Math.max(badgeY - 0.03, 0.1); render(); e.preventDefault(); }
+    if (e.key === 'ArrowDown') { badgeY = Math.min(badgeY + 0.03, 0.9); render(); e.preventDefault(); }
+  });
+
+  document.querySelectorAll('#themes button').forEach(b => {
+    b.addEventListener('click', () => {
+      document.querySelectorAll('#themes button').forEach(x => x.setAttribute('aria-pressed', 'false'));
+      b.setAttribute('aria-pressed', 'true');
+      theme = b.dataset.theme; render();
+    });
+  });
+
+  /* Due strade per la stessa cosa: "capture" apre la fotocamera sul telefono,
+     e sul desktop ricade nel selettore file, quindi non rompe niente. */
+  function loadFrom(input) {
+    const f = input.files && input.files[0];
+    if (!f) return;
+    const img = new Image();
+    img.onload = () => { photo = img; render(); };
+    img.src = URL.createObjectURL(f);
+  }
+  $('upload').addEventListener('click', () => $('file').click());
+  $('take').addEventListener('click', () => $('shot').click());
+  $('file').addEventListener('change', () => loadFrom($('file')));
+  $('shot').addEventListener('change', () => loadFrom($('shot')));
+
+  $('save').addEventListener('click', () => {
+    /* senza foto il PNG conterrebbe il riquadro tratteggiato: meglio chiederla */
+    if (!photo) { $('shot').click(); return; }
+    render();
+    cv.toBlob(b => {
+      if (!b) return;
+      $('savedImg').src = URL.createObjectURL(b);
+      $('saved').classList.add('open');
+      $('saved').scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'center' });
+    }, 'image/png');
+  });
+
+  /* ----- esito ----- */
+  function update() {
+    renderHero();
+    renderResults();
+
+    const c = song();
+    const exact = target() / c.s;
+    const n = Math.ceil(exact);
+
+    const tank = $('tank');
+    tank.textContent = '';
+    const shown = Math.min(n, 60);
+    for (let i = 0; i < shown; i++) {
+      const seg = document.createElement('span');
+      if (i === shown - 1 && n <= 60 && exact % 1 > 0.02) seg.className = 'part';
+      tank.appendChild(seg);
+    }
+    tank.setAttribute('aria-label', n + ' riascolti riempiono ' + kmLabel(km) +
+      (n > 60 ? ' (ne vedi i primi 60)' : ''));
+
+    $('coach').innerHTML = 'Oggi <b>' + kmLabel(km) + '</b> sono ' + n + ' volte ' + c.t + '.';
+    $('fine').textContent = 'La corsa dura ' + minLabel(target()) + ' · ' + c.t + ' dura ' + durLabel(c.s);
+    $('whyText').innerHTML = 'La distanza non si accorcia: <b>' + kmLabel(km) + '</b> restano ' + kmLabel(km) +
+      '. Ma contarli in canzoni li sposta su una misura che non ti pesa, perché ascoltare <b>' + n +
+      ' volte</b> un pezzo che ti piace è una cosa che faresti comunque.';
+
+    render();
+  }
+
+  update();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(render);
+</script>
