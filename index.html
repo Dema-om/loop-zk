@@ -906,21 +906,13 @@
     }, 180);
   }
   if (!reduced) timer = setInterval(nextHero, 3200);
-  /* La vetrina si ferma per due motivi soli, e nessuno dei due e "hai toccato
-     lo schermo". Prima bastava un touchstart qualsiasi, ma sul telefono il
-     primo tocco e quello con cui scorri: la vetrina moriva al primo dito e
-     sembrava non partire mai.
-     1) Scegli qualcosa. Ogni comando chiama stopRotation da se: da quel
-        momento la frase e tua e non deve piu cambiare da sola.
-     2) Il claim esce dallo schermo. Piu sotto la stessa canzone comanda il
-        risultato e la card da condividere: se continuasse a girare, ti
-        cambierebbe i numeri sotto gli occhi mentre guardi altro. */
-  if (timer && 'IntersectionObserver' in window) {
-    const occhio = new IntersectionObserver(voci => {
-      if (voci.some(v => !v.isIntersecting)) { stopRotation(); occhio.disconnect(); }
-    }, { threshold: 0 });
-    occhio.observe(document.querySelector('header'));
-  }
+  /* Prima bastava un touchstart qualsiasi per spegnerla, ma sul telefono il
+     primo tocco e quello con cui scorri: moriva al primo dito e sembrava non
+     partire mai.
+     Si ferma per un motivo solo: hai scelto un valore. Ogni comando chiama
+     stopRotation da se, la distanza, il ritmo, le due schede, la ricerca e
+     la canzone: da quel momento la frase e tua e non cambia piu da sola.
+     Finche non scegli niente resta una vetrina, anche mentre scorri. */
 
   function renderHero() {
     const c = song();
@@ -949,7 +941,7 @@
       stopRotation(); update();
     });
   });
-  $('freeKm').addEventListener('input', () => { km = readFreeKm(); update(); });
+  $('freeKm').addEventListener('input', () => { stopRotation(); km = readFreeKm(); update(); });
 
   document.querySelectorAll('#levels button').forEach(b => {
     b.addEventListener('click', () => {
