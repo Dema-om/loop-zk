@@ -271,38 +271,25 @@
     border-radius: 20px; padding: 18px;
     box-shadow: 0 8px 30px rgba(18, 18, 18, 0.05);
   }
-  /* Il risultato e la risposta del sito, quindi ha la faccia della cosa che si
-     condivide: superficie verde piena, testo scuro, un numero solo. I dati
-     della corsa restano arancioni ma dentro una pastiglia bianca, cosi i due
-     colori di marca non si toccano mai. */
-  /* Il nero su verde era pesante. Si ribalta: superficie scura come l'app di
-     Spotify, e i due colori di marca tornano a essere testo, dove finalmente
-     hanno contrasto (verde 6,9:1 e arancio 5,4:1 su questo fondo). */
-  .verdict {
-    position: relative;
-    background: #14171B; color: #F4F4F0;
-    border-radius: 22px; padding: 22px 22px 20px;
+  /* Il risultato non e piu una card: la card e una sola, quella che si
+     condivide, e sta piu sotto. Qui resta la frase, la barra e le due azioni. */
+  .out-line { margin: 0 0 14px; font-size: 17px; font-weight: 700; }
+  .out-line b { color: var(--green-text); font-variant-numeric: tabular-nums; }
+  .out-foot {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 14px; flex-wrap: wrap; margin-top: 14px;
   }
-  .v-label {
-    margin: 0; font-size: 11px; font-weight: 800;
-    letter-spacing: 0.14em; text-transform: uppercase; color: #9AA49C;
+  .repeat { margin: 0; font-size: 13px; color: var(--soft); }
+  .repeat b { color: var(--ink); }
+  .share-claim {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 9px 16px; margin: 0;
+    font: inherit; font-size: 13px; font-weight: 800;
+    color: var(--on-brand); background: var(--green);
+    border: none; border-radius: 999px; cursor: pointer;
   }
-  .v-number {
-    margin: 4px 0 0; font-weight: 900; font-size: clamp(40px, 12vw, 56px);
-    line-height: 1; letter-spacing: -0.035em;
-  }
-  .v-number { color: var(--green); }
-  .v-number span { font-variant-numeric: tabular-nums; }
-  .v-song {
-    margin: 12px 0 0; font-weight: 900; font-size: 20px; letter-spacing: -0.02em;
-    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-  }
-  .v-artist { margin: 1px 0 0; font-size: 14px; font-weight: 600; color: #9AA49C; }
-  .v-run {
-    display: inline-block; margin: 14px 0 0;
-    color: #FF7A3C; font-size: 15px; font-weight: 800;
-    font-variant-numeric: tabular-nums;
-  }
+  .share-claim:hover { filter: brightness(0.96); }
+  .share-claim:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
 
   /* Un blocco per riascolto: il numero si vede, non si legge soltanto.
      Dentro il verde i blocchi sono scuri su un binario chiaro. */
@@ -310,9 +297,10 @@
     margin-top: 16px;
     display: flex; gap: 3px; align-items: stretch; height: 26px;
     border-radius: 8px; overflow: hidden;
-    background: rgba(255, 255, 255, 0.12); padding: 3px;
+    background: var(--chip); border: 1px solid var(--line); padding: 3px;
   }
   .tank span { flex: 1; border-radius: 4px; background: var(--green); min-width: 2px; }
+  .themes[hidden] { display: none; }
   .tank span.part { opacity: 0.34; }
 
   .fine { font-size: 12px; color: var(--soft); margin: 14px 0 0; font-variant-numeric: tabular-nums; }
@@ -416,13 +404,6 @@
       <p class="claim-who" id="cWho">Dark Polo Gang · 1:59</p>
     </div>
     <p class="thesis">I chilometri restano quelli. Contati in canzoni pesano meno, perché ascoltare un pezzo che ti piace è una cosa che faresti comunque.</p>
-    <button class="share-claim" type="button" id="shareClaim">
-      <svg width="15" height="15" viewBox="0 0 18 18" fill="none" aria-hidden="true">
-        <path d="M9 12V2.5M9 2.5 5.6 5.9M9 2.5l3.4 3.4" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M3 10.5v3.9A1.6 1.6 0 0 0 4.6 16h8.8a1.6 1.6 0 0 0 1.6-1.6v-3.9" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>
-      </svg>
-      <span id="shareClaimLabel">Condividi la frase</span>
-    </button>
     <ol class="path" aria-label="Come funziona">
       <li>I dati della corsa</li>
       <li>La tua canzone</li>
@@ -506,27 +487,30 @@
   </section>
 
   <section class="outcome" aria-label="Il risultato" aria-live="polite">
-    <div class="verdict">
-      <p class="v-label">In loop per</p>
-      <p class="v-number"><span id="bigTimes">16</span> volte</p>
-      <p class="v-song" id="rsTitle">Sportswear</p>
-      <p class="v-artist"><span id="rsArtist">Dark Polo Gang</span> · <span id="rsDur">1:59</span></p>
-      <div class="tank" id="tank" role="img" aria-label="Un blocco per ogni riascolto"></div>
-      <p class="v-run" id="rsRun">5 km · 30 min · 6:00/km</p>
+    <p class="out-line" id="outLine">Sono <b>16 volte</b> Sportswear per 5 km.</p>
+    <div class="tank" id="tank" role="img" aria-label="Un blocco per ogni riascolto"></div>
+    <div class="out-foot">
+      <p class="repeat">Adesso mettila in <b>loop</b> e parti.</p>
+      <button class="share-claim" type="button" id="shareClaim">
+        <svg width="15" height="15" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+          <path d="M9 12V2.5M9 2.5 5.6 5.9M9 2.5l3.4 3.4" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M3 10.5v3.9A1.6 1.6 0 0 0 4.6 16h8.8a1.6 1.6 0 0 0 1.6-1.6v-3.9" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>
+        </svg>
+        <span id="shareClaimLabel">Condividi la frase</span>
+      </button>
     </div>
-    <p class="repeat">Adesso mettila in <b>loop</b> e parti.</p>
   </section>
 
   <section class="share">
     <h2>Condividi sulle storie</h2>
-    <p>Questa è l'etichetta che finirà sulla tua storia. Scatta una foto o prendine una dal rullino: esce un PNG a 1080×1920, e l'immagine non lascia il telefono.</p>
+    <p>Questa è la card che finirà in storia. Va bene così com'è, oppure mettila sopra una tua foto: scattala adesso o prendila dal rullino. Esce un PNG a 1080×1920 e l'immagine non lascia mai il telefono.</p>
 
     <div class="stage">
       <canvas id="cv" width="1080" height="1920" tabindex="0" role="img"
               aria-label="Anteprima della storia. Trascina per spostare l'etichetta."></canvas>
     </div>
 
-    <div class="themes" id="themes" role="group" aria-label="Stile dell'etichetta">
+    <div class="themes" id="themes" role="group" aria-label="Stile dell'etichetta" hidden>
       <button data-theme="light" aria-pressed="true">Etichetta chiara</button>
       <button data-theme="dark" aria-pressed="false">Etichetta scura</button>
     </div>
@@ -538,7 +522,7 @@
       <button class="btn" type="button" id="upload">Prendila dal rullino</button>
     </div>
     <div class="cta">
-      <button class="btn" type="button" id="save" hidden>Genera il PNG</button>
+      <button class="btn" type="button" id="save">Genera il PNG</button>
     </div>
     <p class="hint" id="shareHint"><b>Trascina l'etichetta</b> per spostarla dove vuoi.</p>
 
@@ -876,30 +860,13 @@
     ctx.drawImage(photo, (W - w) / 2, (H - h) / 2, w, h);
   }
 
-  /* Senza foto si vede comunque l'etichetta, così sai cosa stai per condividere
-     prima ancora di scattare. Il fondo dice solo che lì andrà la tua immagine. */
-  function drawPlaceholder() {
-    ctx.fillStyle = '#EEF2EC'; ctx.fillRect(0, 0, W, H);
-    ctx.strokeStyle = '#D5DED2'; ctx.lineWidth = 6;
-    ctx.setLineDash([28, 22]);
-    roundRect(70, 70, W - 140, H - 140, 60); ctx.stroke();
-    ctx.setLineDash([]);
-    ctx.fillStyle = '#9AA49C';
-    ctx.textAlign = 'center';
-    ctx.font = F(800, 50);
-    ctx.fillText('Qui va la tua foto', W / 2, 560);
-    ctx.font = F(600, 38);
-    ctx.fillText('scattala ora o prendila dal rullino', W / 2, 626);
-    ctx.textAlign = 'left';
-  }
-
-  /* La copertina vera arriva dall'API nel sito online. Qui è un segnaposto
-     generato dal titolo, così ogni brano ha comunque la sua tinta. */
+  /* La copertina vera arriva dall'API nel sito online. Qui e un segnaposto
+     generato dal titolo, cosi ogni brano ha comunque la sua tinta. */
   function drawCover(x, y, size, c) {
     let h = 0;
     for (let i = 0; i < c.t.length; i++) h = (h * 31 + c.t.charCodeAt(i)) % 360;
     ctx.save();
-    roundRect(x, y, size, size, 22); ctx.clip();
+    roundRect(x, y, size, size, Math.round(size * 0.13)); ctx.clip();
     const g = ctx.createLinearGradient(x, y, x + size, y + size);
     g.addColorStop(0, 'hsl(' + h + ', 62%, 52%)');
     g.addColorStop(1, 'hsl(' + ((h + 55) % 360) + ', 58%, 30%)');
@@ -914,12 +881,78 @@
     ctx.closePath(); ctx.fill();
     ctx.restore();
     ctx.strokeStyle = 'rgba(0,0,0,0.12)'; ctx.lineWidth = 2;
-    roundRect(x, y, size, size, 22); ctx.stroke();
+    roundRect(x, y, size, size, Math.round(size * 0.13)); ctx.stroke();
   }
 
-  /* L'etichetta, gerarchia C: copertina ancora a sinistra, brano al centro,
-     un solo numero grande a destra. La frase "In loop per N volte" e diventata
-     etichetta piu numero, perche a 105 punti veri una frase non ci sta. */
+  /* Senza foto la storia e gia pronta: una card bianca piccola su fondo scuro,
+     come quando si condivide il testo di una canzone. Il nome del sito sta
+     fuori dalla card, piccolo e chiaro. */
+  function wrapOn(text, font, maxW) {
+    ctx.font = font;
+    const words = text.split(' ');
+    const lines = []; let line = [];
+    for (const w of words) {
+      const test = line.concat(w).join(' ');
+      if (ctx.measureText(test).width > maxW && line.length) { lines.push(line); line = [w]; }
+      else line.push(w);
+    }
+    if (line.length) lines.push(line);
+    return lines;
+  }
+
+  function drawStoryCard() {
+    const c = song(), n = timesFor(c);
+    ctx.fillStyle = '#14171B'; ctx.fillRect(0, 0, W, H);
+    ctx.strokeStyle = 'rgba(255,255,255,0.05)'; ctx.lineWidth = 4;
+    [700, 520].forEach(r => { ctx.beginPath(); ctx.arc(W / 2, H / 2, r, 0, Math.PI * 2); ctx.stroke(); });
+
+    const CW = 880, PAD = 64, inner = CW - PAD * 2, COV = 92;
+    const bigFont = F(900, 68);
+    const frase = kmText() + ' sembrano tanti. Sono ' + n + ' volte ' + c.t + '.';
+    const righe = wrapOn(frase, bigFont, inner);
+    const cardH = PAD * 2 + COV + 66 + righe.length * 84;
+    const cx = (W - CW) / 2, cy = (H - cardH) / 2 - 30;
+
+    ctx.save();
+    ctx.shadowColor = 'rgba(0,0,0,0.42)'; ctx.shadowBlur = 70; ctx.shadowOffsetY = 20;
+    ctx.fillStyle = '#FFFFFF';
+    roundRect(cx, cy, CW, cardH, 44); ctx.fill();
+    ctx.restore();
+
+    /* riga del brano in alto, come nella card di Spotify */
+    drawCover(cx + PAD, cy + PAD, COV, c);
+    ctx.textBaseline = 'alphabetic'; ctx.textAlign = 'left';
+    ctx.fillStyle = '#121212'; ctx.font = F(800, 40);
+    ctx.fillText(fitText(c.t, F(800, 40), inner - COV - 26), cx + PAD + COV + 26, cy + PAD + 40);
+    ctx.fillStyle = '#5F6963'; ctx.font = F(600, 32);
+    ctx.fillText(c.w + ' \u00B7 ' + durLabel(c.s), cx + PAD + COV + 26, cy + PAD + 82);
+
+    /* la frase, con i pezzi colorati come sul sito */
+    const titolo = c.t.split(' ');
+    let y = cy + PAD + COV + 92;
+    ctx.font = bigFont;
+    righe.forEach(parole => {
+      let x = cx + PAD;
+      parole.forEach((w, i) => {
+        const pulita = w.replace(/[.,]/g, '');
+        ctx.fillStyle = '#121212';
+        if (pulita === String(n)) ctx.fillStyle = '#0E7A38';
+        else if (titolo.includes(pulita)) ctx.fillStyle = '#0E7A38';
+        else if (/^[0-9.,]+$/.test(pulita) || pulita === 'km') ctx.fillStyle = '#C23A00';
+        const testo = w + (i < parole.length - 1 ? ' ' : '');
+        ctx.fillText(testo, x, y);
+        x += ctx.measureText(testo).width;
+      });
+      y += 84;
+    });
+
+    /* il sito, fuori dalla card */
+    ctx.fillStyle = 'rgba(244,244,240,0.5)'; ctx.font = F(600, 34);
+    ctx.textAlign = 'center';
+    ctx.fillText('volte.run', W / 2, cy + cardH + 80);
+    ctx.textAlign = 'left';
+  }
+
   /* Una sola fonte di verita per dove sta l'etichetta: la usano il disegno e
      il trascinamento. Prima il limite del disegno e quello del dito erano due
      numeri diversi, quindi ai bordi il dito si muoveva e l'etichetta no. */
@@ -1013,8 +1046,8 @@
 
   function render() {
     ctx.clearRect(0, 0, W, H);
-    if (photo) drawPhoto(); else drawPlaceholder();
-    drawBadge();
+    if (photo) { drawPhoto(); drawBadge(); }
+    else drawStoryCard();
   }
 
   /* Condividere il claim: e una frase e un link, non un'immagine. L'immagine
@@ -1086,8 +1119,8 @@
     const img = new Image();
     img.onload = () => {
       photo = img;
-      $('save').hidden = false;
       document.querySelector('.stage').classList.add('movable');
+      $('themes').hidden = false;
       $('shareHint').innerHTML = '<b>Trascina l\'etichetta</b> per spostarla dove vuoi.';
       render();
     };
@@ -1128,11 +1161,7 @@
     tank.setAttribute('aria-label', n + ' riascolti riempiono ' + kmText() +
       (n > 60 ? ' (ne vedi i primi 60)' : ''));
 
-    $('bigTimes').textContent = n;
-    $('rsTitle').textContent = c.t;
-    $('rsArtist').textContent = c.w;
-    $('rsDur').textContent = durLabel(c.s);
-    $('rsRun').textContent = kmText() + ' · ' + timeText() + ' · ' + paceText();
+    $('outLine').innerHTML = 'Sono <b>' + n + ' volte</b> ' + c.t + ' per ' + kmText() + '.';
 
     render();
   }
