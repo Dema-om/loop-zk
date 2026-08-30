@@ -51,10 +51,17 @@
   /* Le due O di LOOP sono due anelli che si intersecano, uno per marchio:
      il nome dice da solo di cosa parla il concept. */
   .logo {
-    display: inline-flex; align-items: center; gap: 1px;
-    font-weight: 900; font-size: 18px; letter-spacing: -0.02em;
+    display: inline-flex; align-items: center; gap: 0.02em;
+    font-weight: 900; font-size: 18px; line-height: 1; letter-spacing: -0.02em;
   }
-  .logo .rings { width: 26px; height: 15px; display: block; margin: 0 0.5px; }
+  /* Gli anelli si misurano in em, non in pixel: devono crescere col testo,
+     altrimenti a corpo grande restano due puntini in mezzo alle lettere.
+     L'altezza pareggia quella delle maiuscole, e salgono di un soffio perche
+     il centro ottico delle lettere sta sopra il centro della loro riga. */
+  .logo .rings {
+    width: 1.33em; height: 0.78em; display: block;
+    transform: translateY(-0.045em);
+  }
   .concept-tag {
     font-size: 10px; font-weight: 600; color: var(--soft);
     border: 1px solid var(--line); background: var(--card);
