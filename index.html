@@ -1096,16 +1096,18 @@
   function drawPhraseCard() {
     const c = song(), n = timesFor(c);
     const CW = 880, PAD = 60, inner = CW - PAD * 2, COV = 88;
-    const frase = kmText() + ' di corsa sono ' + n + ' volte ' + c.t + '.';
+    /* La frase e quella intera del claim, nelle sue due parti: la seconda va
+       sempre a capo, come in cima al sito. */
+    const parte1 = kmText() + ' sembrano tanti.';
+    const parte2 = 'Sono ' + n + ' volte ' + c.t + '.';
+    const impagina = px => wrapOn(parte1, F(900, px), inner).concat(wrapOn(parte2, F(900, px), inner));
 
-    /* Il corpo si adatta al titolo: si scende finche la frase non sta in tre
-       righe. Un titolo lunghissimo non deve poter rompere la card. */
-    let size = 68, righe = wrapOn(frase, F(900, size), inner);
-    while (righe.length > 3 && size > 40) {
+    let size = 66, righe = impagina(size);
+    while (righe.length > 4 && size > 36) {
       size -= 4;
-      righe = wrapOn(frase, F(900, size), inner);
+      righe = impagina(size);
     }
-    if (righe.length > 3) righe = righe.slice(0, 3);
+    if (righe.length > 4) righe = righe.slice(0, 4);
     const lead = Math.round(size * 1.22);
 
     const footH = 66;
