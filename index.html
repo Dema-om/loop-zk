@@ -1,4 +1,13 @@
-<title>inLOOP</title>
+<title>inLOOP · quanto dura la tua corsa in canzoni</title>
+<meta name="description" content="Cinque chilometri sembrano tanti, ma sono sedici volte la tua canzone preferita. inLOOP traduce la distanza in riascolti e ti prepara la storia da condividere.">
+<meta name="theme-color" content="#F6F8F4">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="inLOOP">
+<meta property="og:title" content="inLOOP · quanto dura la tua corsa in canzoni">
+<meta property="og:description" content="I chilometri restano quelli. Contati in canzoni pesano meno. Un concept su Spotify e Strava, di Matteo De Marco.">
+<meta property="og:url" content="https://inloop.zetakiwi.com">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;800;900&display=swap">
 <style>
@@ -39,8 +48,13 @@
     display: flex; align-items: center; justify-content: space-between;
     gap: 10px; padding: 18px 0;
   }
-  .logo { font-weight: 900; font-size: 18px; letter-spacing: -0.02em; }
-  .logo .dot { color: var(--green-text); }
+  /* Le due O di LOOP sono due anelli che si intersecano, uno per marchio:
+     il nome dice da solo di cosa parla il concept. */
+  .logo {
+    display: inline-flex; align-items: center; gap: 1px;
+    font-weight: 900; font-size: 18px; letter-spacing: -0.02em;
+  }
+  .logo .rings { width: 26px; height: 15px; display: block; margin: 0 0.5px; }
   .concept-tag {
     font-size: 10px; font-weight: 600; color: var(--soft);
     border: 1px solid var(--line); background: var(--card);
@@ -442,7 +456,14 @@
 
 <div class="wrap">
   <nav>
-    <div class="logo">in<span class="dot">LOOP</span></div>
+    <div class="logo" aria-label="inLOOP">
+      <span aria-hidden="true">inL</span>
+      <svg class="rings" viewBox="0 0 34 20" aria-hidden="true">
+        <circle cx="10" cy="10" r="7.6" fill="none" stroke="#1DB954" stroke-width="3.4"/>
+        <circle cx="24" cy="10" r="7.6" fill="none" stroke="#FC4C02" stroke-width="3.4"/>
+      </svg>
+      <span aria-hidden="true">P</span>
+    </div>
     <a class="concept-tag" href="#about">Concept <b>Spotify</b> × <em>Strava</em> · non ufficiale</a>
   </nav>
 
@@ -694,6 +715,10 @@
 </div>
 
 <script>
+  /* Il file non ha un <html> proprio (vive anche dentro un'anteprima), quindi
+     la lingua si dichiara qui: serve agli screen reader e alla sillabazione. */
+  document.documentElement.lang = 'it';
+
   const $ = id => document.getElementById(id);
   const fmt1 = n => n.toLocaleString('it-IT', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
   const kmLabel = n => (Number.isInteger(n) ? n : fmt1(n)) + ' km';
@@ -758,9 +783,12 @@
     }, 180);
   }
   if (!reduced) timer = setInterval(nextHero, 3200);
-  /* La vetrina si ferma al primo segno di vita: uno scroll, un tocco, un tasto.
-     Senza bottone di pausa, ma senza restare in movimento addosso a chi legge. */
-  ['scroll', 'pointerdown', 'keydown', 'wheel'].forEach(ev =>
+  /* La vetrina si ferma al primo gesto vero: un tocco, una rotella, un tasto.
+     NON allo scroll: ricaricando la pagina il browser ripristina la posizione e
+     spara un evento di scroll da solo, che spegneva la vetrina prima ancora che
+     l'utente la vedesse. Rotella e touch coprono comunque l'intenzione di
+     scorrere, e nascono da un dito. */
+  ['pointerdown', 'touchstart', 'wheel', 'keydown'].forEach(ev =>
     window.addEventListener(ev, stopRotation, { once: true, passive: true }));
 
   function renderHero() {
