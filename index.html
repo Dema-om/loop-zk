@@ -53,20 +53,27 @@
 
   /* ---------- hero ---------- */
   header { padding: 24px 0 6px; }
-  .claim-line1, .claim-line2 {
+  .claim-line1 {
     font-weight: 900; font-size: clamp(34px, 9vw, 46px);
     line-height: 1.08; letter-spacing: -0.03em; margin: 0;
+  }
+  .claim-line2 {
+    font-weight: 900; line-height: 1.08; letter-spacing: -0.03em; margin: 0;
   }
   .claim-line1 .d { color: var(--orange-text); font-variant-numeric: tabular-nums; }
   /* Lo spazio si riserva sul blocco, non sulla riga, così l'artista resta
      attaccato alla frase e il layout non salta cambiando canzone. */
-  .claim-block { min-height: 4.6em; }
+  /* Il claim cambia lunghezza e faceva ballare la pagina: lo spazio si riserva
+     nelle unita del claim stesso, non in quelle del corpo del testo. */
+  .claim-block { min-height: 3.1em; font-size: clamp(34px, 9vw, 46px); }
+  .claim-block > * { font-size: initial; }
+  .claim-line2 { font-size: 1em; }
   .claim-line2 { margin-top: 4px; }
   .claim-line2 .n, .claim-line2 .t { color: var(--green-text); }
   .claim-line2 .n { font-variant-numeric: tabular-nums; }
   .claim-line2.fade { opacity: 0; transition: opacity 0.18s; }
   .claim-line2.show { opacity: 1; transition: opacity 0.25s; }
-  .claim-who { font-size: 14px; font-weight: 600; color: var(--soft); margin: 6px 0 0; }
+  .claim-block .claim-who { font-size: 14px; font-weight: 600; color: var(--soft); margin: 6px 0 0; }
   .thesis { font-size: 15px; color: var(--soft); margin: 12px 0 0; }
   /* Il claim si condivide come frase e link: l'immagine e un'altra cosa, e sta
      piu in basso sulla foto dell'utente. */
@@ -152,15 +159,20 @@
   .seg button:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
   .explain { font-size: 12px; color: var(--soft); margin: 10px 0 0; }
 
-  /* I dati esatti non si aggiungono alla stima: la sostituiscono. Un solo
-     comando grigio in fondo alla card fa da interruttore fra le due facce. */
-  .swap {
-    font: inherit; font-size: 12px; font-weight: 700; color: var(--soft);
-    background: none; border: none; padding: 16px 0 0; margin: 0; cursor: pointer;
-    text-decoration: underline; text-underline-offset: 3px;
+  /* Due schede in cima alla card. Un comando nascosto in fondo faceva cambiare
+     tutto senza dire cosa era cambiato: cosi invece si vedono le due strade e
+     quale delle due sei. */
+  .tabs {
+    display: flex; gap: 18px; margin: 0 0 16px;
+    border-bottom: 1px solid var(--line);
   }
-  .swap:hover { color: var(--ink); }
-  .swap:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
+  .tabs button {
+    font: inherit; font-size: 13px; font-weight: 800; color: var(--soft);
+    background: none; border: none; padding: 0 0 10px; margin: 0 0 -1px;
+    cursor: pointer; border-bottom: 3px solid transparent;
+  }
+  .tabs button[aria-pressed="true"] { color: var(--ink); border-bottom-color: var(--orange); }
+  .tabs button:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
   .exact-why { font-size: 13px; color: var(--soft); margin: 0 0 14px; }
   /* Su un telefono tre campi affiancati vanno a capo storti. Diventano righe:
      nome a sinistra, comando a destra, unita in colonna allineata. */
@@ -364,6 +376,7 @@
     border-radius: 999px; padding: 10px 16px; cursor: pointer;
   }
   .themes button[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #FFFFFF; }
+  .themes[hidden] { display: none; }
   .themes button:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
 
   .cta { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; justify-content: center; }
@@ -436,7 +449,11 @@
   <section class="step run" aria-label="La tua corsa">
     <h2 class="step-head"><span class="num">1</span> La tua corsa</h2>
     <div class="card-ui">
-      <!-- Due volti della stessa card: si scambiano, non si sommano. -->
+      <!-- Due schede della stessa card: si vedono entrambe, si scambiano con un tocco. -->
+      <div class="tabs" role="group" aria-label="Tipo di corsa">
+        <button type="button" id="tabStima" aria-pressed="true">Da programmare</button>
+        <button type="button" id="tabEsatti" aria-pressed="false">Già corsa</button>
+      </div>
       <div id="paneStima">
         <div class="chips" id="dists" role="group" aria-label="Distanza">
           <button data-km="3" aria-pressed="false">3 km</button>
@@ -489,7 +506,6 @@
         <p class="explain" id="exactNote">Cambiane due e il terzo si aggiorna da solo.</p>
       </div>
 
-      <button class="swap" type="button" id="swap">Inserisci i dati esatti dell'ultima corsa</button>
     </div>
   </section>
 
@@ -536,19 +552,21 @@
               aria-label="Anteprima della storia. Trascina per spostare l'etichetta."></canvas>
     </div>
 
-    <div class="themes" id="themes" role="group" aria-label="Stile dell'etichetta" hidden>
-      <button data-theme="light" aria-pressed="true">Etichetta chiara</button>
-      <button data-theme="dark" aria-pressed="false">Etichetta scura</button>
+    <div class="themes" id="sfondi" role="group" aria-label="Sfondo della card">
+      <button data-bg="cover" aria-pressed="true">Dalla copertina</button>
+      <button data-bg="0" aria-pressed="false">Verde</button>
+      <button data-bg="1" aria-pressed="false">Arancio</button>
+      <button data-bg="2" aria-pressed="false">Notte</button>
     </div>
 
     <div class="cta">
       <input type="file" id="file" accept="image/*" class="sr" tabindex="-1" aria-hidden="true">
       <input type="file" id="shot" accept="image/*" capture="environment" class="sr" tabindex="-1" aria-hidden="true">
-      <button class="btn primary" type="button" id="take">Scatta una foto</button>
-      <button class="btn" type="button" id="upload">Prendila dal rullino</button>
+      <button class="btn primary" type="button" id="save">Genera il PNG</button>
     </div>
     <div class="cta">
-      <button class="btn" type="button" id="save">Genera il PNG</button>
+      <button class="btn" type="button" id="take">Scatta una foto</button>
+      <button class="btn" type="button" id="upload">Prendila dal rullino</button>
     </div>
     <p class="hint" id="shareHint"><b>Trascina l'etichetta</b> per spostarla dove vuoi.</p>
 
@@ -569,6 +587,22 @@
     ma la musica come <b>unità di misura</b> della fatica.</p>
     <p>Niente account e niente permessi, di proposito. Il loop è un tap dentro la tua app di musica,
     quindi questo sito non ha bisogno di collegarsi a niente per servire a qualcosa.</p>
+  </section>
+
+  <section class="about">
+    <h3>Chi l'ha fatto</h3>
+    <p>Matteo De Marco. Vengo dal design e dall'interfaccia, e da lì mi porto dietro l'abitudine a
+    guardare le cose dal lato di chi le usa: quasi tutte le scelte qui sopra nascono da un'app che mi ha
+    fatto arrabbiare, non da una linea guida.</p>
+    <p>Mi occupo di AI e di come si costruiscono prodotti con l'AI, quello che oggi si chiama vibe coding
+    o AI building. Mi interessano il marketing e i dati, e mi interessano la musica e lo sport: questo
+    progetto è il punto in cui si incontrano.</p>
+    <p>Sto costruendo una serie di progetti come questo, che servono a due cose insieme: risolvere qualcosa
+    di piccolo per bene, e raccontare come ragiono. Ne pubblicherò altri.
+    <b>Lavoro nell'AI e sono aperto a proposte.</b></p>
+    <a class="me" href="https://www.linkedin.com/in/matteodemarcoo" target="_blank" rel="noopener">
+      Matteo De Marco su LinkedIn
+    </a>
   </section>
 
   <section class="about">
@@ -600,22 +634,6 @@
       <li><b>La foto non lascia il telefono.</b> Tutto avviene nel browser: nessun caricamento, nessun server,
       niente da promettere sulla privacy perché non c'è niente da custodire.</li>
     </ul>
-  </section>
-
-  <section class="about">
-    <h3>Chi l'ha fatto</h3>
-    <p>Matteo De Marco. Vengo dal design e dall'interfaccia, e da lì mi porto dietro l'abitudine a
-    guardare le cose dal lato di chi le usa: quasi tutte le scelte qui sopra nascono da un'app che mi ha
-    fatto arrabbiare, non da una linea guida.</p>
-    <p>Mi occupo di AI e di come si costruiscono prodotti con l'AI, quello che oggi si chiama vibe coding
-    o AI building. Mi interessano il marketing e i dati, e mi interessano la musica e lo sport: questo
-    progetto è il punto in cui si incontrano.</p>
-    <p>Sto costruendo una serie di progetti come questo, che servono a due cose insieme: risolvere qualcosa
-    di piccolo per bene, e raccontare come ragiono. Ne pubblicherò altri.
-    <b>Lavoro nell'AI e sono aperto a proposte.</b></p>
-    <a class="me" href="https://www.linkedin.com/in/matteodemarcoo" target="_blank" rel="noopener">
-      Matteo De Marco su LinkedIn
-    </a>
   </section>
 
   <footer>
@@ -652,7 +670,7 @@
   let paceSec = 360;
   let heroIdx = 0;
   let picked = null;
-  let theme = 'light';
+  let sfondo = 'cover';   /* 'cover' oppure l'indice di una tinta */
   let badgeY = 0.78;
   let photo = null;
   let versione = 'frase';   /* 'frase' oppure 'dati' */
@@ -731,6 +749,11 @@
   });
 
   /* ----- passo 2: la canzone, ogni riga porta già il suo numero ----- */
+  /* La lista si ricostruisce SOLO quando cambia la ricerca. Prima la rifacevo
+     a ogni aggiornamento, e sostituire i nodi sopra la vista fa perdere al
+     browser il punto di ancoraggio: da li il salto della pagina toccando il
+     ritmo. I numeri delle righe si aggiornano al loro posto. */
+  let righe = [];
   function renderResults() {
     const q = $('q').value.trim().toLowerCase();
     const found = q
@@ -738,6 +761,7 @@
       : catalog.slice(0, 5);
     const el = $('results');
     el.textContent = '';
+    righe = [];
     if (!found.length) {
       const p = document.createElement('p');
       p.className = 'empty';
@@ -748,20 +772,29 @@
     found.forEach(c => {
       const b = document.createElement('button');
       b.type = 'button';
-      b.setAttribute('aria-pressed', picked === c ? 'true' : 'false');
       b.innerHTML =
         '<span class="cover" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor"><path d="M4 2.5v9l7-4.5z"/></svg></span>' +
         '<span class="name"><span>' + c.t + '</span><span class="artist">' + c.w + '</span></span>' +
-        '<span class="times">×' + timesFor(c) + '<small>' + durLabel(c.s) + '</small></span>';
-      b.setAttribute('aria-label', c.t + ', ' + c.w + ', ' + timesFor(c) + ' volte per ' + kmText());
+        '<span class="times"><span class="n"></span><small>' + durLabel(c.s) + '</small></span>';
       b.addEventListener('click', () => {
         picked = c;
         stopRotation();
         update();
       });
       el.appendChild(b);
+      righe.push({ el: b, c });
+    });
+    refreshRighe();
+  }
+  function refreshRighe() {
+    righe.forEach(({ el, c }) => {
+      const n = timesFor(c);
+      el.querySelector('.times .n').textContent = '×' + n;
+      el.setAttribute('aria-pressed', picked === c ? 'true' : 'false');
+      el.setAttribute('aria-label', c.t + ', ' + c.w + ', ' + n + ' volte per ' + kmText());
     });
   }
+
   $('q').addEventListener('input', renderResults);
 
   /* ----- dati esatti: la card cambia faccia, non si allunga -----
@@ -879,15 +912,15 @@
   function setPane(esatti) {
     $('paneStima').hidden = esatti;
     $('paneEsatti').hidden = !esatti;
-    $('swap').textContent = esatti
-      ? 'Torna alla corsa da programmare'
-      : 'Inserisci i dati esatti dell\'ultima corsa';
+    $('tabStima').setAttribute('aria-pressed', esatti ? 'false' : 'true');
+    $('tabEsatti').setAttribute('aria-pressed', esatti ? 'true' : 'false');
     /* Niente focus automatico: su telefono aprirebbe la tastiera addosso ai
        campi appena comparsi, coprendo proprio quello che devi leggere. */
     if (esatti) { stopRotation(); syncWheelFrom(parseTime($('exTime').value) || 1800); recalcExact(); }
     else { exact = null; update(); }
   }
-  $('swap').addEventListener('click', () => setPane($('paneEsatti').hidden));
+  $('tabStima').addEventListener('click', () => setPane(false));
+  $('tabEsatti').addEventListener('click', () => setPane(true));
 
   /* ================= la storia: un solo renderer su canvas ================= */
   const cv = $('cv');
@@ -974,10 +1007,27 @@
     return lines;
   }
 
-  function drawDark() {
-    ctx.fillStyle = '#14171B'; ctx.fillRect(0, 0, W, H);
-    ctx.strokeStyle = 'rgba(255,255,255,0.05)'; ctx.lineWidth = 4;
-    [700, 520].forEach(r => { ctx.beginPath(); ctx.arc(W / 2, H / 2, r, 0, Math.PI * 2); ctx.stroke(); });
+  /* Lo sfondo e un gradiente, come nelle card di Spotify: o preso dalla
+     copertina, cosi ogni brano ne genera uno suo, o una delle tinte fisse. */
+  const TINTE = [
+    ['#1DB954', '#0A3A20'],
+    ['#FC4C02', '#3E1200'],
+    ['#4C3BA6', '#0E1226']
+  ];
+  function drawGradient() {
+    let a, b;
+    if (sfondo === 'cover') {
+      const c = song();
+      let h = 0;
+      for (let i = 0; i < c.t.length; i++) h = (h * 31 + c.t.charCodeAt(i)) % 360;
+      a = 'hsl(' + h + ', 58%, 42%)';
+      b = 'hsl(' + ((h + 40) % 360) + ', 52%, 12%)';
+    } else {
+      [a, b] = TINTE[sfondo] || TINTE[0];
+    }
+    const g = ctx.createLinearGradient(0, 0, W * 0.4, H);
+    g.addColorStop(0, a); g.addColorStop(1, b);
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
   }
 
   function drawPhraseCard() {
@@ -1046,12 +1096,10 @@
 
   function drawBadge() {
     const c = song();
-    const dark = theme === 'dark';
     const r0 = badgeRect();
     const M = BADGE_M, PAD = 44, w = r0.w, h = r0.h;
     const cx = W / 2, cy = r0.cy;
-    const inkC = dark ? '#F4F4F0' : '#121212';
-    const softC = dark ? '#9AA49C' : '#5F6963';
+    const inkC = '#121212', softC = '#5F6963';
 
     ctx.save();
     ctx.translate(cx, cy);
@@ -1060,14 +1108,9 @@
 
     ctx.save();
     ctx.shadowColor = 'rgba(0,0,0,0.3)'; ctx.shadowBlur = 60; ctx.shadowOffsetY = 18;
-    ctx.fillStyle = dark ? '#16181C' : '#FFFFFF';
+    ctx.fillStyle = '#FFFFFF';
     roundRect(0, 0, w, h, 40); ctx.fill();
     ctx.restore();
-    /* su una foto scura l'etichetta scura sparirebbe: le serve un bordo */
-    if (dark) {
-      ctx.strokeStyle = 'rgba(255,255,255,0.22)'; ctx.lineWidth = 3;
-      roundRect(0, 0, w, h, 40); ctx.stroke();
-    }
 
     const COV = 210;
     drawCover(PAD, PAD, COV, c);
@@ -1114,7 +1157,7 @@
       ctx.fillText(p, px, PAD + 196);
       px += ctx.measureText(p).width;
       if (i < parts.length - 1) {
-        ctx.fillStyle = dark ? '#3A4048' : '#C9D2C6';
+        ctx.fillStyle = '#C9D2C6';
         ctx.fillText(' \u00B7 ', px, PAD + 196);
         px += ctx.measureText(' \u00B7 ').width;
       }
@@ -1127,7 +1170,7 @@
      la versione scelta: la frase in una card bianca, o l'etichetta coi dati. */
   function render() {
     ctx.clearRect(0, 0, W, H);
-    if (photo) drawPhoto(); else drawDark();
+    if (photo) drawPhoto(); else drawGradient();
     if (versione === 'frase') drawPhraseCard(); else drawBadge();
   }
 
@@ -1135,7 +1178,7 @@
     versione = v;
     $('vFrase').setAttribute('aria-pressed', v === 'frase' ? 'true' : 'false');
     $('vDati').setAttribute('aria-pressed', v === 'dati' ? 'true' : 'false');
-    $('themes').hidden = !(v === 'dati');
+    $('sfondi').hidden = !!photo;
     $('shareHint').innerHTML = v === 'dati'
       ? '<b>Trascina l\'etichetta</b> per spostarla dove vuoi.'
       : 'La frase sta al centro. Aggiungi una foto e le finisce sopra.';
@@ -1197,11 +1240,12 @@
     if (e.key === 'ArrowDown') { badgeY = clampY(badgeY + 0.03); render(); e.preventDefault(); }
   });
 
-  document.querySelectorAll('#themes button').forEach(b => {
+  document.querySelectorAll('#sfondi button').forEach(b => {
     b.addEventListener('click', () => {
-      document.querySelectorAll('#themes button').forEach(x => x.setAttribute('aria-pressed', 'false'));
+      document.querySelectorAll('#sfondi button').forEach(x => x.setAttribute('aria-pressed', 'false'));
       b.setAttribute('aria-pressed', 'true');
-      theme = b.dataset.theme; render();
+      sfondo = b.dataset.bg === 'cover' ? 'cover' : parseInt(b.dataset.bg, 10);
+      render();
     });
   });
 
@@ -1214,6 +1258,7 @@
     img.onload = () => {
       photo = img;
       document.querySelector('.stage').classList.add('movable');
+      $('sfondi').hidden = true;
       render();
     };
     img.src = URL.createObjectURL(f);
@@ -1236,7 +1281,7 @@
   /* ----- esito ----- */
   function update() {
     renderHero();
-    renderResults();
+    refreshRighe();
 
     const c = song();
     const giri = target() / c.s;          /* si chiamava "exact" e oscurava i dati esatti */
@@ -1258,6 +1303,7 @@
     render();
   }
 
+  renderResults();   /* la lista si costruisce una volta sola */
   update();
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(render);
 </script>
