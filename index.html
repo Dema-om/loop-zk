@@ -1381,10 +1381,12 @@
     </div>
     <details class="f-priv" id="privacy">
       <summary class="sr" tabindex="-1">Privacy</summary>
-      <p><b>Niente account e niente cookie.</b> La ricerca delle canzoni interroga l'archivio
-      pubblico di Apple direttamente dal tuo browser, e <b>la tua foto non lascia mai il telefono</b>:
-      l'immagine della storia si costruisce e si salva sul tuo dispositivo. L'unica cosa che conto sono
-      le visite, con Umami su un mio server: nessun cookie, nessuna profilazione, nessun dato che ti
+      <p><b>Niente account e niente cookie.</b> Quello che cerchi passa da un mio server, che
+      gira la domanda all'archivio pubblico di Apple e tiene in memoria la risposta per tutti: serve
+      a non farsi chiudere la porta in faccia da Apple quando siete in tanti. Della ricerca resta solo
+      la parola cercata, senza niente che la colleghi a te. <b>La tua foto non lascia mai il
+      telefono</b>: l'immagine della storia si costruisce e si salva sul tuo dispositivo. Le visite le
+      conto con Umami, sempre su un mio server: nessun cookie, nessuna profilazione, nessun dato che ti
       identifichi.</p>
     </details>
     <p class="f-legale">Concept non ufficiale. Non affiliato a Spotify n&eacute; a Strava: i loro nomi e i loro
@@ -1467,22 +1469,11 @@
       return true;
     }
     try {
-      const r = await unaAllaVolta(() => fetch('https://itunes.apple.com/it/rss/topsongs/limit=8/json'));
-      const j = await r.json();
-      const ids = j.feed.entry
-        .map(x => x.id && x.id.attributes && x.id.attributes['im:id'])
-        .filter(Boolean);
-      if (!ids.length) return;
-      const j2 = await unaAllaVolta(() => chiediAdApple('https://itunes.apple.com/lookup?country=IT&id=' + ids.join(',')));
-      const trovati = j2.results
-        .filter(x => x.trackTimeMillis && x.trackName && x.artistName)
-        .slice(0, 4)
-        .map(x => ({
-          s: Math.round(x.trackTimeMillis / 1000),
-          t: x.trackName,
-          w: x.artistName,
-          art: x.artworkUrl100 ? x.artworkUrl100.replace('100x100bb', '600x600bb') : null
-        }));
+      /* Le due richieste ad Apple le fa il ponte su Vercel, non il browser:
+         cosi la classifica costa una chiamata ogni mezz'ora per tutti invece
+         di due per ogni persona che apre il sito. */
+      const j = await chiediAdApple('/api/tendenze');
+      const trovati = j.brani;
       if (!trovati.length) return false;
       tendenze = trovati;
       /* La vetrina del claim gira sui brani della classifica, che la copertina
@@ -1516,11 +1507,10 @@
   async function copertineDiPartenza() {
     await Promise.all(catalog.slice(0, 4).map(async c => {
       try {
-        const r = await fetch('https://itunes.apple.com/search?media=music&entity=song&limit=1&country=IT&term=' +
-          encodeURIComponent(c.t + ' ' + c.w));
+        const r = await fetch('/api/cerca?q=' + encodeURIComponent(c.t + ' ' + c.w));
         const j = await r.json();
-        const x = j.results && j.results[0];
-        if (x && x.artworkUrl100) c.art = x.artworkUrl100.replace('100x100bb', '600x600bb');
+        const x = j.brani && j.brani[0];
+        if (x && x.art) c.art = x.art;
       } catch (e) { /* si resta col segnaposto colorato, non e un errore fatale */ }
     }));
     if (!picked && !$('q').value.trim()) { renderResults(); render(); }
@@ -1645,7 +1635,7 @@
         const r = await fetch(url);
         if (!r.ok) throw new Error('http ' + r.status);
         const j = await r.json();
-        if (!j || !Array.isArray(j.results)) throw new Error('senza lista');
+        if (!j || !Array.isArray(j.brani)) throw new Error('senza lista');
         return j;
       } catch (e) {
         if (giro === pause.length) throw e;
@@ -1668,24 +1658,10 @@
          Le richieste restano poche lo stesso: si aspetta il dito, e una
          ricerca piu recente annulla la precedente. */
       const j = await chiediAdApple(
-        'https://itunes.apple.com/search?media=music&entity=song&limit=12&country=IT&term=' + encodeURIComponent(q),
+        '/api/cerca?q=' + encodeURIComponent(q),
         () => { if (mia === ricercaN) $('listaTit').textContent = 'L\u2019archivio \u00e8 occupato, riprovo\u2026'; });
       if (mia !== ricercaN) return;
-      const visti = new Set();
-      lista = j.results
-        .filter(x => x.trackTimeMillis && x.trackName && x.artistName)
-        .filter(x => {
-          const k = (x.trackName + '|' + x.artistName).toLowerCase();
-          if (visti.has(k)) return false;   /* lo stesso brano torna su piu album */
-          visti.add(k); return true;
-        })
-        .slice(0, 4)
-        .map(x => ({
-          s: Math.round(x.trackTimeMillis / 1000),
-          t: x.trackName,
-          w: x.artistName,
-          art: x.artworkUrl100 ? x.artworkUrl100.replace('100x100bb', '600x600bb') : null
-        }));
+      lista = j.brani;
       cacheRicerche.set(chiave, lista);
       ricorda('q.' + chiave, lista, 24);
       renderResults();
