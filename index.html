@@ -943,10 +943,12 @@
   .f-cols a {
     display: block; margin-bottom: 0; font-size: 13.5px; font-weight: 700;
     color: var(--ink); text-decoration: none;
-    border-bottom: 1.5px solid var(--line); padding-bottom: 2px;
     width: fit-content;
   }
-  .f-cols a:hover { border-bottom-color: var(--green); }
+  /* La riga sta sotto le parole, non sotto il bersaglio: il bersaglio e alto
+     44 px per il dito, e se la riga segue lui resta sospesa a mezz'aria. */
+  .f-cols a > span { border-bottom: 1.5px solid var(--line); padding-bottom: 2px; }
+  .f-cols a:hover > span { border-bottom-color: var(--green); }
   .f-cols a:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; }
   .f-priv { margin-top: 10px; }
   .f-priv summary { list-style: none; }
@@ -977,7 +979,7 @@
   .vai { padding: 12px 18px; }
   .view-toggle button { min-height: 44px; }
   .themes button { width: 44px; height: 44px; }
-  .f-cols a { padding: 11px 0; margin-bottom: 0; }
+  .f-cols a { padding: 12px 0; margin-bottom: 0; }
 
   .f-su { padding: 12px 16px; }
   .f-priv summary { min-height: 0; }
@@ -1278,8 +1280,8 @@
   <div class="wrap">
     <span class="logo f-logo" aria-hidden="true">inL<svg class="rings" viewBox="0 0 34 20"><circle cx="10" cy="10" r="7.6" fill="none" stroke="#1DB954" stroke-width="3.4"/><circle cx="24" cy="10" r="7.6" fill="none" stroke="#FC4C02" stroke-width="3.4"/></svg>P</span>
     <div class="f-cols">
-      <a href="#chi">Sviluppato da</a>
-      <a href="#privacy">Privacy</a>
+      <a href="#chi"><span>Sviluppato da</span></a>
+      <a href="#privacy"><span>Privacy</span></a>
     </div>
     <details class="f-priv" id="privacy">
       <summary class="sr">Privacy</summary>
