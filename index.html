@@ -1400,6 +1400,35 @@
 <script>
   const $ = id => document.getElementById(id);
 
+  /* Interruttore per non contarsi da soli. Aprendo il sito con ?io=1 questo
+     dispositivo smette di essere contato, per sempre: e il modo previsto da
+     Umami, che prima di spedire guarda questa chiave. Con ?io=0 si torna
+     indietro.
+     Deve girare PRIMA che parta il conteggio della visita, e ci riesce: lo
+     script di Umami e differito, quindi aspetta la fine della pagina, mentre
+     questo qui e in linea e parte subito. */
+  (function () {
+    const scelta = new URLSearchParams(location.search).get('io');
+    if (scelta !== '1' && scelta !== '0') return;
+    try {
+      if (scelta === '1') localStorage.setItem('umami.disabled', '1');
+      else localStorage.removeItem('umami.disabled');
+    } catch (e) {}
+    addEventListener('DOMContentLoaded', () => {
+      const avviso = document.createElement('p');
+      avviso.setAttribute('role', 'status');
+      avviso.textContent = scelta === '1'
+        ? 'Fatto: questo dispositivo non viene piu contato nelle statistiche.'
+        : 'Fatto: questo dispositivo torna a essere contato.';
+      avviso.style.cssText = 'position:fixed;left:12px;right:12px;bottom:12px;z-index:99;'
+        + 'margin:0;padding:15px 18px;border-radius:16px;background:#12151A;color:#fff;'
+        + 'font-size:13.5px;font-weight:700;line-height:1.4;text-align:center;'
+        + 'box-shadow:0 10px 34px rgba(0,0,0,.3)';
+      document.body.appendChild(avviso);
+      setTimeout(() => avviso.remove(), 7000);
+    });
+  })();
+
   /* Due gesti contati oltre alle visite, per sapere se la gente arriva in
      fondo o si ferma a guardare. Passa dal guardiano perche Umami puo non
      esserci: bloccato da un'estensione, o giu il server. Se manca, il sito
