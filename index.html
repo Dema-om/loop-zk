@@ -2023,7 +2023,31 @@
   });
 
   $('exKm').addEventListener('input', () => { touched('km'); recalcExact(); });
-  $('exPace').addEventListener('input', () => { touched('pace'); recalcExact(); });
+  /* Il ritmo si scrive con la tastiera numerica, che sul telefono NON ha i due
+     punti: toccando il campo il valore si seleziona, si riscrive, e i due punti
+     non tornavano piu. Restava "559", che parseTime legge come 559 minuti al
+     chilometro. Ora i due punti li mette il campo da solo: le ultime due cifre
+     sono i secondi, quelle prima i minuti. */
+  function mascheraRitmo(v) {
+    const cifre = String(v).replace(/[^0-9]/g, '').slice(0, 4);
+    if (cifre.length <= 2) return cifre;
+    return cifre.slice(0, cifre.length - 2) + ':' + cifre.slice(-2);
+  }
+  $('exPace').addEventListener('input', () => {
+    const el = $('exPace');
+    const con = mascheraRitmo(el.value);
+    if (con !== el.value) {
+      el.value = con;
+      try { el.setSelectionRange(con.length, con.length); } catch (e) {}
+    }
+    touched('pace'); recalcExact();
+  });
+  /* Chi scrive solo "6" intende 6:00, e chi scrive 5:75 intende 6:15: quando
+     lascia il campo il valore si rimette in ordine da solo. */
+  $('exPace').addEventListener('blur', () => {
+    const sec = parseTime($('exPace').value);
+    if (sec) { $('exPace').value = clock(sec); touched('pace'); recalcExact(); }
+  });
 
   function setPane(esatti) {
     $('paneStima').hidden = esatti;
