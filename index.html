@@ -916,16 +916,10 @@
   }
   .f-logo { font-size: 18px; color: var(--ink); }
   .f-paglia { margin: 10px 0 22px; font-size: 12.5px; color: var(--soft); max-width: 30em; }
-  /* Le due colonne erano sbilanciate: tre link da una parte e uno dall'altra.
-     Una lista sola in fila, che va a capo da se, sta in piedi con qualsiasi
-     numero di voci. */
-  .f-cols { display: flex; flex-wrap: wrap; gap: 10px 22px; align-items: baseline; }
-  .f-cols > div { display: contents; }
-  .f-cols h4 {
-    width: 100%; margin: 0; font-size: 10.5px; font-weight: 800;
-    letter-spacing: 0.12em; text-transform: uppercase; color: var(--soft);
-  }
-  .f-cols h4 + a { margin-top: -2px; }
+  /* Tre link in fila sulla stessa linea di base. Prima erano dentro un
+     contenitore rimasto vuoto da quando e sparita la seconda colonna, e da li
+     lo sbilanciamento. */
+  .f-cols { display: flex; flex-wrap: wrap; gap: 10px 24px; align-items: baseline; margin-top: 18px; }
   .f-cols a {
     display: block; margin-bottom: 0; font-size: 13.5px; font-weight: 700;
     color: var(--ink); text-decoration: none;
@@ -947,14 +941,8 @@
     margin: 24px 0 0; padding-top: 16px; border-top: 1px solid var(--line);
     font-size: 11.5px; line-height: 1.65; color: var(--soft);
   }
-  .f-fine {
-    display: flex; align-items: center; justify-content: space-between;
-    gap: 14px; flex-wrap: wrap; margin-top: 16px;
-    font-size: 12.5px; color: var(--soft);
-  }
-  .f-fine a { color: var(--ink); font-weight: 800; text-decoration: none; border-bottom: 1.5px solid var(--line); }
   .f-su {
-    display: inline-block; padding: 8px 14px; border-bottom: none !important;
+    display: inline-block; margin-top: 16px; padding: 8px 14px;
     font-size: 12px; font-weight: 800; color: var(--ink); text-decoration: none;
     background: var(--ground); border: 1px solid var(--line); border-radius: 999px;
   }
@@ -1185,9 +1173,8 @@
 
   <section class="about" id="about">
     <h3>Il concept</h3>
-    <p><b>I chilometri restano quelli.</b> Contati in canzoni pesano meno, perché ascoltare un pezzo
-    che ti piace è una cosa che faresti comunque. inLOOP fa solo questo: prende una distanza e te la
-    ridice in riascolti, poi te la dà pronta da mettere in storia.</p>
+    <p><b>Fatto per chi corre con la stessa canzone nelle orecchie.</b> inLOOP prende una distanza
+    e te la ridice in riascolti, poi te la dà pronta da mettere in storia.</p>
     <p>Non è un lettore musicale attaccato a un'app di corsa: è <b>la musica usata come unità di
     misura della fatica</b>. È un concept dichiarato su Spotify e Strava, e non è affiliato a nessuna
     delle due: i loro colori stanno qui perché sono il materiale dell'esercizio.</p>
@@ -1239,16 +1226,10 @@
 <footer>
   <div class="wrap">
     <span class="logo f-logo" aria-hidden="true">inL<svg class="rings" viewBox="0 0 34 20"><circle cx="10" cy="10" r="7.6" fill="none" stroke="#1DB954" stroke-width="3.4"/><circle cx="24" cy="10" r="7.6" fill="none" stroke="#FC4C02" stroke-width="3.4"/></svg>P</span>
-    <p class="f-paglia">Quanto dura la tua corsa in canzoni. Un concept su Spotify e Strava, fatto per chi corre
-    con la stessa canzone nelle orecchie.</p>
     <div class="f-cols">
-      <div>
-        <h4>Il progetto</h4>
-        <a href="#about">Il concept</a>
-        <a href="#come">Dietro le quinte</a>
-      </div>
-
-
+      <a href="#about">Il concept</a>
+      <a href="#come">Dietro le quinte</a>
+      <a href="#chi">Sviluppato da</a>
     </div>
     <details class="f-priv" id="privacy">
       <summary>Privacy</summary>
@@ -1260,10 +1241,7 @@
     <p class="f-legale">Concept non ufficiale. Non affiliato a Spotify n&eacute; a Strava: i loro nomi e i loro
     colori sono citati come materiale dell'esercizio.<br>
     &copy; 2026 Matteo De Marco</p>
-    <div class="f-fine">
-      <span>Sviluppato da <a href="https://www.linkedin.com/in/matteodemarcoo" target="_blank" rel="noopener">Matteo De Marco</a></span>
-      <a class="f-su" href="#top">Torna su &uarr;</a>
-    </div>
+    <a class="f-su" href="#top">Torna su &uarr;</a>
   </div>
 </footer>
 
