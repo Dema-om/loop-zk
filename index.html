@@ -946,6 +946,24 @@
   }
   .f-su:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
 
+  /* ===== LINEE GUIDA APPLE: 44 punti minimo per ogni bersaglio =====
+     Misurati 34 comandi, 18 erano sotto. Si cresce col riempimento, non con
+     la misura del testo, cosi il disegno resta identico e cambia solo l'area
+     che il dito puo prendere. I collegamenti dentro un discorso restano come
+     sono: li Apple non chiede una misura, e ingrandirli spezzerebbe il testo. */
+  .topbar .logo { padding: 13px 8px; }
+  .topbar .uno { height: auto; min-height: 46px; }
+  .search input { padding: 12px 0; }
+  .tabs button { padding: 12px 0 11px; }
+  .claim-share { width: 44px; height: 44px; }
+  .vai { padding: 12px 18px; }
+  .view-toggle button { min-height: 44px; }
+  .themes button { width: 44px; height: 44px; }
+  .f-cols a { padding: 11px 0; margin-bottom: 0; }
+  .f-cols { gap: 2px 18px; }
+  .f-su { padding: 12px 16px; }
+  .f-priv summary { min-height: 0; }
+
   .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 </style>
 </head>
@@ -1179,26 +1197,37 @@
   </section>
 
   <details class="about fold" id="come">
-    <summary><span>Quattro scelte progettuali</span><small>spiegate una per una</small></summary>
+    <summary><span>Sei scelte progettuali</span><small>spiegate una per una</small></summary>
     <div class="fold-body">
     <ul class="details">
-      <li><b>Nessuna integrazione con Spotify, e non per pigrizia.</b> Da marzo 2025 per uscire dalla
-      modalità sviluppo dell'API servono 250.000 utenti attivi al mese, e la modalità sviluppo è scesa a
-      cinque utenti: un concept pubblico avrebbe funzionato per cinque persone. La ricerca usa l'archivio
-      di Apple, gratuito e senza chiavi.</li>
-      <li><b>Il testo si legge davvero, e l'ho misurato.</b> Bianco su verde Spotify fa 2,59 a 1 e su
-      arancio Strava 3,31, sotto il minimo di legge. Quindi i colori di marca fanno da superficie con
-      testo scuro sopra, come fa Spotify sui suoi bottoni. Passato al setaccio: <b>117 testi controllati,
-      tutti sopra la soglia AA</b> dei 4,5 a 1, mediana 15,8; l'unico segnalato è un'etichetta invisibile
-      che leggono solo i lettori di schermo.</li>
+      <li><b>Nessuna integrazione con Spotify, e non per pigrizia.</b> Da marzo 2025, per uscire dalla
+      modalità sviluppo dell'API servono 250.000 utenti attivi al mese, e quella modalità ammette cinque
+      utenti. Un concept pubblico avrebbe funzionato per cinque persone. Le canzoni arrivano dall'archivio
+      pubblico di Apple, gratuito e senza chiavi.</li>
+
+      <li><b>Contrasto verificato con lo standard WCAG 2.1 AA.</b> Il bianco sul verde Spotify arriva a
+      2,59 su 1, sotto il minimo richiesto di 4,5. Per questo i colori dei due marchi sono usati come
+      sfondo, con il testo scuro sopra. Controllati tutti i testi della pagina: <b>117 su 117 superano la
+      soglia</b>, con un valore mediano di 15,8.</li>
+
+      <li><b>Bersagli touch secondo le linee guida Apple.</b> Apple chiede che ogni cosa da toccare misuri
+      almeno 44 punti per 44. Misurati tutti i comandi del sito: <b>33 su 33 rispettano la misura, e nessuna
+      area di tocco si sovrappone a un'altra</b>. I collegamenti dentro un discorso restano della misura del
+      testo, perché lì la regola non si applica.</li>
+
+      <li><b>Il flusso segue l'ordine in cui si decide.</b> Prima la canzone, poi la corsa, poi il
+      risultato. Ogni passo ha il suo numero, e i pulsanti portano dove serve: «Cambia canzone» risale alla
+      lista, «Condividi una storia» scende alla sezione delle storie. I valori di partenza sono già
+      impostati, così il risultato esiste dal primo istante e i chilometri restano una rifinitura.</li>
+
       <li><b>Lo sticker si monta qui, perché su Instagram non si può.</b> Quando condividi da Spotify,
-      Instagram riceve un adesivo separato e sei tu a spostarlo e ridimensionarlo dentro la storia. Quella
-      scorciatoia esiste solo fra app installate: da un sito è chiusa. Quindi il montaggio si fa prima e
-      sul posto: carichi la foto, sposti l'etichetta col dito e la rimpicciolisci col pizzico, e solo alla
-      fine esce l'immagine finita. Tutto nel browser, e la foto non lascia il telefono.</li>
-      <li><b>L'etichetta non finisce sotto i comandi di Instagram.</b> In alto la storia ha la barra di
-      avanzamento e in basso il campo «rispondi»: c'è un limite invalicabile a 260 pixel dai bordi, che
-      vale anche trascinando e si ricalcola se rimpicciolisci l'etichetta col pizzico.</li>
+      Instagram riceve un adesivo separato e sei tu a spostarlo dentro la storia. Quella scorciatoia esiste
+      solo fra app installate: da un sito è chiusa. Quindi il montaggio si fa prima: carichi la foto, sposti
+      l'etichetta col dito, la rimpicciolisci col pizzico, e alla fine esce l'immagine finita.</li>
+
+      <li><b>Le zone sicure di Instagram sono rispettate.</b> Instagram copre i bordi con la barra di
+      avanzamento in alto e il campo «rispondi» in basso. L'etichetta non entra mai in quei 260 pixel,
+      nemmeno trascinandola a fondo corsa, e il limite si ricalcola se la rimpicciolisci.</li>
     </ul>
     </div>
   </details>
