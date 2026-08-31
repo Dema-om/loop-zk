@@ -1,0 +1,16 @@
+# inLOOP: tutto pubblico, niente da nascondere.
+User-agent: *
+Allow: /
+
+# I raccoglitori dei motori di risposta sono i benvenuti: il sito risponde a
+# una domanda precisa e le risposte stanno nei dati strutturati e in llms.txt.
+User-agent: GPTBot
+Allow: /
+User-agent: ClaudeBot
+Allow: /
+User-agent: PerplexityBot
+Allow: /
+User-agent: Google-Extended
+Allow: /
+
+Sitemap: https://inloop.zetakiwi.com/sitemap.xml

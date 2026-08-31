@@ -1,0 +1,35 @@
+# inLOOP
+
+> Converte una distanza di corsa nel numero di volte che ascolterai una canzone,
+> e prepara l'immagine da condividere nelle storie. Gratuito, senza account,
+> tutto nel browser. https://inloop.zetakiwi.com
+
+## Cosa fa
+
+Scegli una canzone, imposti distanza e ritmo, e il sito dice quante volte
+ascolterai quel brano correndo. Poi genera un'immagine 1080x1920 da mettere
+nelle storie, in due versioni: la frase su un colore, oppure un'etichetta coi
+dati della corsa sopra una tua foto.
+
+## Come si calcola
+
+tempo totale = distanza in km x ritmo al km
+riascolti = tempo totale diviso la durata del brano, arrotondato per eccesso
+
+Esempio: 5 km a 6:00 al km fanno 1800 secondi. Bohemian Rhapsody dura 355
+secondi. 1800 / 355 = 5,07, quindi 6 riascolti.
+
+## Domande frequenti
+
+- Quante canzoni durano 5 km? A ritmo normale sono 30 minuti: con un brano da
+  3 minuti sono 10 riascolti, con Bohemian Rhapsody 6.
+- E' affiliato a Spotify o Strava? No. E' un concept dichiarato non ufficiale.
+  I due marchi sono citati come materiale dell'esercizio.
+- Raccoglie dati? No: niente account, niente cookie, nessun tracciamento e
+  nessun server. La foto non lascia il dispositivo.
+- Da dove arrivano le canzoni? Dall'archivio pubblico di Apple (iTunes Search
+  API), interrogato direttamente dal browser.
+
+## Chi l'ha fatto
+
+Matteo De Marco. https://www.linkedin.com/in/matteodemarcoo
