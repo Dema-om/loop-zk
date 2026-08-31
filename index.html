@@ -1202,10 +1202,11 @@
           w: x.artistName,
           art: x.artworkUrl100 ? x.artworkUrl100.replace('100x100bb', '600x600bb') : null
         }));
-      if (!trovati.length) return;
+      if (!trovati.length) return false;
       tendenze = trovati;
       if (!picked && !$('q').value.trim()) { lista = tendenze; renderResults(); }
-    } catch (e) { /* si resta sui brani scritti a mano */ }
+      return true;
+    } catch (e) { return false; }
   }
 
   /* La copertina arriva dalla rete, e il PNG puo uscire prima di lei: nello
@@ -1302,13 +1303,17 @@
   }
 
   let ricercaTimer = null, ricercaN = 0;
-  async function cercaSuApple(q) {
+  async function cercaSuApple(q, ritenta) {
     const mia = ++ricercaN;
     try {
       const r = await fetch('https://itunes.apple.com/search?media=music&entity=song&limit=12&country=IT&term=' +
         encodeURIComponent(q));
       const j = await r.json();
       if (mia !== ricercaN) return;   /* una ricerca piu recente ha gia risposto */
+      /* Una risposta senza lista (capita quando l'archivio limita le richieste)
+         non e "sei senza rete": e "riprova tra un attimo". E prima di dirlo
+         all'utente, un secondo tentativo lo facciamo noi. */
+      if (!j || !Array.isArray(j.results)) throw new Error('senza lista');
       const visti = new Set();
       lista = j.results
         .filter(x => x.trackTimeMillis && x.trackName && x.artistName)
@@ -1327,8 +1332,12 @@
       renderResults();
     } catch (e) {
       if (mia !== ricercaN) return;
+      if (!ritenta) {
+        setTimeout(() => { if (mia === ricercaN) cercaSuApple(q, true); }, 900);
+        return;
+      }
       lista = [];
-      renderResults('Non riesco a raggiungere l\'archivio di Apple. Controlla la connessione e riprova.');
+      renderResults('L\'archivio di Apple non risponde, capita quando riceve troppe richieste tutte insieme. Aspetta qualche secondo e riprova.');
     }
   }
 
@@ -2183,8 +2192,11 @@
   renderResults();
   aggiornaComandi();
   update();
-  copertineDiPartenza();
-  caricaTendenze();
+  /* Le copertine dei brani di riserva sono 4 ricerche in piu: si chiedono
+     SOLO se la classifica fallisce, perche l'archivio di Apple taglia fuori
+     chi fa troppe richieste al minuto, e ogni chiamata risparmiata e margine
+     per la ricerca vera dell'utente. */
+  caricaTendenze().then(ok => { if (!ok) copertineDiPartenza(); });
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(render);
 </script>
 </body>
