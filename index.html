@@ -1274,6 +1274,12 @@
      insieme passando gli identificativi in una volta sola. Se l'archivio non
      risponde si resta sui brani scritti a mano, che restano il paracadute. */
   async function caricaTendenze() {
+    const salvata = ricordato('classifica');
+    if (salvata && salvata.length) {
+      tendenze = salvata;
+      if (!picked && !$('q').value.trim()) { lista = tendenze; renderResults(); }
+      return true;
+    }
     try {
       const r = await unaAllaVolta(() => fetch('https://itunes.apple.com/it/rss/topsongs/limit=8/json'));
       const j = await r.json();
@@ -1293,6 +1299,7 @@
         }));
       if (!trovati.length) return false;
       tendenze = trovati;
+      ricorda('classifica', trovati, 6);
       if (!picked && !$('q').value.trim()) { lista = tendenze; renderResults(); }
       return true;
     } catch (e) { return false; }
@@ -1396,6 +1403,22 @@
      indietro con la cancellina, o ricercare la stessa cosa, non costa piu
      una chiamata. E' il taglio piu grosso al numero di richieste. */
   const cacheRicerche = new Map();
+
+  /* Meno richieste in partenza vuol dire meno probabilita di trovare la porta
+     chiusa. La classifica non cambia di ora in ora: si tiene sei ore, e le
+     ricerche gia fatte un giorno. Tutto sul dispositivo, niente esce di qui. */
+  const MEM = 'inloop.v1.';
+  function ricorda(chiave, dati, ore) {
+    try { localStorage.setItem(MEM + chiave, JSON.stringify({ q: Date.now() + ore * 3600e3, d: dati })); }
+    catch (e) { /* spazio pieno o navigazione privata: si tira dritto */ }
+  }
+  function ricordato(chiave) {
+    try {
+      const v = JSON.parse(localStorage.getItem(MEM + chiave) || 'null');
+      if (v && v.q > Date.now()) return v.d;
+    } catch (e) { /* niente */ }
+    return null;
+  }
   /* Apple, quando riceve troppe richieste, risponde 403 SENZA le intestazioni
      che permettono al browser di leggere la risposta: dal nostro lato non si
      vede un errore ma un muro, "Failed to fetch". Il blocco pero dura pochi
@@ -1412,12 +1435,18 @@
     return p;
   }
 
-  /* Misurato: dopo una raffica che fa scattare il blocco, Apple torna a
-     rispondere in circa due secondi. Quattro tentativi con pause crescenti
-     coprono quasi sei secondi, quindi con margine. */
+  /* AUDIT (31/08). Il rifiuto di Apple NON e un blocco a tempo: e casuale.
+     Misurato sul dominio: 21% di rifiuti anche a richieste distanziate, e
+     dopo un rifiuto spesso basta un quarto di secondo perche passi. Avevo
+     tarato le pause sul modello sbagliato, quello del blocco che dura: con
+     quattro tentativi lenti si aspettava tanto e si tentava poco.
+     Provata anche la via JSONP, che aggira i controlli di origine: va PEGGIO,
+     quindi non e il trasporto, e l'indirizzo a essere limitato.
+     Sei tentativi con pause che partono corte coprono sei secondi e, con un
+     rifiuto su cinque, la probabilita di fallire tutti e sotto l'uno per mille. */
   async function chiediAdApple(url, avvisa) {
-    let attesa = 800;
-    for (let giro = 0; giro < 4; giro++) {
+    const pause = [250, 500, 900, 1600, 2600];
+    for (let giro = 0; giro <= pause.length; giro++) {
       try {
         const r = await fetch(url);
         if (!r.ok) throw new Error('http ' + r.status);
@@ -1425,11 +1454,10 @@
         if (!j || !Array.isArray(j.results)) throw new Error('senza lista');
         return j;
       } catch (e) {
-        if (giro === 3) throw e;
-        /* Dal secondo tentativo lo si dice, invece di lasciare la pagina muta. */
-        if (giro >= 1 && avvisa) avvisa();
-        await new Promise(r => setTimeout(r, attesa));
-        attesa = Math.round(attesa * 2.1);
+        if (giro === pause.length) throw e;
+        /* Dal terzo tentativo lo si dice, invece di lasciare la pagina muta. */
+        if (giro >= 2 && avvisa) avvisa();
+        await new Promise(r => setTimeout(r, pause[giro] + Math.random() * 120));
       }
     }
   }
@@ -1438,6 +1466,8 @@
     const mia = ++ricercaN;
     const chiave = q.toLowerCase();
     if (cacheRicerche.has(chiave)) { lista = cacheRicerche.get(chiave); renderResults(); return; }
+    const daMemoria = ricordato('q.' + chiave);
+    if (daMemoria) { cacheRicerche.set(chiave, daMemoria); lista = daMemoria; renderResults(); return; }
     try {
       /* NON in fila: la ricerca e un gesto dell'utente e non deve aspettare
          il caricamento della classifica, che ha la sua coda e i suoi tentativi.
@@ -1463,6 +1493,7 @@
           art: x.artworkUrl100 ? x.artworkUrl100.replace('100x100bb', '600x600bb') : null
         }));
       cacheRicerche.set(chiave, lista);
+      ricorda('q.' + chiave, lista, 24);
       renderResults();
     } catch (e) {
       if (mia !== ricercaN) return;
