@@ -1884,6 +1884,8 @@
         stopRotation();
         update();
         conta('canzone-scelta', {
+          titolo: c.t.slice(0, 60),
+          artista: c.w.slice(0, 60),
           origine: $('q').value.trim() ? 'ricerca' : (tendenze ? 'tendenze' : 'catalogo'),
           durata: c.s
         });
