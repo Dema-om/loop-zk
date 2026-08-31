@@ -1189,6 +1189,7 @@
             <path d="M4 13v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
           </svg>
         </button>
+      </div>
     </div>
     <div class="tank" id="tank" role="img" aria-label="Un blocco per ogni riascolto"></div>
     <div class="tank-scala" aria-hidden="true"><span>0</span><span id="tankFine">5 km</span></div>
@@ -1355,9 +1356,9 @@
         <path d="M4 10 10 4M10 4H5.2M10 4v4.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </a>
-    <p>Vengo dal design del prodotto e dall'UI/UX, e da lì mi porto dietro l'abitudine a guardare le
-      cose dal lato di chi le usa: quasi tutte le scelte qui sopra nascono da un'app di cui ho percepito
-      attriti come utente più che da una linea guida.</p>
+    <p>Vengo dall'UI/UX e dal design di prodotto, e da lì mi porto dietro l'abitudine a guardare le
+      cose dal lato di chi le usa: quasi tutte le scelte qui sopra nascono da qualcosa che da utente mi
+      ha dato fastidio, non da una linea guida.</p>
     <p>Mi occupo di AI e di come si costruiscono prodotti con l'AI, quello che oggi si chiama vibe coding
     o AI building. Mi interessano il marketing e i dati, e mi interessano la musica e lo sport: questo
     progetto è il punto in cui si incontrano.</p>
@@ -1759,11 +1760,14 @@
      a tre righe e la pagina si alza e si abbassa da sola ogni pochi secondi.
      Si misura una volta l'altezza piu grande fra i brani in vetrina e la si
      blocca: da li in poi il blocco non cambia piu misura. */
+  let staMisurando = false;
   function bloccaAltezzaClaim() {
     const box = document.querySelector('.claim-block');
     if (!box || !heroPicks.length) return;
     const prima = heroIdx;
+    staMisurando = true;
     box.style.minHeight = '0px';
+    box.style.fontSize = '';
     let max = 0;
     for (let i = 0; i < heroPicks.length; i++) {
       heroIdx = i; renderHero();
@@ -1771,7 +1775,39 @@
     }
     heroIdx = prima; renderHero();
     box.style.minHeight = Math.ceil(max) + 'px';
+    staMisurando = false;
+    adattaClaim();
   }
+
+  /* L'altezza riservata e misurata sui brani in vetrina. Se poi scegli una
+     canzone dal titolo piu lungo, la frase non ci sta e tutto quello che viene
+     dopo, la barra e i tasti, scende di una riga. Qui la frase rimpicciolisce
+     quel tanto che basta per stare nello spazio gia riservato: cosi cambiando
+     canzone sotto non si muove piu niente. Il 62% e il fondo: sotto quella
+     misura il claim smetterebbe di essere un claim. */
+  function adattaClaim() {
+    const box = document.querySelector('.claim-block');
+    if (!box || staMisurando) return;
+    const riservata = parseFloat(box.style.minHeight);
+    if (!riservata) return;
+    box.style.fontSize = '';
+    const pieno = parseFloat(getComputedStyle(box).fontSize);
+    let scala = 1;
+    while (box.scrollHeight > riservata + 1 && scala > 0.62) {
+      scala -= 0.04;
+      box.style.fontSize = (pieno * scala).toFixed(1) + 'px';
+    }
+  }
+
+  /* L'altezza e in pixel, misurata a una larghezza precisa: girando il
+     telefono va rifatta. Solo se cambia la larghezza, perche su iPhone la
+     barra dell'indirizzo che si ritira spara un resize a ogni scorrimento. */
+  let larghezzaVista = window.innerWidth;
+  window.addEventListener('resize', () => {
+    if (window.innerWidth === larghezzaVista) return;
+    larghezzaVista = window.innerWidth;
+    bloccaAltezzaClaim();
+  });
 
   function renderHero() {
     const c = song();
@@ -1782,6 +1818,7 @@
     $('cLine1').innerHTML = '<span class="d">' + kmText() + '</span> sembrano tanti.';
     $('cLine2').innerHTML = 'Ma sono <span class="n">' + timesFor(c) + '</span> volte <span class="t">' + c.t + '</span>.';
     $('cWho').textContent = c.w + ' · ' + durLabel(c.s);
+    adattaClaim();
   }
 
   /* ----- passo 1: la corsa ----- */
