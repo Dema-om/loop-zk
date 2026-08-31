@@ -9,12 +9,12 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="inLOOP">
 <meta property="og:title" content="inLOOP · quanto dura la tua corsa in canzoni">
-<meta property="og:description" content="I chilometri restano quelli. Contati in canzoni pesano meno. Un concept su Spotify e Strava, di Matteo De Marco.">
+<meta property="og:description" content="Scegli una canzone e la tua distanza diventa un numero. Un concept su Spotify e Strava, di Matteo De Marco.">
 <meta property="og:url" content="https://inloop.zetakiwi.com">
 <meta property="og:image" content="https://inloop.zetakiwi.com/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="5 km sembrano tanti. Ma sono 16 volte Sportswear.">
+<meta property="og:image:alt" content="Quanto dura la tua corsa in canzoni?">
 <meta property="og:locale" content="it_IT">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
@@ -542,6 +542,8 @@
      ora sono schede che si aprono, chiuse di default. Il titolo resta visibile,
      quindi si sa cosa c'e dentro senza doverlo scorrere. */
   details.fold { padding: 0; }
+  .fold-body .nome { color: var(--green-text); font-weight: 800; text-decoration: none; border-bottom: 2px solid var(--green-soft); }
+  .fold-body .nome:hover { border-bottom-color: var(--green); }
   a.linkrow {
     display: flex; align-items: center; gap: 10px;
     padding: 18px 20px; text-decoration: none; color: var(--ink);
@@ -816,6 +818,15 @@
   }
   .f-cols a:hover { border-bottom-color: var(--green); }
   .f-cols a:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; }
+  .f-priv { margin-top: 20px; }
+  .f-priv summary {
+    cursor: pointer; list-style: none; font-size: 13.5px; font-weight: 700; color: var(--ink);
+    border-bottom: 1.5px solid var(--line); padding-bottom: 2px; width: fit-content;
+  }
+  .f-priv summary::-webkit-details-marker { display: none; }
+  .f-priv summary:hover { border-bottom-color: var(--green); }
+  .f-priv p { margin: 10px 0 0; font-size: 12px; line-height: 1.6; color: var(--soft); }
+  .f-priv p b { color: var(--ink); }
   .f-legale {
     margin: 24px 0 0; padding-top: 16px; border-top: 1px solid var(--line);
     font-size: 11.5px; line-height: 1.65; color: var(--soft);
@@ -1052,25 +1063,33 @@
     fatto vero: nel 2023 <b>si erano davvero parlate</b>, col lettore di Spotify dentro la schermata
     di registrazione di Strava, poi l'integrazione è stata chiusa. Qui la direzione è un'altra:
     non i comandi del lettore dentro l'app di corsa, ma la musica come <b>unità di misura</b> della fatica.</p>
-    <p>L'ho fatto io, Matteo De Marco. Vengo dal design e dall'interfaccia, e mi occupo di AI e di come
-    si costruiscono prodotti con l'AI: questo progetto è il punto dove si incontrano con la musica e lo
-    sport. <b>Lavoro nell'AI e sono aperto a proposte.</b></p>
   </section>
 
-  <a class="about linkrow" id="chi" href="https://www.linkedin.com/in/matteodemarcoo" target="_blank" rel="noopener">
-    <span>Chi l'ha fatto</span><small>Matteo De Marco &middot; LinkedIn</small>
-    <svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-      <path d="M4 10 10 4M10 4H5.2M10 4v4.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-  </a>
+  <details class="about fold" id="chi">
+    <summary><span>Chi l'ha fatto</span><small>Matteo De Marco</small></summary>
+    <div class="fold-body">
+    <p>L'ho fatto io,
+      <a class="nome" href="https://www.linkedin.com/in/matteodemarcoo" target="_blank" rel="noopener">Matteo De Marco</a>.
+      Vengo dal design e dall'interfaccia, e da lì mi porto dietro l'abitudine a guardare le cose dal
+      lato di chi le usa: quasi tutte le scelte qui sopra nascono da un'app che mi ha fatto arrabbiare,
+      non da una linea guida.</p>
+    <p>Mi occupo di AI e di come si costruiscono prodotti con l'AI, quello che oggi si chiama vibe coding
+    o AI building. Mi interessano il marketing e i dati, e mi interessano la musica e lo sport: questo
+    progetto è il punto in cui si incontrano.</p>
+    <p>Sto costruendo una serie di progetti come questo, che servono a due cose insieme: risolvere qualcosa
+    di piccolo per bene, e raccontare come ragiono. Ne pubblicherò altri.
+    <b>Lavoro nell'AI e sono aperto a proposte.</b></p>
+    </div>
+  </details>
 
   <details class="about fold" id="come">
-    <summary><span>Dietro le quinte</span><small>le cose che si notano solo se mancano</small></summary>
+    <summary><span>Dietro le quinte</span><small>quattordici cose che si notano solo se mancano</small></summary>
     <div class="fold-body">
     <ul class="details">
-      <li><b>Prima della corsa, non dopo.</b> Chiedere lo screenshot di Strava significava chiedere dati
-      già scritti dentro l'immagine, e produceva etichette che si contraddicevano da sole: il ritmo scelto
-      a mano contro il ritmo stampato nello screenshot.</li>
+      <li><b>Niente screenshot di Strava.</b> Chiederlo significava chiedere dati già scritti dentro
+      l'immagine, e produceva etichette che si contraddicevano da sole: il ritmo scelto a mano contro
+      quello stampato nello screenshot. I numeri della corsa fatta si ricopiano a mano, in tre campi
+      legati fra loro: ne compili due e il terzo si calcola.</li>
       <li><b>Una canzone, non una playlist.</b> Una playlist che non puoi esportare su Spotify è inutile.
       Una canzone in loop invece è un tap dentro qualsiasi app: il sito dà il numero e lo esegui da solo.</li>
       <li><b>Nessuna integrazione con Spotify, e non per pigrizia.</b> Da marzo 2025 per uscire dalla
@@ -1092,21 +1111,21 @@
       dito, e ai bordi c'erano zone morte perché il limite del dito non coincideva con quello del disegno.</li>
       <li><b>L'etichetta non finisce sotto Instagram.</b> In alto la storia ha la barra di avanzamento e in
       basso il campo «rispondi»: c'è un limite invalicabile a 260 pixel dai bordi, anche trascinando.</li>
+      <li><b>Le bande nere sulla foto scattata.</b> La fotocamera scrive l'orientamento come etichetta
+      invece di girare i pixel: il conto per riempire il riquadro veniva fatto sui numeri sbagliati e
+      restava del vuoto, che in una storia si vede nero. Ora la rotazione si cuoce nell'immagine prima
+      di disegnarla.</li>
+      <li><b>Chiedere meno all'archivio.</b> A ogni apertura partivano quattro ricerche sprecate per
+      copertine che poi buttavamo, e l'archivio di Apple taglia fuori chi fa troppe richieste al minuto:
+      compariva un finto errore di connessione. Ora quelle quattro non partono, ogni ricerca già fatta
+      resta in memoria, e prima di mostrare un errore il sito riprova da solo.</li>
+      <li><b>L'etichetta si legge come una frase.</b> Era spezzata in due colonne, col numero da una parte
+      e i dati dall'altra, e l'occhio doveva ricucirla. Ora è una riga sola dall'alto, col numero che resta
+      il pezzo più grosso e quindi si vede lo stesso da lontano.</li>
       <li><b>Le copertine si caricano in un modo preciso.</b> Un'immagine presa da un altro sito
       «contamina» il disegno e blocca il salvataggio del PNG: va chiesta dichiarando l'origine. Provato:
       senza quella riga il file non esce, e l'errore arriva solo al momento di salvare.</li>
     </ul>
-    </div>
-  </details>
-
-  <details class="about fold" id="privacy">
-    <summary><span>Privacy</span><small>non raccogliamo niente</small></summary>
-    <div class="fold-body">
-    <p>Niente account, niente cookie, niente tracciamento, nessun dato raccolto: non c'&egrave;
-    un server nostro a cui mandare qualcosa.</p>
-    <p>La ricerca delle canzoni interroga l'archivio pubblico di Apple direttamente dal tuo
-    browser. <b>La tua foto non lascia mai il telefono</b>: l'immagine della storia si
-    costruisce e si salva sul tuo dispositivo.</p>
     </div>
   </details>
 
@@ -1125,11 +1144,18 @@
         <a href="#privacy">Privacy</a>
       </div>
       <div>
-        <h4>Matteo</h4>
-        <a href="https://www.linkedin.com/in/matteodemarcoo" target="_blank" rel="noopener">Chi l'ha fatto</a>
-        <a href="https://www.linkedin.com/in/matteodemarcoo" target="_blank" rel="noopener">LinkedIn</a>
+        <h4>Sviluppato da</h4>
+        <a href="https://www.linkedin.com/in/matteodemarcoo" target="_blank" rel="noopener">Matteo De Marco</a>
       </div>
+
     </div>
+    <details class="f-priv" id="privacy">
+      <summary>Privacy &middot; non raccogliamo niente</summary>
+      <p>Niente account, niente cookie, niente tracciamento, nessun dato raccolto: non c'&egrave; un
+      server nostro a cui mandare qualcosa. La ricerca delle canzoni interroga l'archivio pubblico di
+      Apple direttamente dal tuo browser. <b>La tua foto non lascia mai il telefono</b>: l'immagine
+      della storia si costruisce e si salva sul tuo dispositivo.</p>
+    </details>
     <p class="f-legale">Concept non ufficiale. Non affiliato a Spotify n&eacute; a Strava: i loro nomi e i loro
     colori sono citati come materiale dell'esercizio.<br>
     Niente account, niente tracciamento, nessun dato raccolto: la tua foto non lascia il telefono.<br>
@@ -1142,6 +1168,14 @@
   const $ = id => document.getElementById(id);
 
   /* La barra si riduce al solo logo appena scorri. */
+  /* Un link del footer che punta a una scheda chiusa la apre: altrimenti si
+     salta li e non si vede niente. */
+  document.querySelectorAll('.f-cols a[href^="#"]').forEach(a =>
+    a.addEventListener('click', () => {
+      const t = document.querySelector(a.getAttribute('href'));
+      if (t && t.tagName === 'DETAILS') t.open = true;
+    }));
+
   const topbar = document.querySelector('.topbar');
   let topbarTick = false;
   window.addEventListener('scroll', () => {
@@ -1303,8 +1337,14 @@
   }
 
   let ricercaTimer = null, ricercaN = 0;
+  /* Ogni ricerca gia fatta resta in memoria per tutta la visita: tornare
+     indietro con la cancellina, o ricercare la stessa cosa, non costa piu
+     una chiamata. E' il taglio piu grosso al numero di richieste. */
+  const cacheRicerche = new Map();
   async function cercaSuApple(q, ritenta) {
     const mia = ++ricercaN;
+    const chiave = q.toLowerCase();
+    if (cacheRicerche.has(chiave)) { lista = cacheRicerche.get(chiave); renderResults(); return; }
     try {
       const r = await fetch('https://itunes.apple.com/search?media=music&entity=song&limit=12&country=IT&term=' +
         encodeURIComponent(q));
@@ -1329,6 +1369,7 @@
           w: x.artistName,
           art: x.artworkUrl100 ? x.artworkUrl100.replace('100x100bb', '600x600bb') : null
         }));
+      cacheRicerche.set(chiave, lista);
       renderResults();
     } catch (e) {
       if (mia !== ricercaN) return;
