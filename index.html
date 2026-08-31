@@ -104,22 +104,6 @@
   /* Il risultato non e piu una card: e una sezione come le altre due, con il
      suo numero. La card lo faceva sembrare un riquadro di servizio, mentre e
      la cosa per cui si e' arrivati fin qui. */
-  /* In attesa si vede solo chi corre: il resto del risultato e nascosto. */
-  .step.esito.attesa .claim-line1, .step.esito.attesa .claim-block,
-  .step.esito.attesa .tank, .step.esito.attesa .tank-scala,
-  .step.esito.attesa .repeat, .step.esito.attesa .azioni-esito { display: none; }
-  .attesa-box { display: none; }
-  .step.esito.attesa .attesa-box {
-    display: flex; align-items: center; gap: 14px; padding: 10px 0 4px;
-  }
-  .attesa-box .runner { width: 46px; height: 46px; flex: none; }
-  .attesa-box p { margin: 0; font-size: 14px; font-weight: 700; color: var(--soft); }
-  @keyframes corre {
-    0%, 100% { transform: translateY(0) rotate(0deg); }
-    50% { transform: translateY(-3px) rotate(-3deg); }
-  }
-  .attesa-box .runner { animation: corre 0.55s ease-in-out infinite; }
-  @media (prefers-reduced-motion: reduce) { .attesa-box .runner { animation: none; } }
   .step.esito .step-head { color: var(--green-text); }
   .step.esito .step-head .num { background: var(--green); }
   .step.esito .tank { margin-top: 18px; }
@@ -401,17 +385,10 @@
     border-radius: 999px; text-decoration: none;
   }
   .vai:hover { filter: brightness(0.96); }
-  .azioni-esito { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-  .vai.indietro { background: var(--chip); color: var(--ink); padding: 8px 14px; font-size: 12.5px; }
-  .claim-share {
-    flex: none; width: 40px; height: 40px;
-    display: flex; align-items: center; justify-content: center;
-    background: var(--card); border: 1px solid var(--line); border-radius: 50%;
-    color: var(--ink); cursor: pointer; padding: 0;
-  }
-  .claim-share svg { width: 18px; height: 18px; }
-  .claim-share:hover { background: var(--green-soft); border-color: var(--green); }
-  .claim-share:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; }
+  /* Due comandi pari grado: cambia a sinistra, condividi (verde) a destra. */
+  .azioni-esito { display: grid; grid-template-columns: auto 1fr; gap: 10px; align-items: center; }
+  .azioni-esito .vai { justify-content: center; display: inline-flex; }
+  .vai.indietro { background: var(--chip); color: var(--ink); }
   .vai:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
   .fine { font-size: 12px; color: var(--soft); margin: 14px 0 0; font-variant-numeric: tabular-nums; }
   .repeat {
@@ -632,7 +609,12 @@
     margin: 0; height: 25px; line-height: 25px; text-align: center;
     border-top: 1px solid var(--line); background: var(--card);
     font-size: 10px; font-weight: 600; color: var(--soft);
+    overflow: hidden; transition: height 0.18s ease, border-top-width 0.18s ease;
   }
+  /* Scorrendo, la dichiarazione si ritira e resta solo il logo: 25 px in piu
+     di pagina. In cima torna, perche e li che uno arriva la prima volta. */
+  .topbar.mini .due { height: 0; border-top-width: 0; }
+  @media (prefers-reduced-motion: reduce) { .topbar .due { transition: none; } }
   .topbar .due b { color: var(--green-text); }
   .topbar .due em { font-style: normal; color: var(--orange-text); }
   header { padding-top: 30px; }
@@ -651,7 +633,10 @@
   /* La barra appiccicata sta sopra il contenuto: senza questo, ogni salto a
      un'ancora infila il pezzo di sotto dietro la barra. Il claim spariva per
      26 px premendo "Torna su". */
-  #top, #about, #chi, #come, #storie, #canzone, #risultato, #privacy { scroll-margin-top: 84px; }
+  #top, #about, #chi, #come, #canzone, #risultato, #privacy { scroll-margin-top: 84px; }
+  /* Il nero deve toccare la barra, senza filini bianchi: lo scarto e esattamente
+     l'altezza della barra ridotta (solo logo), che e quella che c'e scendendo. */
+  #storie { scroll-margin-top: 46px; }
   html { scroll-behavior: smooth; }
   @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 
@@ -671,10 +656,6 @@
   .share .view-toggle button[aria-pressed="true"] { background: var(--green); color: #0F1112; }
   .share .view-toggle button[aria-pressed="true"] small { color: #0F1112; opacity: 0.78; }
   .share .stage canvas { border-color: rgba(255, 255, 255, 0.16); box-shadow: 0 18px 50px rgba(0, 0, 0, 0.5); }
-  .share .themes button {
-    background: transparent; border-color: rgba(255, 255, 255, 0.35); color: #FFFFFF;
-  }
-  .share .themes button[aria-pressed="true"] { background: #FFFFFF; border-color: #FFFFFF; color: #121212; }
   .share .hint { color: var(--notte-soft); }
   .share .dopo { color: #8C948E; }
   .share .dopo b { color: var(--notte-soft); }
@@ -950,38 +931,21 @@
     </div>
   </section>
 
-  <section class="step esito attesa" id="risultato" aria-label="Quante volte" aria-live="polite">
+  <section class="step esito" id="risultato" aria-label="Quante volte" aria-live="polite">
     <h2 class="step-head"><span class="num">3</span> Quante volte</h2>
-    <!-- Finche non scegli una canzone, qui non c'e un risultato: c'e uno che
-         corre. Niente tasto "calcola": il numero arriva da solo alla scelta. -->
-    <div class="attesa-box" aria-hidden="true">
-      <svg class="runner" viewBox="0 0 24 24">
-        <defs><linearGradient id="gRun" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stop-color="#1DB954"/><stop offset="1" stop-color="#FC4C02"/>
-        </linearGradient></defs>
-        <path fill="url(#gRun)" d="M13.49 5.48c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-3.6 13.9 1-4.4 2.1 2v6h2v-7.5l-2.1-2 .6-3c1.3 1.5 3.3 2.5 5.5 2.5v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1l-5.2 2.2v4.7h2v-3.4l1.8-.7-1.6 8.1-4.9-1-.4 2 7 1.4z"/>
-      </svg>
-      <p>Scegli la canzone.</p>
-    </div>
     <h2 class="claim-line1" id="cLine1"><span class="d">5 km</span> sembrano tanti.</h2>
     <div class="claim-block">
       <p class="claim-line2 show" id="cLine2">Ma sono <span class="n">15</span> volte <span class="t">Sportswear</span>.</p>
       <div class="claim-foot">
         <p class="claim-who" id="cWho">Dark Polo Gang · 1:59</p>
-        <button class="claim-share" type="button" id="claimIcon" aria-label="Condividi questa frase come storia">
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M12 15V3m0 0L8 7m4-4 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M4 13v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-          </svg>
-        </button>
       </div>
     </div>
     <div class="tank" id="tank" role="img" aria-label="Un blocco per ogni riascolto"></div>
     <div class="tank-scala" aria-hidden="true"><span>0</span><span id="tankFine">5 km</span></div>
     <p class="repeat">Adesso mettila in <b>loop</b> e parti.</p>
     <div class="azioni-esito">
-      <a class="vai" href="#storie" id="claimShare">Condividi una storia <span aria-hidden="true">&darr;</span></a>
       <a class="vai indietro" href="#canzone">Cambia canzone</a>
+      <a class="vai" href="#storie" id="claimShare">Condividi una storia <span aria-hidden="true">&darr;</span></a>
     </div>
   </section>
 
@@ -1071,7 +1035,7 @@
           <span class="rispondi">Rispondi&hellip;</span>
         </figure>
       </div>
-      <p class="es-nota">Foto di esempio con licenza libera. L'etichetta si trascina e si pizzica per rimpicciolirla.</p>
+      <p class="es-nota">Foto di esempio con licenza libera.</p>
     </div>
   </div>
 </section>
@@ -1084,7 +1048,13 @@
     che ti piace è una cosa che faresti comunque. inLOOP fa solo questo: prende una distanza e te la
     ridice in riascolti, poi te la dà pronta da mettere in storia.</p>
     <p>È un concept dichiarato su Spotify e Strava, e non è affiliato a nessuna delle due:
-    i loro colori stanno qui perché sono il materiale dell'esercizio.</p>
+    i loro colori stanno qui perché sono il materiale dell'esercizio. Il punto di partenza è un
+    fatto vero: nel 2023 <b>si erano davvero parlate</b>, col lettore di Spotify dentro la schermata
+    di registrazione di Strava, poi l'integrazione è stata chiusa. Qui la direzione è un'altra:
+    non i comandi del lettore dentro l'app di corsa, ma la musica come <b>unità di misura</b> della fatica.</p>
+    <p>L'ho fatto io, Matteo De Marco. Vengo dal design e dall'interfaccia, e mi occupo di AI e di come
+    si costruiscono prodotti con l'AI: questo progetto è il punto dove si incontrano con la musica e lo
+    sport. <b>Lavoro nell'AI e sono aperto a proposte.</b></p>
   </section>
 
   <a class="about linkrow" id="chi" href="https://www.linkedin.com/in/matteodemarcoo" target="_blank" rel="noopener">
@@ -1170,6 +1140,18 @@
 
 <script>
   const $ = id => document.getElementById(id);
+
+  /* La barra si riduce al solo logo appena scorri. */
+  const topbar = document.querySelector('.topbar');
+  let topbarTick = false;
+  window.addEventListener('scroll', () => {
+    if (topbarTick) return;
+    topbarTick = true;
+    requestAnimationFrame(() => {
+      topbar.classList.toggle('mini', window.scrollY > 40);
+      topbarTick = false;
+    });
+  }, { passive: true });
   const fmt1 = n => n.toLocaleString('it-IT', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
   const kmLabel = n => (Number.isInteger(n) ? n : fmt1(n)) + ' km';
   const durLabel = s => Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
@@ -1483,7 +1465,6 @@
         '<span class="times"><span class="n"></span><small>' + durLabel(c.s) + '</small></span>';
       b.addEventListener('click', () => {
         picked = c;
-        document.getElementById('risultato').classList.remove('attesa');
         caricaCopertina(c);
         stopRotation();
         update();
@@ -2159,13 +2140,6 @@
   /* L'icona accanto al claim non esporta: porta alla condivisione con la
      canzone gia dentro e la versione "frase" gia scelta. Cosi la scelta del
      colore resta dov'e, invece di sparire per far posto a una scorciatoia. */
-  $('claimIcon').addEventListener('click', () => {
-    setVersione('frase');
-    document.getElementById('storie').scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
-    const t2 = document.querySelector('.share .view-toggle');
-    t2.classList.add('arrivo');
-    setTimeout(() => t2.classList.remove('arrivo'), 1400);
-  });
   /* La corsa resta "standard" finche non scegli davvero: il grigio diventa
      arancio quando premi un TASTO della sezione, non toccando la card. */
   document.querySelectorAll('.step.run button, .step.run input, .step.run .wheel-col').forEach(el =>
