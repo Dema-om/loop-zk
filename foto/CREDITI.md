@@ -1,12 +1,13 @@
 # Foto di esempio
 
-Due scatti verticali usati nei mockup delle storie. **Non sono foto di Matteo**: sono
+Tre scatti verticali usati nei mockup delle storie. **Non sono foto di Matteo**: sono
 segnaposto, e vanno sostituiti appena ci sono scatti veri.
 
 | file | soggetto | fonte |
 |---|---|---|
 | `bosco.jpg` | sentiero nel bosco d'estate | Pexels, foto 32798746 |
 | `strada.jpg` | strada alberata all'alba | Pexels, foto 19783892 |
+| `scarpe.jpg` | scarpa da corsa inquadrata dal basso, al parco | Pexels, foto 29616381 |
 
 Licenza Pexels: uso gratuito anche commerciale, senza attribuzione obbligatoria,
 niente rivendita della foto in sé e niente ritratti usati per far sembrare che la
