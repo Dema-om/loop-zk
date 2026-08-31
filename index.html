@@ -433,7 +433,30 @@
   .view-toggle button[aria-pressed="true"] small { color: var(--on-brand); opacity: 0.72; }
   .view-toggle button:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
 
-  .stage { margin: 20px auto 0; width: min(228px, 62vw); }
+  .stage { margin: 20px auto 0; width: min(228px, 62vw); position: relative; }
+  /* Compare quando carichi la foto e se ne va al primo gesto: i comandi che
+     non si vedono non esistono, e l'etichetta non ha maniglie per dirlo. */
+  .tutor {
+    position: absolute; left: 8px; right: 8px; top: 50%; transform: translateY(-50%);
+    z-index: 3; display: flex; align-items: center; justify-content: center; gap: 10px;
+    background: rgba(10, 12, 14, 0.82); color: #FFFFFF;
+    -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
+    border-radius: 14px; padding: 12px 10px; text-align: left;
+    font-size: 11.5px; font-weight: 700; line-height: 1.35;
+    animation: tutorIn 0.3s ease both;
+  }
+  .tutor[hidden] { display: none; }
+  .tutor i { font-style: normal; font-weight: 600; color: #AEB7AF; }
+  .tutor .frecce { display: grid; gap: 2px; font-size: 15px; line-height: 1; flex: none; }
+  .tutor .frecce b { animation: sposta 1.1s ease-in-out infinite; }
+  .tutor .frecce b:last-child { animation-delay: 0.55s; }
+  @keyframes tutorIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes sposta { 0%, 100% { opacity: 0.35; } 50% { opacity: 1; } }
+  .tutor.via { animation: tutorOut 0.35s ease both; }
+  @keyframes tutorOut { to { opacity: 0; transform: translateY(-50%) scale(0.96); } }
+  @media (prefers-reduced-motion: reduce) {
+    .tutor, .tutor .frecce b, .tutor.via { animation: none; }
+  }
   .stage canvas {
     display: block; width: 100%; height: auto; border-radius: 26px;
     border: 1px solid var(--line); box-shadow: 0 18px 50px rgba(18, 18, 18, 0.14);
@@ -985,6 +1008,10 @@
         <button class="btn ghost" type="button" id="upload">Prendila dal rullino</button>
       </div>
       <div class="stage">
+        <div class="tutor" id="tutor" hidden aria-hidden="true">
+          <span class="frecce"><b>&uarr;</b><b>&darr;</b></span>
+          <span>Trascina per spostarla<br><i>pizzica per rimpicciolirla</i></span>
+        </div>
         <canvas id="cv" width="1080" height="1920" tabindex="0" role="img"
                 aria-label="Anteprima della storia. Trascina per spostare l'etichetta."></canvas>
       </div>
@@ -1918,9 +1945,19 @@
   /* Una sola fonte di verita per dove sta l'etichetta: la usano il disegno e
      il trascinamento. Prima il limite del disegno e quello del dito erano due
      numeri diversi, quindi ai bordi il dito si muoveva e l'etichetta no. */
-  const BADGE_H = 280, BADGE_M = 60;
-  const BADGE_W = () => W - BADGE_M * 2;          /* misura base, prima della scala */
-  const badgeH = () => BADGE_H * badgeS;
+  const BADGE_M = 60;
+  /* Lo sticker cresce di una riga solo quando l'artista non sta in coda al
+     titolo: con nomi corti resta compatto, con nomi lunghi l'artista scende
+     invece di sparire. */
+  let artistaSotto = false;
+  const BADGE_H = () => artistaSotto ? 322 : 280;
+  /* Lo sticker si stringe sul contenuto invece di essere sempre largo uguale:
+     con testi corti restava mezzo riquadro bianco vuoto a destra. Il limite
+     massimo resta quello di prima, il minimo evita francobolli. */
+  const BADGE_MAX = () => W - BADGE_M * 2;
+  let badgeWCache = 0;
+  const BADGE_W = () => badgeWCache || BADGE_MAX();
+  const badgeH = () => BADGE_H() * badgeS;
   const badgeMin = () => (SAFE + badgeH() / 2) / H;
   const badgeMax = () => (H - SAFE - badgeH() / 2) / H;
   const clampY = v => Math.min(Math.max(v, badgeMin()), badgeMax());
@@ -1933,10 +1970,51 @@
     return { x: (W - w) / 2, y: cy - h / 2, w, h, cy };
   }
 
+  /* Si misura prima di disegnare, perche l'altezza dello sticker dipende dal
+     risultato e il riquadro serve gia al dito e ai limiti dei bordi. */
+  function misuraTitolo() {
+    const c = song();
+    const PAD = 44, COV = 200;
+    const tx = PAD + COV + 28;
+    const max = BADGE_MAX() - tx - PAD;
+
+    /* 1. il titolo: scende di corpo, poi si tronca */
+    let tSize = 40;
+    ctx.font = F(800, tSize);
+    while (tSize > 30 && ctx.measureText(c.t).width > max) { tSize -= 2; ctx.font = F(800, tSize); }
+    const tTxt = fitText(c.t, F(800, tSize), max);
+    const wT = ctx.measureText(tTxt).width;
+
+    /* 2. l'artista: in coda se ci sta, su una riga sua se no */
+    ctx.font = F(600, 28);
+    const coda = ' \u00B7 ' + c.w;
+    artistaSotto = (wT + ctx.measureText(coda).width) > max;
+    const wRiga1 = artistaSotto
+      ? Math.max(wT, Math.min(ctx.measureText(c.w).width, max))
+      : wT + ctx.measureText(coda).width;
+
+    /* 3. la frase e i dati: quanto larghi vengono davvero */
+    const nStr = String(timesFor(c));
+    ctx.font = F(800, 44);
+    let wRiga2 = ctx.measureText('Ascoltata ').width + ctx.measureText(' in').width;
+    ctx.font = F(900, 66); wRiga2 += ctx.measureText(nStr).width;
+    ctx.font = F(800, 44); wRiga2 += ctx.measureText(' volte').width;
+
+    ctx.font = F(800, 34);
+    const parts = [kmText(), timeText(), paceText()];
+    let wRiga3 = parts.reduce((a, p) => a + ctx.measureText(p).width, 0)
+               + ctx.measureText(' \u00B7 ').width * (parts.length - 1);
+
+    const contenuto = Math.min(max, Math.max(wRiga1, wRiga2, wRiga3));
+    badgeWCache = Math.max(620, Math.round(tx + contenuto + PAD));
+    return { tx, tw: max, tSize, tTxt, wT };
+  }
+
   function drawBadge() {
     const c = song();
+    const m = misuraTitolo();   /* aggiorna anche la larghezza dello sticker */
     const r0 = badgeRect();
-    const M = BADGE_M, PAD = 44, w = BADGE_W(), h = BADGE_H;
+    const M = BADGE_M, PAD = 44, w = BADGE_W(), h = BADGE_H();
     const cx = W / 2, cy = r0.cy;
     const inkC = '#121212', softC = '#5F6963';
 
@@ -1961,50 +2039,44 @@
        Prima era spezzata in due colonne, col numero a destra e i dati a
        sinistra: l'occhio doveva ricucirla. Il numero resta il pezzo piu
        grosso, quindi si vede lo stesso da lontano. */
-    const tx = PAD + COV + 28, tw = w - tx - PAD;
+    const tx = m.tx, tw = w - m.tx - 44;
     ctx.textBaseline = 'alphabetic';
     ctx.textAlign = 'left';
 
-    /* Riga 1: la canzone, e l'artista in coda se ci sta. */
-    let tSize = 40;
-    ctx.font = F(800, tSize);
-    while (tSize > 30 && ctx.measureText(c.t).width > tw) { tSize -= 2; ctx.font = F(800, tSize); }
-    const tTxt = fitText(c.t, F(800, tSize), tw);
+    /* Riga 1: la canzone. L'artista in coda se ci sta, su una riga sua se no. */
+    ctx.font = F(800, m.tSize);
     ctx.fillStyle = inkC;
-    ctx.fillText(tTxt, tx, PAD + 44);
-    const wT = ctx.measureText(tTxt).width;
-    const coda = ' \u00B7 ' + c.w;
+    ctx.fillText(m.tTxt, tx, PAD + 44);
     ctx.font = F(600, 28);
-    if (wT + ctx.measureText(coda).width <= tw) {
-      ctx.fillStyle = softC;
-      ctx.fillText(coda, tx + wT, PAD + 44);
-    }
+    ctx.fillStyle = softC;
+    if (artistaSotto) ctx.fillText(fitText(c.w, F(600, 28), tw), tx, PAD + 86);
+    else ctx.fillText(' \u00B7 ' + c.w, tx + m.wT, PAD + 44);
 
-    /* Riga 2: la frase, col numero grande in verde. */
+    const giu = artistaSotto ? 42 : 0;
     const nStr = String(timesFor(c));
     let px = tx;
     ctx.font = F(800, 44); ctx.fillStyle = inkC;
-    ctx.fillText('Ascoltata ', px, PAD + 122);
+    ctx.fillText('Ascoltata ', px, PAD + 122 + giu);
     px += ctx.measureText('Ascoltata ').width;
     ctx.font = F(900, 66); ctx.fillStyle = '#0E7A38';
-    ctx.fillText(nStr, px, PAD + 122);
+    ctx.fillText(nStr, px, PAD + 122 + giu);
     px += ctx.measureText(nStr).width;
     ctx.font = F(800, 44); ctx.fillStyle = '#0E7A38';
-    ctx.fillText(' volte', px, PAD + 122);
+    ctx.fillText(' volte', px, PAD + 122 + giu);
     px += ctx.measureText(' volte').width;
     ctx.fillStyle = inkC;
-    ctx.fillText(' in', px, PAD + 122);
+    ctx.fillText(' in', px, PAD + 122 + giu);
 
     /* Riga 3: i dati della corsa. Quel /km dice "corsa" senza scriverlo. */
     const parts = [kmText(), timeText(), paceText()];
     let dx2 = tx;
     parts.forEach((p, i) => {
       ctx.font = F(800, 34); ctx.fillStyle = '#FC4C02';
-      ctx.fillText(p, dx2, PAD + 182);
+      ctx.fillText(p, dx2, PAD + 182 + giu);
       dx2 += ctx.measureText(p).width;
       if (i < parts.length - 1) {
         ctx.fillStyle = '#C9D2C6';
-        ctx.fillText(' \u00B7 ', dx2, PAD + 182);
+        ctx.fillText(' \u00B7 ', dx2, PAD + 182 + giu);
         dx2 += ctx.measureText(' \u00B7 ').width;
       }
     });
@@ -2068,6 +2140,24 @@
      si poteva trascinare senza foto, un tocco ovunque teletrasportava
      l'etichetta sotto il dito, e ai bordi c'erano zone morte perche il
      limite del dito non coincideva con quello del disegno. */
+  /* Il suggerimento vive finche non tocchi: al primo dito sparisce, perche a
+     quel punto l'hai capito da solo. */
+  let tutorTimer = null;
+  function mostraTutor() {
+    const t = $('tutor');
+    t.classList.remove('via');
+    t.hidden = false;
+    clearTimeout(tutorTimer);
+    tutorTimer = setTimeout(viaTutor, 4200);
+  }
+  function viaTutor() {
+    const t = $('tutor');
+    if (t.hidden) return;
+    clearTimeout(tutorTimer);
+    t.classList.add('via');
+    setTimeout(() => { t.hidden = true; }, 360);
+  }
+
   let dragging = false, grabDY = 0;
   const yInCanvas = e => (e.clientY - cv.getBoundingClientRect().top) * (H / cv.getBoundingClientRect().height);
   const xInCanvas = e => (e.clientX - cv.getBoundingClientRect().left) * (W / cv.getBoundingClientRect().width);
@@ -2087,6 +2177,7 @@
   const scala = v => { badgeS = Math.min(Math.max(v, SMIN), SMAX); badgeY = clampY(badgeY); render(); };
 
   cv.addEventListener('pointerdown', e => {
+    viaTutor();
     if (versione !== 'dati') return;           /* si trascina solo l'etichetta */
     tocchi.set(e.pointerId, { x: xInCanvas(e), y: yInCanvas(e) });
     if (tocchi.size === 2) {                   /* due dita: si passa al pizzico */
@@ -2152,7 +2243,7 @@
       if (window.createImageBitmap) {
         photo = await createImageBitmap(f, { imageOrientation: 'from-image' });
         document.querySelector('.stage').classList.add('movable');
-        aggiornaComandi(); render();
+        aggiornaComandi(); render(); mostraTutor();
         return;
       }
     } catch (e) { /* qualche browser non accetta l'opzione: si passa di sotto */ }
@@ -2162,6 +2253,7 @@
       document.querySelector('.stage').classList.add('movable');
       aggiornaComandi();
       render();
+      mostraTutor();
     };
     img.src = URL.createObjectURL(f);
   }
