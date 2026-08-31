@@ -107,6 +107,13 @@
   .step.esito .step-head { color: var(--green-text); }
   .step.esito .step-head .num { background: var(--green); }
   .step.esito .tank { margin-top: 18px; }
+  /* La scala della barra: da 0 ai km scelti. Vive solo sul sito, non finisce
+     nell'immagine esportata. */
+  .tank-scala {
+    display: flex; justify-content: space-between; margin-top: 5px; padding: 0 2px;
+    font-size: 11px; font-weight: 700; color: var(--soft);
+    font-variant-numeric: tabular-nums;
+  }
   .step.esito .repeat { border-top: none; padding-top: 0; margin-top: 12px; }
   .claim-line1 {
     font-weight: 900; font-size: clamp(34px, 9vw, 46px);
@@ -148,10 +155,6 @@
   .step-head {
     display: flex; align-items: center; gap: 8px; margin: 0 0 10px;
     font-size: 11px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase;
-  }
-  .step-head small {
-    font-weight: 600; font-size: 10px; letter-spacing: 0.04em;
-    text-transform: none; color: var(--soft);
   }
   .step-head .num {
     width: 18px; height: 18px; border-radius: 50%;
@@ -852,7 +855,7 @@
   </section>
 
   <section class="step run default" id="corsa" aria-label="La tua corsa">
-    <h2 class="step-head"><span class="num">2</span> La tua corsa <small>se non sono 5 km a ritmo normale</small></h2>
+    <h2 class="step-head"><span class="num">2</span> La tua corsa</h2>
     <div class="card-ui">
       <!-- Due schede della stessa card: si vedono entrambe, si scambiano con un tocco. -->
       <div class="tabs" role="group" aria-label="Tipo di corsa">
@@ -930,6 +933,7 @@
       </div>
     </div>
     <div class="tank" id="tank" role="img" aria-label="Un blocco per ogni riascolto"></div>
+    <div class="tank-scala" aria-hidden="true"><span>0</span><span id="tankFine">5 km</span></div>
     <p class="repeat">Adesso mettila in <b>loop</b> e parti.</p>
     <div class="azioni-esito">
       <a class="vai" href="#storie" id="claimShare">Condividi una storia <span aria-hidden="true">&darr;</span></a>
@@ -2130,11 +2134,11 @@
     t2.classList.add('arrivo');
     setTimeout(() => t2.classList.remove('arrivo'), 1400);
   });
-  /* La corsa resta "standard" finche non la tocchi: al primo tocco i comandi
-     passano dal grigio all'arancio, e da li in poi la scelta e tua. */
-  document.querySelector('.step.run').addEventListener('pointerdown', function () {
-    this.classList.remove('default');
-  }, { once: true });
+  /* La corsa resta "standard" finche non scegli davvero: il grigio diventa
+     arancio quando premi un TASTO della sezione, non toccando la card. */
+  document.querySelectorAll('.step.run button, .step.run input, .step.run .wheel-col').forEach(el =>
+    el.addEventListener('pointerdown', () =>
+      document.querySelector('.step.run').classList.remove('default'), { once: true }));
 
   $('claimShare').addEventListener('click', () => {
     setVersione('frase');
@@ -2154,6 +2158,7 @@
     const giri = target() / c.s;          /* si chiamava "exact" e oscurava i dati esatti */
     const n = Math.ceil(giri);
 
+    $('tankFine').textContent = kmText();
     const tank = $('tank');
     tank.textContent = '';
     const shown = Math.min(n, 60);
