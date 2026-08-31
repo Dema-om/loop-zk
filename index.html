@@ -168,7 +168,10 @@
     font-weight: 900; font-size: clamp(28px, 7.6vw, 38px);
     line-height: 1.12; letter-spacing: -0.03em; margin: 0;
   }
-  .promessa em { font-style: normal; color: var(--green-text); }
+  /* "in canzoni?" e la meta che porta il senso: va tenuta intera su una riga
+     sua. Lasciata scorrere, a seconda della larghezza si spezzava dopo "in",
+     e la promessa si leggeva a meta. */
+  .promessa em { display: block; font-style: normal; color: var(--green-text); }
   /* Il risultato non e piu una card: e una sezione come le altre due, con il
      suo numero. La card lo faceva sembrare un riquadro di servizio, mentre e
      la cosa per cui si e' arrivati fin qui. */
@@ -997,6 +1000,60 @@
   .f-priv summary { min-height: 0; }
 
   .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+  /* ===== DA DESKTOP: due colonne, e il numero resta fermo =====
+     Su uno schermo grande la colonna da telefono usava il 36% della larghezza
+     e il resto era vuoto: sembrava uno screenshot incollato. Qui a sinistra si
+     sceglie e a destra il risultato resta sotto gli occhi mentre si scorre,
+     che e il gesto vero dello strumento. Tutto dentro questa media query:
+     sotto i 900 px non cambia niente. */
+  @media (min-width: 900px) {
+    .wrap { max-width: 1000px; }
+
+    #top {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 0 44px; align-items: start;
+    }
+    #top > header { grid-column: 1 / -1; padding: 34px 0 10px; }
+    .promessa { font-size: 50px; }
+    /* La tesi non prende tutta la larghezza: oltre i 70 caratteri per riga
+       l'occhio perde il capo della riga dopo. */
+    .thesis { max-width: 34em; font-size: 16px; }
+
+    .step.music, .step.run { grid-column: 1; }
+    .step.esito {
+      grid-column: 2; grid-row: 2 / span 2;
+      position: sticky; top: 92px;
+    }
+
+    /* Le due frecce fra i passi servivano a scorrere: da qui i due passi si
+       vedono insieme, e portare via dalla vista e' un dispetto. */
+    .azioni-esito { display: none; }
+
+    /* L'anteprima della storia resta a misura di telefono: e' un telefono. */
+    .share .wrap { max-width: 560px; }
+
+    /* Le tre schede si dividono la larghezza come i due passi di sopra: il
+       concept, che e da leggere, tiene una colonna sua a misura di riga; le
+       due a scomparsa stanno accanto. Cosi il fondo pagina non e mezza pagina
+       bianca. */
+    .finale {
+      display: grid; grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto 1fr; gap: 16px 40px; align-items: start;
+    }
+    .finale #about { grid-row: 1 / span 2; margin-top: 30px; }
+    .finale .about + .about { margin-top: 0; }
+    .finale #come { grid-column: 2; grid-row: 1; margin-top: 30px; }
+    /* La riga di sotto si prende tutto lo spazio che avanza dal concept, che e
+       piu alto: senza questo la seconda scheda finiva a meta del vuoto. */
+    .finale #chi { grid-column: 2; grid-row: 2; align-self: start; }
+
+    /* Le tre storie di esempio ci stanno tutte e tre: qui lo spazio c'e, e
+       una riga che scorre di lato su desktop non la trova nessuno. */
+    .share .esempi { width: 700px; margin-left: -90px; }
+    .es-riga { overflow-x: visible; justify-content: center; }
+  }
+
 </style>
 </head>
 
@@ -1218,7 +1275,7 @@
   </div>
 </section>
 
-<div class="wrap">
+<div class="wrap finale">
 
   <section class="about" id="about">
     <h2>Il concept</h2>
