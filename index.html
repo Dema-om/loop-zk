@@ -545,8 +545,11 @@
   .topbar .uno { height: 46px; display: flex; align-items: center; justify-content: center; }
   .topbar .logo { color: var(--ink); text-decoration: none; }
   .topbar .logo:focus-visible { outline: 2px solid var(--green); outline-offset: 4px; border-radius: 6px; }
+  /* Non flex: in un contenitore flex ogni pezzo di testo diventa un elemento
+     a se e gli spazi fra loro spariscono, quindi si leggeva
+     "ConceptSpotify×Strava". Riga normale, centrata con l'interlinea. */
   .topbar .due {
-    margin: 0; height: 25px; display: flex; align-items: center; justify-content: center;
+    margin: 0; height: 25px; line-height: 25px; text-align: center;
     border-top: 1px solid var(--line); background: var(--card);
     font-size: 10px; font-weight: 600; color: var(--soft);
   }
