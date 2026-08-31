@@ -223,14 +223,17 @@
 
   /* ---------- passi ---------- */
   .step { margin-top: 30px; }
+  /* I numeri erano un'etichetta di servizio: pallino da 18 con dentro un 10,
+     si vedevano solo se li cercavi. Il passo e la cosa che ti dice dove sei,
+     quindi il pallino diventa un segnaposto che si legge da lontano. */
   .step-head {
-    display: flex; align-items: center; gap: 8px; margin: 0 0 10px;
-    font-size: 11px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase;
+    display: flex; align-items: center; gap: 10px; margin: 0 0 12px;
+    font-size: 13px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
   }
   .step-head .num {
-    width: 18px; height: 18px; border-radius: 50%;
+    width: 28px; height: 28px; border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    font-size: 10px; letter-spacing: 0; color: var(--on-brand); flex: none;
+    font-size: 15px; letter-spacing: 0; color: var(--on-brand); flex: none;
   }
   .step.music .step-head { color: var(--green-text); }
   .step.music .step-head .num { background: var(--green); }
@@ -1047,6 +1050,21 @@
     /* La riga di sotto si prende tutto lo spazio che avanza dal concept, che e
        piu alto: senza questo la seconda scheda finiva a meta del vuoto. */
     .finale #chi { grid-column: 2; grid-row: 2; align-self: start; }
+
+    /* La scala dei caratteri era disegnata per un telefono da 375 e veniva
+       usata tale e quale su uno schermo da 1440: da lontano l'11 px e' un
+       ronzio. Qui sotto sale solo il piccolo, di un punto e mezzo, senza
+       toccare titoli e claim che sono gia' cresciuti da soli. */
+    .thesis { font-size: 17px; }
+    .about p, .details { font-size: 15px; }
+    .lista-tit { font-size: 12.5px; }
+    .artist { font-size: 13.5px; }
+    .results .times small, .seg button small { font-size: 12px; }
+    .tabs button, .view-toggle button, .btn.ghost, .repeat { font-size: 14px; }
+    .sub-label, .exact-why, .explain, .hint, .dopo { font-size: 13px; }
+    .f-legale { font-size: 12px; }
+    .f-priv p { font-size: 12.5px; }
+    .f-su { font-size: 13px; }
 
     /* Le tre storie di esempio ci stanno tutte e tre: qui lo spazio c'e, e
        una riga che scorre di lato su desktop non la trova nessuno. */
