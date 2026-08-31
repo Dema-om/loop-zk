@@ -19,6 +19,8 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://itunes.apple.com" crossorigin>
+<link rel="preconnect" href="https://is1-ssl.mzstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;800;900&display=swap">
 <style>
   /* Concept dichiarato "Spotify × Strava", mobile first, tutto prima della corsa.
@@ -308,7 +310,9 @@
   .search input:focus { outline: none; }
   .search:focus-within { outline: 2px solid var(--green); outline-offset: 2px; }
 
-  .results { display: grid; gap: 4px; margin-top: 8px; }
+  /* minmax(0,1fr): una griglia allarga la colonna fino al contenuto piu
+     lungo, e un titolo chilometrico sfondava la card invece di troncarsi. */
+  .results { display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px; margin-top: 8px; }
   .results button {
     display: flex; align-items: center; gap: 12px; width: 100%; text-align: left;
     font: inherit; font-size: 15px; font-weight: 600; color: var(--ink);
@@ -1471,8 +1475,11 @@
     const q = $('q').value.trim();
     clearTimeout(ricercaTimer);
     if (!q) { ricercaN++; lista = tendenze || catalog.slice(0, 4); renderResults(); return; }
-    renderResults('Cerco «' + q + '»…');
-    ricercaTimer = setTimeout(() => cercaSuApple(q), 320);
+    /* La lista vecchia resta a schermo finche non arriva quella nuova:
+       svuotarla a ogni lettera faceva sembrare la ricerca piu lenta di
+       quanto sia. Il titoletto dice che si sta cercando. */
+    $('listaTit').textContent = 'Cerco \u00AB' + q + '\u00BB\u2026';
+    ricercaTimer = setTimeout(() => cercaSuApple(q), 250);
   });
 
   /* ----- dati esatti: la card cambia faccia, non si allunga -----
