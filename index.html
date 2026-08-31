@@ -2636,11 +2636,31 @@
   /* Condividere: il telefono apre il suo foglio con l'immagine dentro, dove
      Instagram e gia in lista. Dove il foglio non c'e, l'immagine resta a
      schermo da tenere premuta. */
+  /* Instagram, sui telefoni di oggi, ingrandisce le storie esportate a 1080 di
+     larghezza: quegli schermi hanno piu pixel di cosi, e ingrandendo i bordi si
+     ammorbidiscono. Per questo si esporta a 1440x2560, che e la misura
+     consigliata adesso.
+     Il disegno NON si tocca: resta scritto nelle stesse coordinate di prima, e
+     si ingrandisce il foglio sotto. Cosi il testo e le forme nascono nitidi
+     alla misura nuova, invece di essere un'immagine piccola stirata. Anche la
+     foto dell'utente ci guadagna, perche ne serve una porzione piu grande.
+     Finita l'esportazione il foglio torna piccolo: l'anteprima e il trascinamento
+     dell'etichetta lavorano nelle coordinate di sempre. */
+  const SCALA_EXPORT = 1440 / W;
+  async function pngGrande() {
+    cv.width = Math.round(W * SCALA_EXPORT);
+    cv.height = Math.round(H * SCALA_EXPORT);
+    ctx.scale(SCALA_EXPORT, SCALA_EXPORT);
+    render(); render();
+    const blob = await new Promise(r => cv.toBlob(r, 'image/png'));
+    cv.width = W; cv.height = H;
+    render();
+    return blob;
+  }
+
   $('save').addEventListener('click', async () => {
     await attendiCopertina(song());
-    render();
-    render();
-    const blob = await new Promise(r => cv.toBlob(r, 'image/png'));
+    const blob = await pngGrande();
     if (!blob) return;
     /* Si conta qui, appena l'immagine esiste: dopo c'e il foglio di sistema,
        che l'utente puo annullare, e non saprei piu distinguere un ripensamento
