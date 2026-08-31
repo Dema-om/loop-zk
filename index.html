@@ -916,13 +916,18 @@
   }
   .f-logo { font-size: 18px; color: var(--ink); }
   .f-paglia { margin: 10px 0 22px; font-size: 12.5px; color: var(--soft); max-width: 30em; }
-  .f-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 22px 16px; }
+  /* Le due colonne erano sbilanciate: tre link da una parte e uno dall'altra.
+     Una lista sola in fila, che va a capo da se, sta in piedi con qualsiasi
+     numero di voci. */
+  .f-cols { display: flex; flex-wrap: wrap; gap: 10px 22px; align-items: baseline; }
+  .f-cols > div { display: contents; }
   .f-cols h4 {
-    margin: 0 0 9px; font-size: 10.5px; font-weight: 800;
+    width: 100%; margin: 0; font-size: 10.5px; font-weight: 800;
     letter-spacing: 0.12em; text-transform: uppercase; color: var(--soft);
   }
+  .f-cols h4 + a { margin-top: -2px; }
   .f-cols a {
-    display: block; margin-bottom: 9px; font-size: 13.5px; font-weight: 700;
+    display: block; margin-bottom: 0; font-size: 13.5px; font-weight: 700;
     color: var(--ink); text-decoration: none;
     border-bottom: 1.5px solid var(--line); padding-bottom: 2px;
     width: fit-content;
@@ -942,8 +947,14 @@
     margin: 24px 0 0; padding-top: 16px; border-top: 1px solid var(--line);
     font-size: 11.5px; line-height: 1.65; color: var(--soft);
   }
+  .f-fine {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 14px; flex-wrap: wrap; margin-top: 16px;
+    font-size: 12.5px; color: var(--soft);
+  }
+  .f-fine a { color: var(--ink); font-weight: 800; text-decoration: none; border-bottom: 1.5px solid var(--line); }
   .f-su {
-    display: inline-block; margin-top: 14px; padding: 8px 14px;
+    display: inline-block; padding: 8px 14px; border-bottom: none !important;
     font-size: 12px; font-weight: 800; color: var(--ink); text-decoration: none;
     background: var(--ground); border: 1px solid var(--line); border-radius: 999px;
   }
@@ -1166,7 +1177,6 @@
           <span class="rispondi">Rispondi&hellip;</span>
         </figure>
       </div>
-      <p class="es-nota">Foto di esempio con licenza libera.</p>
     </div>
   </div>
 </section>
@@ -1178,18 +1188,15 @@
     <p><b>I chilometri restano quelli.</b> Contati in canzoni pesano meno, perché ascoltare un pezzo
     che ti piace è una cosa che faresti comunque. inLOOP fa solo questo: prende una distanza e te la
     ridice in riascolti, poi te la dà pronta da mettere in storia.</p>
-    <p>È un concept dichiarato su Spotify e Strava, e non è affiliato a nessuna delle due:
-    i loro colori stanno qui perché sono il materiale dell'esercizio. Il punto di partenza è un
-    fatto vero: nel 2023 <b>si erano davvero parlate</b>, col lettore di Spotify dentro la schermata
-    di registrazione di Strava, poi l'integrazione è stata chiusa. Qui la direzione è un'altra:
-    non i comandi del lettore dentro l'app di corsa, ma la musica come <b>unità di misura</b> della fatica.</p>
+    <p>Non è un lettore musicale attaccato a un'app di corsa: è <b>la musica usata come unità di
+    misura della fatica</b>. È un concept dichiarato su Spotify e Strava, e non è affiliato a nessuna
+    delle due: i loro colori stanno qui perché sono il materiale dell'esercizio.</p>
   </section>
 
   <details class="about fold" id="chi">
-    <summary><span>Chi l'ha fatto</span><small>Matteo De Marco</small></summary>
+    <summary><span>Sviluppato da</span><small>Matteo De Marco</small></summary>
     <div class="fold-body">
-    <p>L'ho fatto io,
-      <a class="nome" href="https://www.linkedin.com/in/matteodemarcoo" target="_blank" rel="noopener">Matteo De Marco</a>.
+    <p><a class="nome" href="https://www.linkedin.com/in/matteodemarcoo" target="_blank" rel="noopener">Matteo De Marco</a>.
       Vengo dal design e dall'interfaccia, e da lì mi porto dietro l'abitudine a guardare le cose dal
       lato di chi le usa: quasi tutte le scelte qui sopra nascono da un'app che mi ha fatto arrabbiare,
       non da una linea guida.</p>
@@ -1198,53 +1205,30 @@
     progetto è il punto in cui si incontrano.</p>
     <p>Sto costruendo una serie di progetti come questo, che servono a due cose insieme: risolvere qualcosa
     di piccolo per bene, e raccontare come ragiono. Ne pubblicherò altri.
-    <b>Lavoro nell'AI e sono aperto a proposte.</b></p>
+    <b>Costruire con l'AI è la direzione in cui sto andando, e ascolto volentieri chi ci lavora.</b></p>
     </div>
   </details>
 
   <details class="about fold" id="come">
-    <summary><span>Dietro le quinte</span><small>quattordici cose che si notano solo se mancano</small></summary>
+    <summary><span>Dietro le quinte</span><small>quattro cose che si notano solo se mancano</small></summary>
     <div class="fold-body">
     <ul class="details">
-      <li><b>Niente screenshot di Strava.</b> Chiederlo significava chiedere dati già scritti dentro
-      l'immagine, e produceva etichette che si contraddicevano da sole: il ritmo scelto a mano contro
-      quello stampato nello screenshot. I numeri della corsa fatta si ricopiano a mano, in tre campi
-      legati fra loro: ne compili due e il terzo si calcola.</li>
-      <li><b>Una canzone, non una playlist.</b> Una playlist che non puoi esportare su Spotify è inutile.
-      Una canzone in loop invece è un tap dentro qualsiasi app: il sito dà il numero e lo esegui da solo.</li>
       <li><b>Nessuna integrazione con Spotify, e non per pigrizia.</b> Da marzo 2025 per uscire dalla
       modalità sviluppo dell'API servono 250.000 utenti attivi al mese, e la modalità sviluppo è scesa a
-      cinque utenti. La ricerca usa l'archivio di Apple, gratuito e senza chiavi.</li>
-      <li><b>Il testo si legge davvero.</b> Bianco su verde Spotify fa 2,59 a 1 e su arancio Strava 3,31,
-      sotto il minimo. Quindi i colori di marca fanno da superficie con testo scuro sopra, come fa Spotify
-      sui suoi bottoni, e diventano testo solo dove il fondo è scuro.</li>
-      <li><b>L'arancione è quello giusto.</b> Usavo #FC5200 preso da una ricerca, ma quello di Strava è
-      #FC4C02. In un concept sui marchi altrui non puoi sbagliarlo.</li>
-      <li><b>Il sito non sapeva di essere su un telefono.</b> Mancava la riga che lo dichiara, e Safari
-      disegnava la pagina larga 980 pixel per poi rimpicciolirla: usciva una colonnina stretta in mezzo a
-      due margini enormi. Si vede solo da un telefono vero, mai nell'anteprima del computer.</li>
-      <li><b>Toccare la ricerca non ingrandisce la pagina.</b> iPhone lo fa da solo con ogni campo sotto i
-      16 pixel di testo, e la vista salta. Era l'unico campo del sito sotto quella soglia.</li>
-      <li><b>La pagina non salta.</b> Ricostruivo la lista delle canzoni a ogni cambio, e sostituire nodi
-      sopra la vista fa perdere al browser l'ancoraggio dello scroll.</li>
-      <li><b>Si afferra l'etichetta, non la foto.</b> Prima un tocco qualsiasi la teletrasportava sotto il
-      dito, e ai bordi c'erano zone morte perché il limite del dito non coincideva con quello del disegno.</li>
-      <li><b>L'etichetta non finisce sotto Instagram.</b> In alto la storia ha la barra di avanzamento e in
-      basso il campo «rispondi»: c'è un limite invalicabile a 260 pixel dai bordi, anche trascinando.</li>
-      <li><b>Le bande nere sulla foto scattata.</b> La fotocamera scrive l'orientamento come etichetta
-      invece di girare i pixel: il conto per riempire il riquadro veniva fatto sui numeri sbagliati e
-      restava del vuoto, che in una storia si vede nero. Ora la rotazione si cuoce nell'immagine prima
-      di disegnarla.</li>
-      <li><b>Chiedere meno all'archivio.</b> A ogni apertura partivano quattro ricerche sprecate per
-      copertine che poi buttavamo, e l'archivio di Apple taglia fuori chi fa troppe richieste al minuto:
-      compariva un finto errore di connessione. Ora quelle quattro non partono, ogni ricerca già fatta
-      resta in memoria, e prima di mostrare un errore il sito riprova da solo.</li>
-      <li><b>L'etichetta si legge come una frase.</b> Era spezzata in due colonne, col numero da una parte
-      e i dati dall'altra, e l'occhio doveva ricucirla. Ora è una riga sola dall'alto, col numero che resta
-      il pezzo più grosso e quindi si vede lo stesso da lontano.</li>
-      <li><b>Le copertine si caricano in un modo preciso.</b> Un'immagine presa da un altro sito
-      «contamina» il disegno e blocca il salvataggio del PNG: va chiesta dichiarando l'origine. Provato:
-      senza quella riga il file non esce, e l'errore arriva solo al momento di salvare.</li>
+      cinque utenti: un concept pubblico avrebbe funzionato per cinque persone. La ricerca usa l'archivio
+      di Apple, gratuito e senza chiavi.</li>
+      <li><b>Il testo si legge davvero, e l'ho misurato.</b> Bianco su verde Spotify fa 2,59 a 1 e su
+      arancio Strava 3,31, sotto il minimo di legge. Quindi i colori di marca fanno da superficie con
+      testo scuro sopra, come fa Spotify sui suoi bottoni. Passato al setaccio: <b>117 testi controllati,
+      tutti sopra la soglia AA</b> dei 4,5 a 1, mediana 15,8; l'unico segnalato è un'etichetta invisibile
+      che leggono solo i lettori di schermo.</li>
+      <li><b>Instagram non si apre da un sito, quindi si lavora sul PNG.</b> La scorciatoia che porta uno
+      sticker dentro le storie esiste solo fra app installate, e un sito non può usarla. Allora l'immagine
+      si costruisce nel browser e si consegna finita al foglio di condivisione del telefono: niente server,
+      e la foto non lascia il dispositivo.</li>
+      <li><b>L'etichetta non finisce sotto i comandi di Instagram.</b> In alto la storia ha la barra di
+      avanzamento e in basso il campo «rispondi»: c'è un limite invalicabile a 260 pixel dai bordi, che
+      vale anche trascinando e si ricalcola se rimpicciolisci l'etichetta col pizzico.</li>
     </ul>
     </div>
   </details>
@@ -1262,10 +1246,7 @@
         <a href="#about">Il concept</a>
         <a href="#come">Dietro le quinte</a>
       </div>
-      <div>
-        <h4>Sviluppato da</h4>
-        <a href="https://www.linkedin.com/in/matteodemarcoo" target="_blank" rel="noopener">Matteo De Marco</a>
-      </div>
+
 
     </div>
     <details class="f-priv" id="privacy">
@@ -1279,7 +1260,10 @@
     colori sono citati come materiale dell'esercizio.<br>
     Niente account, niente tracciamento, nessun dato raccolto: la tua foto non lascia il telefono.<br>
     &copy; 2026 Matteo De Marco</p>
-    <a class="f-su" href="#top">Torna su &uarr;</a>
+    <div class="f-fine">
+      <span>Sviluppato da <a href="https://www.linkedin.com/in/matteodemarcoo" target="_blank" rel="noopener">Matteo De Marco</a></span>
+      <a class="f-su" href="#top">Torna su &uarr;</a>
+    </div>
   </div>
 </footer>
 
@@ -1326,7 +1310,7 @@
     { s: 210, t: 'Lose Yourself', w: 'Eminem' },
     { s: 192, t: 'Brividi', w: 'Mahmood e Blanco' }
   ];
-  const heroPicks = catalog.slice(0, 5);
+  let heroPicks = catalog.slice(0, 5);
 
   /* I brani di partenza non avevano copertina, e cinque righe con lo stesso
      triangolino grigio sembrano un segnaposto invece di un catalogo vero.
@@ -1340,6 +1324,8 @@
     const salvata = ricordato('classifica');
     if (salvata && salvata.length) {
       tendenze = salvata;
+      heroPicks = salvata; heroIdx = 0;
+      salvata.forEach(caricaCopertina);
       if (!picked && !$('q').value.trim()) { lista = tendenze; renderResults(); }
       return true;
     }
@@ -1362,6 +1348,13 @@
         }));
       if (!trovati.length) return false;
       tendenze = trovati;
+      /* La vetrina del claim gira sui brani della classifica, che la copertina
+         ce l'hanno gia: prima girava sui brani scritti a mano, che ce l'avevano
+         solo se la classifica falliva, e chi condivideva senza scegliere una
+         canzone si portava via un segnaposto colorato al posto della copertina. */
+      heroPicks = trovati;
+      heroIdx = 0;
+      trovati.forEach(caricaCopertina);
       ricorda('classifica', trovati, 6);
       if (!picked && !$('q').value.trim()) { lista = tendenze; renderResults(); }
       return true;
@@ -2038,7 +2031,13 @@
     const parte2 = 'Ma sono ' + n + ' volte ' + c.t + '.';
     const impagina = px => wrapOn(parte1, F(900, px), inner).concat(wrapOn(parte2, F(900, px), inner));
 
+    /* "5,04 km sembrano tanti." deve stare su una riga sola: spezzato fra i km
+       e il resto perde il colpo. Si scende di corpo finche non ci sta. */
     let size = 66, righe = impagina(size);
+    while (wrapOn(parte1, F(900, size), inner).length > 1 && size > 34) {
+      size -= 2;
+      righe = impagina(size);
+    }
     while (righe.length > 4 && size > 36) {
       size -= 4;
       righe = impagina(size);
@@ -2274,9 +2273,9 @@
        affollava la riga: sta sotto, sulla foto, con un'ombra che lo tiene
        leggibile su qualunque cosa ci finisca dietro. */
     const rb = badgeRect();
-    const dy = Math.min(rb.y + rb.h + 58, H - SAFE + 40);
+    const dy = Math.min(rb.y + rb.h + 42, H - SAFE + 40);
     ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
-    ctx.fillStyle = 'rgba(255,255,255,0.92)'; ctx.font = F(600, 32);
+    ctx.fillStyle = 'rgba(255,255,255,0.92)'; ctx.font = F(600, 26);
     ctx.shadowColor = 'rgba(0,0,0,0.55)'; ctx.shadowBlur = 16; ctx.shadowOffsetY = 2;
     ctx.fillText('inloop.zetakiwi.com', W / 2, dy);
     ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
