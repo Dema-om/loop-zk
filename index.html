@@ -353,6 +353,12 @@
   }
   .empty { font-size: 13px; color: var(--soft); padding: 10px; }
   .empty b { color: var(--ink); }
+  .riprova {
+    font: inherit; font-size: 13px; font-weight: 800; color: var(--on-brand);
+    background: var(--green); border: none; border-radius: 999px;
+    padding: 9px 18px; margin: 4px 0 6px 10px; cursor: pointer;
+  }
+  .riprova:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
 
   /* ---------- esito ---------- */
   .outcome {
@@ -1269,14 +1275,13 @@
      risponde si resta sui brani scritti a mano, che restano il paracadute. */
   async function caricaTendenze() {
     try {
-      const r = await fetch('https://itunes.apple.com/it/rss/topsongs/limit=8/json');
+      const r = await unaAllaVolta(() => fetch('https://itunes.apple.com/it/rss/topsongs/limit=8/json'));
       const j = await r.json();
       const ids = j.feed.entry
         .map(x => x.id && x.id.attributes && x.id.attributes['im:id'])
         .filter(Boolean);
       if (!ids.length) return;
-      const r2 = await fetch('https://itunes.apple.com/lookup?country=IT&id=' + ids.join(','));
-      const j2 = await r2.json();
+      const j2 = await unaAllaVolta(() => chiediAdApple('https://itunes.apple.com/lookup?country=IT&id=' + ids.join(',')));
       const trovati = j2.results
         .filter(x => x.trackTimeMillis && x.trackName && x.artistName)
         .slice(0, 4)
@@ -1391,19 +1396,57 @@
      indietro con la cancellina, o ricercare la stessa cosa, non costa piu
      una chiamata. E' il taglio piu grosso al numero di richieste. */
   const cacheRicerche = new Map();
-  async function cercaSuApple(q, ritenta) {
+  /* Apple, quando riceve troppe richieste, risponde 403 SENZA le intestazioni
+     che permettono al browser di leggere la risposta: dal nostro lato non si
+     vede un errore ma un muro, "Failed to fetch". Il blocco pero dura pochi
+     secondi. Provato: 40 richieste insieme lo fanno scattare, e dopo un paio
+     di secondi risponde di nuovo.
+     E non e detto che le richieste di troppo siano nostre: al telefono molti
+     utenti escono dallo stesso indirizzo del gestore, quindi il conto si
+     divide con degli sconosciuti. Per questo non basta chiedere meno: bisogna
+     insistere con pause crescenti invece di arrendersi al primo no. */
+  let inFila = Promise.resolve();
+  function unaAllaVolta(fn) {
+    const p = inFila.then(fn, fn);
+    inFila = p.catch(() => {});
+    return p;
+  }
+
+  /* Misurato: dopo una raffica che fa scattare il blocco, Apple torna a
+     rispondere in circa due secondi. Quattro tentativi con pause crescenti
+     coprono quasi sei secondi, quindi con margine. */
+  async function chiediAdApple(url, avvisa) {
+    let attesa = 800;
+    for (let giro = 0; giro < 4; giro++) {
+      try {
+        const r = await fetch(url);
+        if (!r.ok) throw new Error('http ' + r.status);
+        const j = await r.json();
+        if (!j || !Array.isArray(j.results)) throw new Error('senza lista');
+        return j;
+      } catch (e) {
+        if (giro === 3) throw e;
+        /* Dal secondo tentativo lo si dice, invece di lasciare la pagina muta. */
+        if (giro >= 1 && avvisa) avvisa();
+        await new Promise(r => setTimeout(r, attesa));
+        attesa = Math.round(attesa * 2.1);
+      }
+    }
+  }
+
+  async function cercaSuApple(q) {
     const mia = ++ricercaN;
     const chiave = q.toLowerCase();
     if (cacheRicerche.has(chiave)) { lista = cacheRicerche.get(chiave); renderResults(); return; }
     try {
-      const r = await fetch('https://itunes.apple.com/search?media=music&entity=song&limit=12&country=IT&term=' +
-        encodeURIComponent(q));
-      const j = await r.json();
-      if (mia !== ricercaN) return;   /* una ricerca piu recente ha gia risposto */
-      /* Una risposta senza lista (capita quando l'archivio limita le richieste)
-         non e "sei senza rete": e "riprova tra un attimo". E prima di dirlo
-         all'utente, un secondo tentativo lo facciamo noi. */
-      if (!j || !Array.isArray(j.results)) throw new Error('senza lista');
+      /* NON in fila: la ricerca e un gesto dell'utente e non deve aspettare
+         il caricamento della classifica, che ha la sua coda e i suoi tentativi.
+         Le richieste restano poche lo stesso: si aspetta il dito, e una
+         ricerca piu recente annulla la precedente. */
+      const j = await chiediAdApple(
+        'https://itunes.apple.com/search?media=music&entity=song&limit=12&country=IT&term=' + encodeURIComponent(q),
+        () => { if (mia === ricercaN) $('listaTit').textContent = 'L\u2019archivio \u00e8 occupato, riprovo\u2026'; });
+      if (mia !== ricercaN) return;
       const visti = new Set();
       lista = j.results
         .filter(x => x.trackTimeMillis && x.trackName && x.artistName)
@@ -1423,12 +1466,8 @@
       renderResults();
     } catch (e) {
       if (mia !== ricercaN) return;
-      if (!ritenta) {
-        setTimeout(() => { if (mia === ricercaN) cercaSuApple(q, true); }, 900);
-        return;
-      }
       lista = [];
-      renderResults('L\'archivio di Apple non risponde, capita quando riceve troppe richieste tutte insieme. Aspetta qualche secondo e riprova.');
+      renderResults('RIPROVA');
     }
   }
 
@@ -1549,6 +1588,22 @@
     if (messaggio || !lista.length) {
       const p = document.createElement('p');
       p.className = 'empty';
+      if (messaggio === 'RIPROVA') {
+        p.innerHTML = '<b>L\'archivio di Apple non risponde.</b> Succede quando riceve troppe richieste ' +
+          'tutte insieme, e passa in pochi secondi.';
+        const b = document.createElement('button');
+        b.type = 'button'; b.className = 'riprova'; b.textContent = 'Riprova';
+        b.addEventListener('click', () => {
+          const q = $('q').value.trim();
+          if (!q) return;
+          cacheRicerche.delete(q.toLowerCase());
+          $('listaTit').textContent = 'Cerco \u00AB' + q + '\u00BB\u2026';
+          el.textContent = '';
+          cercaSuApple(q);
+        });
+        el.appendChild(p); el.appendChild(b);
+        return;
+      }
       p.textContent = messaggio || 'Nessuna canzone con «' + $('q').value.trim() + '». Prova col titolo o con l\'artista.';
       el.appendChild(p);
       return;
@@ -1596,7 +1651,7 @@
        svuotarla a ogni lettera faceva sembrare la ricerca piu lenta di
        quanto sia. Il titoletto dice che si sta cercando. */
     $('listaTit').textContent = 'Cerco \u00AB' + q + '\u00BB\u2026';
-    ricercaTimer = setTimeout(() => cercaSuApple(q), 250);
+    ricercaTimer = setTimeout(() => cercaSuApple(q), 420);
   });
 
   /* ----- dati esatti: la card cambia faccia, non si allunga -----
