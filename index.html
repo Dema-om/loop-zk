@@ -94,6 +94,18 @@
 
   /* ---------- hero ---------- */
   header { padding: 24px 0 6px; }
+  .promessa {
+    font-weight: 900; font-size: clamp(28px, 7.6vw, 38px);
+    line-height: 1.12; letter-spacing: -0.03em; margin: 0;
+  }
+  .promessa em { font-style: normal; color: var(--green-text); }
+  /* Il risultato non e piu una card: e una sezione come le altre due, con il
+     suo numero. La card lo faceva sembrare un riquadro di servizio, mentre e
+     la cosa per cui si e' arrivati fin qui. */
+  .step.esito .step-head { color: var(--green-text); }
+  .step.esito .step-head .num { background: var(--green); }
+  .step.esito .tank { margin-top: 18px; }
+  .step.esito .repeat { border-top: none; padding-top: 0; margin-top: 12px; }
   .claim-line1 {
     font-weight: 900; font-size: clamp(34px, 9vw, 46px);
     line-height: 1.14; letter-spacing: -0.03em; margin: 0;
@@ -564,13 +576,6 @@
   /* Sta sulla riga dell'artista, non sopra il claim: appoggiata in alto a
      destra rubava larghezza alla prima riga e la mandava a capo prima. */
   .claim-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-  .claim-share {
-    flex: none; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
-    background: var(--card); border: 1px solid var(--line); border-radius: 50%;
-    color: var(--ink); cursor: pointer; padding: 0;
-  }
-  .claim-share svg { width: 18px; height: 18px; }
-  .claim-share:hover { background: var(--green-soft); border-color: var(--green); }
   /* Arrivando dall'icona, il commutatore si accende un attimo: senza, si
      atterra in mezzo al nero senza capire perche' si e' finiti li. */
   @keyframes arrivo {
@@ -579,7 +584,6 @@
   }
   .share .view-toggle.arrivo { animation: arrivo 1.4s ease; }
   @media (prefers-reduced-motion: reduce) { .share .view-toggle.arrivo { animation: none; } }
-  .claim-share:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; }
   /* La barra appiccicata sta sopra il contenuto: senza questo, ogni salto a
      un'ancora infila il pezzo di sotto dietro la barra. Il claim spariva per
      26 px premendo "Torna su". */
@@ -794,21 +798,7 @@
 
 <div class="wrap" id="top">
   <header>
-    <!-- Il claim e gia una storia pronta: il comando per mandarla via sta qui,
-         accanto alla frase, non solo mezza pagina piu in basso. -->
-    <h1 class="claim-line1" id="cLine1"><span class="d">5 km</span> sembrano tanti.</h1>
-    <div class="claim-block">
-      <p class="claim-line2 show" id="cLine2">Ma sono <span class="n">15</span> volte <span class="t">Sportswear</span>.</p>
-      <div class="claim-foot">
-        <p class="claim-who" id="cWho">Dark Polo Gang · 1:59</p>
-        <button class="claim-share" type="button" id="claimShare" aria-label="Condividi questa frase come storia">
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M12 15V3m0 0L8 7m4-4 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M4 13v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-          </svg>
-        </button>
-      </div>
-    </div>
+    <h1 class="promessa">Quanto dura la tua corsa <em>in canzoni?</em></h1>
     <p class="thesis">I chilometri restano quelli. Contati in canzoni pesano meno, perché ascoltare un pezzo che ti piace è una cosa che faresti comunque.</p>
   </header>
 
@@ -890,11 +880,18 @@
     </div>
   </section>
 
-  <section class="outcome" aria-label="Il risultato" aria-live="polite">
-    <p class="out-line" id="outLine">5 km di corsa sono <b>16 volte</b> Sportswear.</p>
+  <section class="step esito" id="risultato" aria-label="Quante volte" aria-live="polite">
+    <h2 class="step-head"><span class="num">3</span> Quante volte</h2>
+    <h2 class="claim-line1" id="cLine1"><span class="d">5 km</span> sembrano tanti.</h2>
+    <div class="claim-block">
+      <p class="claim-line2 show" id="cLine2">Ma sono <span class="n">15</span> volte <span class="t">Sportswear</span>.</p>
+      <div class="claim-foot">
+        <p class="claim-who" id="cWho">Dark Polo Gang · 1:59</p>
+      </div>
+    </div>
     <div class="tank" id="tank" role="img" aria-label="Un blocco per ogni riascolto"></div>
     <p class="repeat">Adesso mettila in <b>loop</b> e parti.</p>
-    <a class="vai" href="#storie">Condividi una storia <span aria-hidden="true">&darr;</span></a>
+    <a class="vai" href="#storie" id="claimShare">Condividi una storia <span aria-hidden="true">&darr;</span></a>
   </section>
 
 </div>
@@ -2069,9 +2066,6 @@
      colore resta dov'e, invece di sparire per far posto a una scorciatoia. */
   $('claimShare').addEventListener('click', () => {
     setVersione('frase');
-    document.getElementById('storie').scrollIntoView({
-      behavior: reduced ? 'auto' : 'smooth', block: 'start'
-    });
     /* Un lampo verde dice che sei arrivato al pezzo giusto. */
     const t = document.querySelector('.share .view-toggle');
     t.classList.add('arrivo');
@@ -2099,7 +2093,6 @@
     tank.setAttribute('aria-label', n + ' riascolti riempiono ' + kmText() +
       (n > 60 ? ' (ne vedi i primi 60)' : ''));
 
-    $('outLine').innerHTML = kmText() + ' di corsa sono <b>' + n + ' volte</b> ' + c.t + '.';
 
     render();
   }
