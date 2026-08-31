@@ -650,6 +650,14 @@
      quindi si sa cosa c'e dentro senza doverlo scorrere. */
   details.fold { padding: 0; }
   .fold-body .nome { color: var(--green-text); font-weight: 800; text-decoration: none; border-bottom: 2px solid var(--green-soft); }
+  /* Il nome e la firma: sta su una riga sua e si vede, invece di sparire
+     dentro la prima frase del paragrafo. */
+  .fold-body .nome.grande {
+    display: inline-flex; align-items: center; gap: 8px;
+    margin: 0 0 12px; padding: 10px 16px; border-bottom: none;
+    font-size: 16px; background: var(--chip); border-radius: 999px;
+  }
+  .fold-body .nome.grande:hover { background: var(--green-soft); }
   .fold-body .nome:hover { border-bottom-color: var(--green); }
   a.linkrow {
     display: flex; align-items: center; gap: 10px;
@@ -1235,8 +1243,13 @@
   <details class="about fold" id="chi">
     <summary><span>Sviluppato da</span><small>Matteo De Marco</small></summary>
     <div class="fold-body">
-    <p><a class="nome" href="https://www.linkedin.com/in/matteodemarcoo" target="_blank" rel="noopener">Matteo De Marco</a>.
-      Vengo dal design e dall'interfaccia, e da lì mi porto dietro l'abitudine a guardare le cose dal
+    <a class="nome grande" href="https://www.linkedin.com/in/matteodemarcoo" target="_blank" rel="noopener">
+      Matteo De Marco
+      <svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+        <path d="M4 10 10 4M10 4H5.2M10 4v4.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </a>
+    <p>Vengo dal design e dall'interfaccia, e da lì mi porto dietro l'abitudine a guardare le cose dal
       lato di chi le usa: quasi tutte le scelte qui sopra nascono da un'app che mi ha fatto arrabbiare,
       non da una linea guida.</p>
     <p>Mi occupo di AI e di come si costruiscono prodotti con l'AI, quello che oggi si chiama vibe coding
@@ -1254,8 +1267,6 @@
   <div class="wrap">
     <span class="logo f-logo" aria-hidden="true">inL<svg class="rings" viewBox="0 0 34 20"><circle cx="10" cy="10" r="7.6" fill="none" stroke="#1DB954" stroke-width="3.4"/><circle cx="24" cy="10" r="7.6" fill="none" stroke="#FC4C02" stroke-width="3.4"/></svg>P</span>
     <div class="f-cols">
-      <a href="#come">Scelte progettuali</a>
-      <a href="#about">Il concept</a>
       <a href="#chi">Sviluppato da</a>
       <a href="#privacy">Privacy</a>
     </div>
