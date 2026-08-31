@@ -571,6 +571,14 @@
   }
   .claim-share svg { width: 18px; height: 18px; }
   .claim-share:hover { background: var(--green-soft); border-color: var(--green); }
+  /* Arrivando dall'icona, il commutatore si accende un attimo: senza, si
+     atterra in mezzo al nero senza capire perche' si e' finiti li. */
+  @keyframes arrivo {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(29, 185, 84, 0); }
+    30%, 70% { box-shadow: 0 0 0 4px rgba(29, 185, 84, 0.55); }
+  }
+  .share .view-toggle.arrivo { animation: arrivo 1.4s ease; }
+  @media (prefers-reduced-motion: reduce) { .share .view-toggle.arrivo { animation: none; } }
   .claim-share:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; }
   /* La barra appiccicata sta sopra il contenuto: senza questo, ogni salto a
      un'ancora infila il pezzo di sotto dietro la barra. Il claim spariva per
@@ -2056,30 +2064,20 @@
     $('saved').scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'center' });
   });
 
-  /* L'icona accanto al claim manda via la frase senza far scorrere niente:
-     mette da parte la versione scelta, disegna quella della frase, esporta e
-     poi rimette tutto com'era. */
-  $('claimShare').addEventListener('click', async () => {
-    const prima = versione;
-    versione = 'frase';
-    await attendiCopertina(song());
-    render();
-    render();
-    const blob = await new Promise(r => cv.toBlob(r, 'image/png'));
-    versione = prima;
-    render();
-    if (!blob) return;
-    const file = new File([blob], 'inloop.png', { type: 'image/png' });
-    try {
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share({ files: [file] });
-        return;
-      }
-    } catch (e) { return; }
-    $('savedImg').src = URL.createObjectURL(blob);
-    $('saved').classList.add('open');
-    $('saved').scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'center' });
+  /* L'icona accanto al claim non esporta: porta alla condivisione con la
+     canzone gia dentro e la versione "frase" gia scelta. Cosi la scelta del
+     colore resta dov'e, invece di sparire per far posto a una scorciatoia. */
+  $('claimShare').addEventListener('click', () => {
+    setVersione('frase');
+    document.getElementById('storie').scrollIntoView({
+      behavior: reduced ? 'auto' : 'smooth', block: 'start'
+    });
+    /* Un lampo verde dice che sei arrivato al pezzo giusto. */
+    const t = document.querySelector('.share .view-toggle');
+    t.classList.add('arrivo');
+    setTimeout(() => t.classList.remove('arrivo'), 1400);
   });
+
 
   /* ----- esito ----- */
   function update() {
