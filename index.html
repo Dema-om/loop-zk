@@ -135,6 +135,10 @@
     display: flex; align-items: center; gap: 8px; margin: 0 0 10px;
     font-size: 11px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase;
   }
+  .step-head small {
+    font-weight: 600; font-size: 10px; letter-spacing: 0.04em;
+    text-transform: none; color: var(--soft);
+  }
   .step-head .num {
     width: 18px; height: 18px; border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
@@ -556,7 +560,18 @@
   .topbar .due b { color: var(--green-text); }
   .topbar .due em { font-style: normal; color: var(--orange-text); }
   header { padding-top: 30px; }
-  header { padding-top: 46px; padding-bottom: 10px; }
+  header { padding-top: 46px; padding-bottom: 10px; position: relative; }
+  .claim-share {
+    position: absolute; top: 44px; right: 0; z-index: 2;
+    width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;
+    background: var(--card); border: 1px solid var(--line); border-radius: 50%;
+    color: var(--ink); cursor: pointer; padding: 0;
+  }
+  .claim-share svg { width: 20px; height: 20px; }
+  .claim-share:hover { background: var(--green-soft); border-color: var(--green); }
+  .claim-share:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; }
+  /* Il claim gli lascia posto invece di finirci sotto. */
+  .claim-line1 { padding-right: 52px; }
   /* La barra appiccicata sta sopra il contenuto: senza questo, ogni salto a
      un'ancora infila il pezzo di sotto dietro la barra. Il claim spariva per
      26 px premendo "Torna su". */
@@ -771,6 +786,14 @@
 
 <div class="wrap" id="top">
   <header>
+    <!-- Il claim e gia una storia pronta: il comando per mandarla via sta qui,
+         accanto alla frase, non solo mezza pagina piu in basso. -->
+    <button class="claim-share" type="button" id="claimShare" aria-label="Condividi questa frase come storia">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M12 15V3m0 0L8 7m4-4 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M4 13v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </button>
     <h1 class="claim-line1" id="cLine1"><span class="d">5 km</span> sembrano tanti.</h1>
     <div class="claim-block">
       <p class="claim-line2 show" id="cLine2">Ma sono <span class="n">15</span> volte <span class="t">Sportswear</span>.</p>
@@ -779,8 +802,23 @@
     <p class="thesis">I chilometri restano quelli. Contati in canzoni pesano meno, perché ascoltare un pezzo che ti piace è una cosa che faresti comunque.</p>
   </header>
 
-  <section class="step run" aria-label="La tua corsa">
-    <h2 class="step-head"><span class="num">1</span> La tua corsa</h2>
+  <section class="step music" aria-label="La tua canzone">
+    <h2 class="step-head"><span class="num">1</span> La tua canzone</h2>
+    <div class="card-ui">
+      <div class="search">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.8"/>
+          <path d="M11 11l3.2 3.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+        <input id="q" type="search" placeholder="Cerca una canzone o un artista…" aria-label="Cerca una canzone o un artista">
+      </div>
+      <p class="lista-tit" id="listaTit">Di tendenza in Italia</p>
+      <div class="results" id="results"></div>
+    </div>
+  </section>
+
+  <section class="step run" id="corsa" aria-label="La tua corsa">
+    <h2 class="step-head"><span class="num">2</span> La tua corsa <small>se non sono 5 km a ritmo normale</small></h2>
     <div class="card-ui">
       <!-- Due schede della stessa card: si vedono entrambe, si scambiano con un tocco. -->
       <div class="tabs" role="group" aria-label="Tipo di corsa">
@@ -839,21 +877,6 @@
         <p class="explain" id="exactNote">Cambiane due e il terzo si aggiorna da solo.</p>
       </div>
 
-    </div>
-  </section>
-
-  <section class="step music" aria-label="La tua canzone">
-    <h2 class="step-head"><span class="num">2</span> La tua canzone</h2>
-    <div class="card-ui">
-      <div class="search">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-          <circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.8"/>
-          <path d="M11 11l3.2 3.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-        </svg>
-        <input id="q" type="search" placeholder="Cerca una canzone o un artista…" aria-label="Cerca una canzone o un artista">
-      </div>
-      <p class="lista-tit" id="listaTit">Di tendenza in Italia</p>
-      <div class="results" id="results"></div>
     </div>
   </section>
 
@@ -2018,6 +2041,31 @@
     render();
     render();
     const blob = await new Promise(r => cv.toBlob(r, 'image/png'));
+    if (!blob) return;
+    const file = new File([blob], 'inloop.png', { type: 'image/png' });
+    try {
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file] });
+        return;
+      }
+    } catch (e) { return; }
+    $('savedImg').src = URL.createObjectURL(blob);
+    $('saved').classList.add('open');
+    $('saved').scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'center' });
+  });
+
+  /* L'icona accanto al claim manda via la frase senza far scorrere niente:
+     mette da parte la versione scelta, disegna quella della frase, esporta e
+     poi rimette tutto com'era. */
+  $('claimShare').addEventListener('click', async () => {
+    const prima = versione;
+    versione = 'frase';
+    await attendiCopertina(song());
+    render();
+    render();
+    const blob = await new Promise(r => cv.toBlob(r, 'image/png'));
+    versione = prima;
+    render();
     if (!blob) return;
     const file = new File([blob], 'inloop.png', { type: 'image/png' });
     try {
