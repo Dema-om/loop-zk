@@ -1312,6 +1312,14 @@
 <script>
   const $ = id => document.getElementById(id);
 
+  /* Due gesti contati oltre alle visite, per sapere se la gente arriva in
+     fondo o si ferma a guardare. Passa dal guardiano perche Umami puo non
+     esserci: bloccato da un'estensione, o giu il server. Se manca, il sito
+     deve funzionare identico e in silenzio. */
+  const conta = (nome, dettagli) => {
+    try { window.umami && window.umami.track(nome, dettagli); } catch (e) {}
+  };
+
   /* La barra si riduce al solo logo appena scorri. */
   /* Un link del footer che punta a una scheda chiusa la apre: altrimenti si
      salta li e non si vede niente. */
@@ -1772,6 +1780,10 @@
         caricaCopertina(c);
         stopRotation();
         update();
+        conta('canzone-scelta', {
+          origine: $('q').value.trim() ? 'ricerca' : (tendenze ? 'tendenze' : 'catalogo'),
+          durata: c.s
+        });
       });
       el.appendChild(b);
       righe.push({ el: b, c });
@@ -2508,6 +2520,10 @@
     render();
     const blob = await new Promise(r => cv.toBlob(r, 'image/png'));
     if (!blob) return;
+    /* Si conta qui, appena l'immagine esiste: dopo c'e il foglio di sistema,
+       che l'utente puo annullare, e non saprei piu distinguere un ripensamento
+       da un errore mio. */
+    conta('storia-creata', { versione: versione, foto: !!photo });
     const file = new File([blob], 'inloop.png', { type: 'image/png' });
     try {
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
