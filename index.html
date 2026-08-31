@@ -919,7 +919,9 @@
   /* Tre link in fila sulla stessa linea di base. Prima erano dentro un
      contenitore rimasto vuoto da quando e sparita la seconda colonna, e da li
      lo sbilanciamento. */
-  .f-cols { display: flex; flex-wrap: wrap; gap: 10px 24px; align-items: baseline; margin-top: 18px; }
+  /* Quattro voci a due a due: in fila andavano a capo tre piu uno, e quella
+     riga spaiata sembrava un errore invece di una scelta. */
+  .f-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 18px; margin-top: 18px; }
   .f-cols a {
     display: block; margin-bottom: 0; font-size: 13.5px; font-weight: 700;
     color: var(--ink); text-decoration: none;
@@ -929,12 +931,8 @@
   .f-cols a:hover { border-bottom-color: var(--green); }
   .f-cols a:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; }
   .f-priv { margin-top: 20px; }
-  .f-priv summary {
-    cursor: pointer; list-style: none; font-size: 13.5px; font-weight: 700; color: var(--ink);
-    border-bottom: 1.5px solid var(--line); padding-bottom: 2px; width: fit-content;
-  }
+  .f-priv summary { list-style: none; }
   .f-priv summary::-webkit-details-marker { display: none; }
-  .f-priv summary:hover { border-bottom-color: var(--green); }
   .f-priv p { margin: 10px 0 0; font-size: 12px; line-height: 1.6; color: var(--soft); }
   .f-priv p b { color: var(--ink); }
   .f-legale {
@@ -1180,24 +1178,8 @@
     delle due: i loro colori stanno qui perché sono il materiale dell'esercizio.</p>
   </section>
 
-  <details class="about fold" id="chi">
-    <summary><span>Sviluppato da</span><small>Matteo De Marco</small></summary>
-    <div class="fold-body">
-    <p><a class="nome" href="https://www.linkedin.com/in/matteodemarcoo" target="_blank" rel="noopener">Matteo De Marco</a>.
-      Vengo dal design e dall'interfaccia, e da lì mi porto dietro l'abitudine a guardare le cose dal
-      lato di chi le usa: quasi tutte le scelte qui sopra nascono da un'app che mi ha fatto arrabbiare,
-      non da una linea guida.</p>
-    <p>Mi occupo di AI e di come si costruiscono prodotti con l'AI, quello che oggi si chiama vibe coding
-    o AI building. Mi interessano il marketing e i dati, e mi interessano la musica e lo sport: questo
-    progetto è il punto in cui si incontrano.</p>
-    <p>Sto costruendo una serie di progetti come questo, che servono a due cose insieme: risolvere qualcosa
-    di piccolo per bene, e raccontare come ragiono. Ne pubblicherò altri.
-    <b>Costruire con l'AI è la direzione in cui sto andando, e ascolto volentieri chi ci lavora.</b></p>
-    </div>
-  </details>
-
   <details class="about fold" id="come">
-    <summary><span>Dietro le quinte</span><small>quattro cose che si notano solo se mancano</small></summary>
+    <summary><span>Quattro scelte progettuali</span><small>spiegate una per una</small></summary>
     <div class="fold-body">
     <ul class="details">
       <li><b>Nessuna integrazione con Spotify, e non per pigrizia.</b> Da marzo 2025 per uscire dalla
@@ -1221,18 +1203,35 @@
     </div>
   </details>
 
+  <details class="about fold" id="chi">
+    <summary><span>Sviluppato da</span><small>Matteo De Marco</small></summary>
+    <div class="fold-body">
+    <p><a class="nome" href="https://www.linkedin.com/in/matteodemarcoo" target="_blank" rel="noopener">Matteo De Marco</a>.
+      Vengo dal design e dall'interfaccia, e da lì mi porto dietro l'abitudine a guardare le cose dal
+      lato di chi le usa: quasi tutte le scelte qui sopra nascono da un'app che mi ha fatto arrabbiare,
+      non da una linea guida.</p>
+    <p>Mi occupo di AI e di come si costruiscono prodotti con l'AI, quello che oggi si chiama vibe coding
+    o AI building. Mi interessano il marketing e i dati, e mi interessano la musica e lo sport: questo
+    progetto è il punto in cui si incontrano.</p>
+    <p>Sto costruendo una serie di progetti come questo, che servono a due cose insieme: risolvere qualcosa
+    di piccolo per bene, e raccontare come ragiono. Ne pubblicherò altri.
+    <b>Costruire con l'AI è la direzione in cui sto andando, e ascolto volentieri chi ci lavora.</b></p>
+    </div>
+  </details>
+
 </div>
 
 <footer>
   <div class="wrap">
     <span class="logo f-logo" aria-hidden="true">inL<svg class="rings" viewBox="0 0 34 20"><circle cx="10" cy="10" r="7.6" fill="none" stroke="#1DB954" stroke-width="3.4"/><circle cx="24" cy="10" r="7.6" fill="none" stroke="#FC4C02" stroke-width="3.4"/></svg>P</span>
     <div class="f-cols">
+      <a href="#come">Scelte progettuali</a>
       <a href="#about">Il concept</a>
-      <a href="#come">Dietro le quinte</a>
       <a href="#chi">Sviluppato da</a>
+      <a href="#privacy">Privacy</a>
     </div>
     <details class="f-priv" id="privacy">
-      <summary>Privacy</summary>
+      <summary class="sr">Privacy</summary>
       <p><b>Niente account, niente cookie, niente tracciamento, nessun dato raccolto.</b> Non c'&egrave;
       un server nostro a cui mandare qualcosa. La ricerca delle canzoni interroga l'archivio pubblico di
       Apple direttamente dal tuo browser. <b>La tua foto non lascia mai il telefono</b>: l'immagine
@@ -1304,6 +1303,7 @@
       tendenze = salvata;
       heroPicks = salvata; heroIdx = 0;
       salvata.forEach(caricaCopertina);
+      bloccaAltezzaClaim();
       if (!picked && !$('q').value.trim()) { lista = tendenze; renderResults(); }
       return true;
     }
@@ -1333,6 +1333,7 @@
       heroPicks = trovati;
       heroIdx = 0;
       trovati.forEach(caricaCopertina);
+      bloccaAltezzaClaim();
       ricorda('classifica', trovati, 6);
       if (!picked && !$('q').value.trim()) { lista = tendenze; renderResults(); }
       return true;
@@ -1595,6 +1596,24 @@
      stopRotation da se, la distanza, il ritmo, le due schede, la ricerca e
      la canzone: da quel momento la frase e tua e non cambia piu da sola.
      Finche non scegli niente resta una vetrina, anche mentre scorri. */
+
+  /* Le canzoni hanno titoli di lunghezza diversa, quindi il claim passa da due
+     a tre righe e la pagina si alza e si abbassa da sola ogni pochi secondi.
+     Si misura una volta l'altezza piu grande fra i brani in vetrina e la si
+     blocca: da li in poi il blocco non cambia piu misura. */
+  function bloccaAltezzaClaim() {
+    const box = document.querySelector('.claim-block');
+    if (!box || !heroPicks.length) return;
+    const prima = heroIdx;
+    box.style.minHeight = '0px';
+    let max = 0;
+    for (let i = 0; i < heroPicks.length; i++) {
+      heroIdx = i; renderHero();
+      max = Math.max(max, box.scrollHeight);
+    }
+    heroIdx = prima; renderHero();
+    box.style.minHeight = Math.ceil(max) + 'px';
+  }
 
   function renderHero() {
     const c = song();
