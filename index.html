@@ -243,15 +243,17 @@
   .exact-fields { display: grid; gap: 0; }
   .exact-fields label,
   .exact-fields .field {
-    display: grid; grid-template-columns: 1fr auto 4.2em;
-    align-items: center; gap: 12px;
+    display: grid; grid-template-columns: 1fr 130px 4.2em;
+    align-items: center; justify-items: start; gap: 12px;
     padding: 11px 0; border-top: 1px solid var(--line);
     font-size: 12px; font-weight: 800; letter-spacing: 0.08em;
     text-transform: uppercase; color: var(--soft);
   }
   .exact-fields > *:first-child { border-top: none; padding-top: 2px; }
+  /* Stessa larghezza della rotella: erano 124 contro 130, e i tre comandi
+     incolonnati non avevano lo stesso centro. */
   .exact-fields input {
-    width: 124px; font: inherit; font-weight: 800; font-size: 20px; text-align: center;
+    width: 130px; font: inherit; font-weight: 800; font-size: 20px; text-align: center;
     color: var(--ink); background: var(--chip); border: 1px solid var(--line);
     border-radius: 12px; padding: 10px 8px; font-variant-numeric: tabular-nums;
     letter-spacing: 0; text-transform: none;
@@ -263,7 +265,7 @@
      noto; per la distanza si scrive e basta, e piu veloce. */
   .wheel {
     position: relative; display: flex; align-items: center; justify-content: center;
-    gap: 2px; padding: 0 8px;
+    width: 130px; gap: 2px; padding: 0 8px;
     background: var(--chip); border: 1px solid var(--line); border-radius: 12px;
   }
   .wheel-band {
