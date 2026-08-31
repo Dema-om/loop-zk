@@ -1913,54 +1913,58 @@
     const COV = 200;
     drawCover(PAD, PAD, COV, c);
 
-    /* Niente etichetta "IN LOOP" sopra il numero: il marchio si chiama inLOOP,
-       quindi era la stessa parola detta due volte. Resta il numero, grande, e
-       il marchio piccolo in fondo a destra sulla riga dei dati. */
-    const nStr = String(timesFor(c));
-    ctx.font = F(900, 96); const wNum = ctx.measureText(nStr).width;
-    ctx.font = F(800, 36); const wVolte = ctx.measureText(' volte').width;
-    const bigW = wNum + wVolte + 46;
-
+    /* Una sola colonna che si legge come una frase, dall'alto:
+         Sportswear . Dark Polo Gang
+         Ascoltata 13 volte in
+         5 km . 30 min . 6:00/km
+       Prima era spezzata in due colonne, col numero a destra e i dati a
+       sinistra: l'occhio doveva ricucirla. Il numero resta il pezzo piu
+       grosso, quindi si vede lo stesso da lontano. */
+    const tx = PAD + COV + 28, tw = w - tx - PAD;
     ctx.textBaseline = 'alphabetic';
-    ctx.textAlign = 'right';
-    /* Il numero da solo non dice cosa conta. "IN LOOP PER" no, perche il
-       marchio si chiama gia inLOOP: "ASCOLTATA" invece aggiunge il verbo
-       che mancava. */
-    ctx.font = F(800, 24); ctx.fillStyle = softC;
-    ctx.letterSpacing = '4px';
-    ctx.fillText('ASCOLTATA', w - PAD, PAD + 34);
-    ctx.letterSpacing = '0px';
-    ctx.font = F(800, 36); ctx.fillStyle = inkC;
-    const vw = ctx.measureText(' volte').width;
-    ctx.fillText(' volte', w - PAD, PAD + 118);
-    ctx.fillStyle = '#0E7A38'; ctx.font = F(900, 96);
-    ctx.fillText(nStr, w - PAD - vw, PAD + 118);
     ctx.textAlign = 'left';
 
-    /* Il titolo scende di corpo prima di rassegnarsi a farsi troncare. */
-    const tx = PAD + COV + 28, tw = w - tx - PAD - bigW;
-    let tSize = 46;
+    /* Riga 1: la canzone, e l'artista in coda se ci sta. */
+    let tSize = 40;
     ctx.font = F(800, tSize);
-    while (tSize > 32 && ctx.measureText(c.t).width > tw) {
-      tSize -= 2;
-      ctx.font = F(800, tSize);
-    }
+    while (tSize > 30 && ctx.measureText(c.t).width > tw) { tSize -= 2; ctx.font = F(800, tSize); }
+    const tTxt = fitText(c.t, F(800, tSize), tw);
     ctx.fillStyle = inkC;
-    ctx.fillText(fitText(c.t, F(800, tSize), tw), tx, PAD + 64);
-    ctx.fillStyle = softC; ctx.font = F(600, 32);
-    ctx.fillText(fitText(c.w, F(600, 32), tw), tx, PAD + 112);
+    ctx.fillText(tTxt, tx, PAD + 44);
+    const wT = ctx.measureText(tTxt).width;
+    const coda = ' \u00B7 ' + c.w;
+    ctx.font = F(600, 28);
+    if (wT + ctx.measureText(coda).width <= tw) {
+      ctx.fillStyle = softC;
+      ctx.fillText(coda, tx + wT, PAD + 44);
+    }
 
-    /* Distanza, tempo e ritmo. Quel /km dice "corsa" senza scrivere la parola. */
-    const parts = [kmText(), timeText(), paceText()];
+    /* Riga 2: la frase, col numero grande in verde. */
+    const nStr = String(timesFor(c));
     let px = tx;
+    ctx.font = F(800, 44); ctx.fillStyle = inkC;
+    ctx.fillText('Ascoltata ', px, PAD + 122);
+    px += ctx.measureText('Ascoltata ').width;
+    ctx.font = F(900, 66); ctx.fillStyle = '#0E7A38';
+    ctx.fillText(nStr, px, PAD + 122);
+    px += ctx.measureText(nStr).width;
+    ctx.font = F(800, 44); ctx.fillStyle = '#0E7A38';
+    ctx.fillText(' volte', px, PAD + 122);
+    px += ctx.measureText(' volte').width;
+    ctx.fillStyle = inkC;
+    ctx.fillText(' in', px, PAD + 122);
+
+    /* Riga 3: i dati della corsa. Quel /km dice "corsa" senza scriverlo. */
+    const parts = [kmText(), timeText(), paceText()];
+    let dx2 = tx;
     parts.forEach((p, i) => {
-      ctx.font = F(800, 32); ctx.fillStyle = '#FC4C02';
-      ctx.fillText(p, px, PAD + 180);
-      px += ctx.measureText(p).width;
+      ctx.font = F(800, 34); ctx.fillStyle = '#FC4C02';
+      ctx.fillText(p, dx2, PAD + 182);
+      dx2 += ctx.measureText(p).width;
       if (i < parts.length - 1) {
         ctx.fillStyle = '#C9D2C6';
-        ctx.fillText(' \u00B7 ', px, PAD + 180);
-        px += ctx.measureText(' \u00B7 ').width;
+        ctx.fillText(' \u00B7 ', dx2, PAD + 182);
+        dx2 += ctx.measureText(' \u00B7 ').width;
       }
     });
 
