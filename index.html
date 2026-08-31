@@ -386,7 +386,20 @@
   }
   .vai:hover { filter: brightness(0.96); }
   /* Due comandi pari grado: cambia a sinistra, condividi (verde) a destra. */
-  .azioni-esito { display: grid; grid-template-columns: auto 1fr; gap: 10px; align-items: center; }
+  .azioni-esito { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; }
+  .claim-share {
+    flex: none; width: 40px; height: 40px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--card); border: 1px solid var(--line); border-radius: 50%;
+    color: var(--ink); cursor: pointer; padding: 0;
+  }
+  .claim-share svg { width: 18px; height: 18px; }
+  /* Il verde solo dove c'e un mouse vero: sul telefono il passaggio del dito
+     restava attaccato e l'icona sembrava selezionata dopo il tocco. */
+  @media (hover: hover) {
+    .claim-share:hover { background: var(--green-soft); border-color: var(--green); }
+  }
+  .claim-share:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; }
   .azioni-esito .vai { justify-content: center; display: inline-flex; }
   .vai.indietro { background: var(--chip); color: var(--ink); }
   .vai:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
@@ -972,14 +985,19 @@
       <p class="claim-line2 show" id="cLine2">Ma sono <span class="n">15</span> volte <span class="t">Sportswear</span>.</p>
       <div class="claim-foot">
         <p class="claim-who" id="cWho">Dark Polo Gang · 1:59</p>
-      </div>
+        <button class="claim-share" type="button" id="claimIcon" aria-label="Condividi questa frase come storia">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M12 15V3m0 0L8 7m4-4 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M4 13v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
     </div>
     <div class="tank" id="tank" role="img" aria-label="Un blocco per ogni riascolto"></div>
     <div class="tank-scala" aria-hidden="true"><span>0</span><span id="tankFine">5 km</span></div>
     <p class="repeat">Adesso mettila in <b>loop</b> e parti.</p>
     <div class="azioni-esito">
-      <a class="vai indietro" href="#canzone">Cambia canzone</a>
       <a class="vai" href="#storie" id="claimShare">Condividi una storia <span aria-hidden="true">&darr;</span></a>
+      <a class="vai indietro" href="#canzone">Cambia canzone</a>
     </div>
   </section>
 
@@ -2295,6 +2313,16 @@
   document.querySelectorAll('.step.run button, .step.run input, .step.run .wheel-col').forEach(el =>
     el.addEventListener('pointerdown', () =>
       document.querySelector('.step.run').classList.remove('default'), { once: true }));
+
+  $('claimIcon').addEventListener('click', function () {
+    setVersione('frase');
+    /* Senza questo il tasto resta "acceso" tornando su. */
+    this.blur();
+    document.getElementById('storie').scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
+    const t2 = document.querySelector('.share .view-toggle');
+    t2.classList.add('arrivo');
+    setTimeout(() => t2.classList.remove('arrivo'), 1400);
+  });
 
   $('claimShare').addEventListener('click', () => {
     setVersione('frase');
