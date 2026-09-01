@@ -676,6 +676,13 @@
      stanno. Il secondo e volutamente piu spento: il nome resta la cosa
      principale, il post e la strada per chi vuole la storia dietro. */
   .firma-riga { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 12px; }
+  .firma-riga .nome.grande { white-space: nowrap; }
+  /* Su un telefono i due insieme sforavano di una trentina di pixel e andavano a
+     capo: si stringe il riempimento invece di rimpicciolire il testo. */
+  @media (max-width: 430px) {
+    .firma-riga { gap: 6px; }
+    .firma-riga .nome.grande { padding-left: 12px; padding-right: 12px; gap: 6px; }
+  }
   .firma-riga .nome.grande { margin: 0; }
   .fold-body .nome.grande.secondaria {
     color: var(--ink); background: var(--ground); border: 1px solid var(--line);
@@ -1373,7 +1380,7 @@
       </svg>
       </a>
       <a class="nome grande secondaria" href="https://www.linkedin.com/posts/matteodemarcoo_quanto-dura-la-tua-corsa-in-canzoni-activity-7500239518789292033-DgkH" target="_blank" rel="noopener">
-        Post su LinkedIn
+        Il post
         <svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true">
         <path d="M4 10 10 4M10 4H5.2M10 4v4.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
