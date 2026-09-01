@@ -672,6 +672,15 @@
     font-size: 16px; background: var(--chip); border-radius: 999px;
   }
   .fold-body .nome.grande:hover { background: var(--green-soft); }
+  /* Il nome e il post stanno sulla stessa riga e vanno a capo insieme se non ci
+     stanno. Il secondo e volutamente piu spento: il nome resta la cosa
+     principale, il post e la strada per chi vuole la storia dietro. */
+  .firma-riga { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 12px; }
+  .firma-riga .nome.grande { margin: 0; }
+  .fold-body .nome.grande.secondaria {
+    color: var(--ink); background: var(--ground); border: 1px solid var(--line);
+  }
+  .fold-body .nome.grande.secondaria:hover { background: var(--chip); border-color: var(--green); }
   .fold-body .nome:hover { border-bottom-color: var(--green); }
   a.linkrow {
     display: flex; align-items: center; gap: 10px;
@@ -1356,12 +1365,20 @@
     <summary><h2><span>Sviluppato da</span></h2><small>Matteo De Marco</small></summary>
     <div class="fold-body">
 
-    <a class="nome grande" href="https://www.linkedin.com/in/matteodemarcoo" target="_blank" rel="noopener">
-      Matteo De Marco
-      <svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+    <div class="firma-riga">
+      <a class="nome grande" href="https://www.linkedin.com/in/matteodemarcoo" target="_blank" rel="noopener">
+        Matteo De Marco
+        <svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true">
         <path d="M4 10 10 4M10 4H5.2M10 4v4.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
-    </a>
+      </a>
+      <a class="nome grande secondaria" href="https://www.linkedin.com/posts/matteodemarcoo_quanto-dura-la-tua-corsa-in-canzoni-activity-7500239518789292033-DgkH" target="_blank" rel="noopener">
+        Post su LinkedIn
+        <svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+        <path d="M4 10 10 4M10 4H5.2M10 4v4.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      </a>
+    </div>
     <p>Vengo dall'UI/UX e dal design di prodotto, e da lì mi porto dietro l'abitudine a guardare le
       cose dal lato di chi le usa: quasi tutte le scelte qui sopra nascono da qualcosa che da utente mi
       ha dato fastidio, non da una linea guida.</p>
