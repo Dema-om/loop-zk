@@ -760,10 +760,12 @@
     margin: 0; height: 25px; line-height: 25px; text-align: center;
     border-top: 1px solid var(--line); background: var(--card);
     font-size: 10px; font-weight: 600; color: var(--soft);
-    overflow: hidden; transition: height 0.18s ease, border-top-width 0.18s ease;
+    overflow: hidden; transition: height 0.12s ease, border-top-width 0.12s ease;
   }
   /* Scorrendo, la dichiarazione si ritira e resta solo il logo: 25 px in piu
-     di pagina. In cima torna, perche e li che uno arriva la prima volta. */
+     di pagina. In cima torna, perche e li che uno arriva la prima volta.
+     Si ritira al primo accenno di scorrimento, non dopo mezzo pollice: la
+     dichiarazione serve a chi arriva, non a chi sta gia leggendo. */
   .topbar.mini .due { height: 0; border-top-width: 0; }
   @media (prefers-reduced-motion: reduce) { .topbar .due { transition: none; } }
   .topbar .due b { color: var(--green-text); }
@@ -1482,7 +1484,7 @@
     if (topbarTick) return;
     topbarTick = true;
     requestAnimationFrame(() => {
-      topbar.classList.toggle('mini', window.scrollY > 40);
+      topbar.classList.toggle('mini', window.scrollY > 4);
       topbarTick = false;
     });
   }, { passive: true });
